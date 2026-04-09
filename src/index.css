@@ -1,47 +1,64 @@
+@import url('https://fonts.googleapis.com/css2?family=Hind+Siliguri:wght@300;400;500;600;700&family=Noto+Serif:ital,wght@0,100..900;1,100..900&display=swap');
+
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
 
 @layer base {
   :root {
-    --background: 120 20% 98%;
-    --foreground: 150 30% 10%;
+    --background: 56 80% 94%;
+    --foreground: 68 30% 9%;
 
     --card: 0 0% 100%;
-    --card-foreground: 150 30% 10%;
+    --card-foreground: 68 30% 9%;
 
     --popover: 0 0% 100%;
-    --popover-foreground: 150 30% 10%;
+    --popover-foreground: 68 30% 9%;
 
-    --primary: 145 63% 32%;
+    --primary: 150 100% 15%;
     --primary-foreground: 0 0% 100%;
 
-    --secondary: 43 80% 55%;
-    --secondary-foreground: 150 30% 10%;
+    --secondary: 43 100% 23%;
+    --secondary-foreground: 0 0% 100%;
 
-    --muted: 120 10% 95%;
-    --muted-foreground: 150 10% 45%;
+    --muted: 56 30% 90%;
+    --muted-foreground: 140 8% 30%;
 
-    --accent: 43 80% 55%;
-    --accent-foreground: 150 30% 10%;
+    --accent: 43 95% 67%;
+    --accent-foreground: 43 100% 14%;
 
-    --destructive: 0 84.2% 60.2%;
+    --destructive: 0 84% 60%;
     --destructive-foreground: 0 0% 100%;
 
-    --border: 120 10% 90%;
-    --input: 120 10% 90%;
-    --ring: 145 63% 32%;
+    --border: 100 10% 78%;
+    --input: 100 10% 78%;
+    --ring: 150 100% 15%;
 
     --radius: 0.75rem;
 
-    --sidebar-background: 145 30% 96%;
-    --sidebar-foreground: 150 30% 15%;
-    --sidebar-primary: 145 63% 32%;
+    /* Heritage Modernist custom tokens */
+    --surface: 56 80% 94%;
+    --on-surface: 68 30% 9%;
+    --surface-container: 53 50% 89%;
+    --surface-container-low: 55 50% 92%;
+    --surface-container-high: 53 30% 86%;
+    --surface-container-lowest: 0 0% 100%;
+    --surface-variant: 100 12% 87%;
+    --on-surface-variant: 120 8% 27%;
+    --outline: 105 5% 45%;
+    --outline-variant: 100 8% 76%;
+    --primary-container: 145 100% 60%;
+    --secondary-container: 46 98% 67%;
+    --on-secondary-container: 43 100% 14%;
+
+    --sidebar-background: 150 100% 10%;
+    --sidebar-foreground: 0 0% 100%;
+    --sidebar-primary: 150 100% 15%;
     --sidebar-primary-foreground: 0 0% 100%;
-    --sidebar-accent: 43 80% 55%;
-    --sidebar-accent-foreground: 150 30% 10%;
-    --sidebar-border: 120 10% 88%;
-    --sidebar-ring: 145 63% 32%;
+    --sidebar-accent: 43 95% 67%;
+    --sidebar-accent-foreground: 43 100% 14%;
+    --sidebar-border: 150 50% 18%;
+    --sidebar-ring: 150 100% 15%;
   }
 
   .dark {
@@ -90,6 +107,6 @@
   }
 
   body {
-    @apply bg-background text-foreground;
+    @apply bg-background text-foreground font-body;
   }
 }

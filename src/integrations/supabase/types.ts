@@ -14,16 +14,265 @@ export type Database = {
   }
   public: {
     Tables: {
-      [_ in never]: never
+      ad_packages: {
+        Row: {
+          created_at: string
+          duration: number
+          id: string
+          is_featured: boolean
+          name_bn: string
+          name_en: string
+          price: number
+        }
+        Insert: {
+          created_at?: string
+          duration?: number
+          id?: string
+          is_featured?: boolean
+          name_bn: string
+          name_en: string
+          price?: number
+        }
+        Update: {
+          created_at?: string
+          duration?: number
+          id?: string
+          is_featured?: boolean
+          name_bn?: string
+          name_en?: string
+          price?: number
+        }
+        Relationships: []
+      }
+      contact_unlocks: {
+        Row: {
+          created_at: string
+          id: string
+          land_id: string
+          user_id: string
+        }
+        Insert: {
+          created_at?: string
+          id?: string
+          land_id: string
+          user_id: string
+        }
+        Update: {
+          created_at?: string
+          id?: string
+          land_id?: string
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "contact_unlocks_land_id_fkey"
+            columns: ["land_id"]
+            isOneToOne: false
+            referencedRelation: "lands"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      favorites: {
+        Row: {
+          created_at: string
+          id: string
+          land_id: string
+          user_id: string
+        }
+        Insert: {
+          created_at?: string
+          id?: string
+          land_id: string
+          user_id: string
+        }
+        Update: {
+          created_at?: string
+          id?: string
+          land_id?: string
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "favorites_land_id_fkey"
+            columns: ["land_id"]
+            isOneToOne: false
+            referencedRelation: "lands"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      lands: {
+        Row: {
+          area_size: number
+          created_at: string
+          description_bn: string | null
+          description_en: string | null
+          id: string
+          images: string[] | null
+          is_featured: boolean
+          location_bn: string
+          location_en: string
+          owner_address: string | null
+          owner_name: string
+          owner_phone: string
+          price: number
+          road_width: number
+          status: string
+          title_bn: string
+          title_en: string
+          updated_at: string
+        }
+        Insert: {
+          area_size?: number
+          created_at?: string
+          description_bn?: string | null
+          description_en?: string | null
+          id?: string
+          images?: string[] | null
+          is_featured?: boolean
+          location_bn?: string
+          location_en?: string
+          owner_address?: string | null
+          owner_name?: string
+          owner_phone?: string
+          price?: number
+          road_width?: number
+          status?: string
+          title_bn: string
+          title_en: string
+          updated_at?: string
+        }
+        Update: {
+          area_size?: number
+          created_at?: string
+          description_bn?: string | null
+          description_en?: string | null
+          id?: string
+          images?: string[] | null
+          is_featured?: boolean
+          location_bn?: string
+          location_en?: string
+          owner_address?: string | null
+          owner_name?: string
+          owner_phone?: string
+          price?: number
+          road_width?: number
+          status?: string
+          title_bn?: string
+          title_en?: string
+          updated_at?: string
+        }
+        Relationships: []
+      }
+      payments: {
+        Row: {
+          amount: number
+          created_at: string
+          id: string
+          land_id: string | null
+          package_id: string | null
+          payment_type: string
+          status: string
+          transaction_id: string | null
+          user_id: string
+        }
+        Insert: {
+          amount?: number
+          created_at?: string
+          id?: string
+          land_id?: string | null
+          package_id?: string | null
+          payment_type: string
+          status?: string
+          transaction_id?: string | null
+          user_id: string
+        }
+        Update: {
+          amount?: number
+          created_at?: string
+          id?: string
+          land_id?: string | null
+          package_id?: string | null
+          payment_type?: string
+          status?: string
+          transaction_id?: string | null
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "payments_land_id_fkey"
+            columns: ["land_id"]
+            isOneToOne: false
+            referencedRelation: "lands"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "payments_package_id_fkey"
+            columns: ["package_id"]
+            isOneToOne: false
+            referencedRelation: "ad_packages"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      profiles: {
+        Row: {
+          created_at: string
+          full_name: string | null
+          id: string
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          created_at?: string
+          full_name?: string | null
+          id?: string
+          updated_at?: string
+          user_id: string
+        }
+        Update: {
+          created_at?: string
+          full_name?: string | null
+          id?: string
+          updated_at?: string
+          user_id?: string
+        }
+        Relationships: []
+      }
+      user_roles: {
+        Row: {
+          id: string
+          role: Database["public"]["Enums"]["app_role"]
+          user_id: string
+        }
+        Insert: {
+          id?: string
+          role: Database["public"]["Enums"]["app_role"]
+          user_id: string
+        }
+        Update: {
+          id?: string
+          role?: Database["public"]["Enums"]["app_role"]
+          user_id?: string
+        }
+        Relationships: []
+      }
     }
     Views: {
       [_ in never]: never
     }
     Functions: {
-      [_ in never]: never
+      has_role: {
+        Args: {
+          _role: Database["public"]["Enums"]["app_role"]
+          _user_id: string
+        }
+        Returns: boolean
+      }
     }
     Enums: {
-      [_ in never]: never
+      app_role: "admin" | "user"
     }
     CompositeTypes: {
       [_ in never]: never
@@ -150,6 +399,8 @@ export type CompositeTypes<
 
 export const Constants = {
   public: {
-    Enums: {},
+    Enums: {
+      app_role: ["admin", "user"],
+    },
   },
 } as const

@@ -590,62 +590,100 @@ const AddListing = () => {
                     <h2 className="text-xl font-bold text-primary mb-4">{t('selectPackage')}</h2>
 
                     <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                      {packages?.map(pkg => (
-                        <button
-                          key={pkg.id}
-                          type="button"
-                          onClick={() => updateField('package_id', pkg.id)}
-                          className={`p-5 rounded-xl text-left transition-all border ${
-                            formData.package_id === pkg.id
-                              ? 'border-primary bg-primary/5 shadow-md'
-                              : 'border-outline-variant/20 bg-surface-container hover:border-primary/40'
-                          }`}
-                        >
-                          <div className="flex items-center justify-between mb-2">
-                            <h3 className="font-bold text-primary text-lg">
-                              {lang === 'bn' ? pkg.name_bn : pkg.name_en}
-                            </h3>
-                            {pkg.is_featured && <Star className="h-5 w-5 text-accent fill-accent" />}
-                          </div>
-                          <p className="text-2xl font-bold text-on-surface">৳{pkg.price}</p>
-                          <p className="text-sm text-on-surface-variant">{pkg.duration} {t('days')}</p>
-                          {formData.package_id === pkg.id && (
-                            <div className="mt-3 flex items-center gap-1 text-primary text-sm font-medium">
-                              <Check className="h-4 w-4" /> {lang === 'bn' ? 'নির্বাচিত' : 'Selected'}
+                      {packages?.map(pkg => {
+                        const isSelected = formData.package_id === pkg.id;
+                        const features = pkg.is_featured
+                          ? [
+                              lang === 'bn' ? `${pkg.duration} দিনের জন্য বৈধ` : `Valid for ${pkg.duration} days`,
+                              lang === 'bn' ? 'সর্বোচ্চ ৫টি ছবি' : 'Up to 5 photos',
+                              lang === 'bn' ? 'হোমপেজে ফিচার্ড' : 'Featured on Home Page',
+                              lang === 'bn' ? 'প্রিমিয়াম ব্যাজ' : 'Premium badge',
+                            ]
+                          : [
+                              lang === 'bn' ? `${pkg.duration} দিনের জন্য বৈধ` : `Valid for ${pkg.duration} days`,
+                              lang === 'bn' ? 'সর্বোচ্চ ৫টি ছবি' : 'Up to 5 photos',
+                              lang === 'bn' ? 'সাধারণ তালিকা' : 'Standard listing',
+                            ];
+
+                        return (
+                          <button
+                            key={pkg.id}
+                            type="button"
+                            onClick={() => updateField('package_id', pkg.id)}
+                            className={`relative p-5 rounded-xl text-left transition-all border-2 ${
+                              isSelected
+                                ? 'border-primary bg-primary/5 shadow-lg ring-2 ring-primary/20'
+                                : 'border-outline-variant/20 bg-surface-container hover:border-primary/40'
+                            }`}
+                          >
+                            {pkg.is_featured && (
+                              <span className="absolute -top-3 right-4 bg-accent text-accent-foreground text-xs font-bold px-3 py-1 rounded-full shadow-sm">
+                                {lang === 'bn' ? 'সেরা মূল্য' : 'BEST VALUE'}
+                              </span>
+                            )}
+                            <div className="flex items-center justify-between mb-1">
+                              <h3 className="font-bold text-primary text-lg">
+                                {lang === 'bn' ? pkg.name_bn : pkg.name_en}
+                              </h3>
+                              {pkg.is_featured && <Star className="h-5 w-5 text-accent fill-accent" />}
                             </div>
-                          )}
-                        </button>
-                      ))}
+                            <p className="text-3xl font-bold text-on-surface mb-3">৳{pkg.price.toLocaleString()}</p>
+
+                            <ul className="space-y-2 mb-3">
+                              {features.map((f, i) => (
+                                <li key={i} className="flex items-center gap-2 text-sm text-on-surface-variant">
+                                  <Check className="h-4 w-4 text-primary shrink-0" />
+                                  {f}
+                                </li>
+                              ))}
+                            </ul>
+
+                            {isSelected && (
+                              <div className="mt-3 flex items-center gap-1 text-primary text-sm font-bold">
+                                <Check className="h-4 w-4" /> {lang === 'bn' ? 'নির্বাচিত' : 'Selected'}
+                              </div>
+                            )}
+                          </button>
+                        );
+                      })}
                     </div>
 
                     {/* Summary */}
-                    {formData.package_id && (
-                      <div className="mt-6 p-5 rounded-xl bg-surface-container">
-                        <h3 className="font-bold text-primary mb-3">{t('listingSummary')}</h3>
-                        <div className="space-y-2 text-sm text-on-surface-variant">
-                          <div className="flex justify-between">
-                            <span>{t('landType')}</span>
-                            <span className="font-medium text-on-surface">{formData.land_type}</span>
-                          </div>
-                          <div className="flex justify-between">
-                            <span>{t('totalSize')}</span>
-                            <span className="font-medium text-on-surface">{formData.total_size} {t('decimal')}</span>
-                          </div>
-                          <div className="flex justify-between">
-                            <span>{t('expectedPrice')}</span>
-                            <span className="font-medium text-on-surface">৳{formData.expected_price}</span>
-                          </div>
-                          <div className="flex justify-between">
-                            <span>{t('location')}</span>
-                            <span className="font-medium text-on-surface">{formData.district}</span>
-                          </div>
-                          <div className="border-t border-outline-variant/20 pt-2 mt-2 flex justify-between font-bold text-on-surface">
-                            <span>{lang === 'bn' ? 'প্যাকেজ মূল্য' : 'Package Price'}</span>
-                            <span>৳{packages?.find(p => p.id === formData.package_id)?.price}</span>
+                    {formData.package_id && (() => {
+                      const selectedPkg = packages?.find(p => p.id === formData.package_id);
+                      return (
+                        <div className="mt-6 p-5 rounded-xl bg-surface-container border border-outline-variant/20">
+                          <h3 className="font-bold text-primary mb-3">{t('listingSummary')}</h3>
+                          <div className="space-y-2 text-sm text-on-surface-variant">
+                            <div className="flex justify-between">
+                              <span>{t('landType')}</span>
+                              <span className="font-medium text-on-surface">{formData.land_type}</span>
+                            </div>
+                            <div className="flex justify-between">
+                              <span>{t('totalSize')}</span>
+                              <span className="font-medium text-on-surface">{formData.total_size} {t('decimal')}</span>
+                            </div>
+                            <div className="flex justify-between">
+                              <span>{t('expectedPrice')}</span>
+                              <span className="font-medium text-on-surface">৳{Number(formData.expected_price).toLocaleString()}</span>
+                            </div>
+                            <div className="flex justify-between">
+                              <span>{t('location')}</span>
+                              <span className="font-medium text-on-surface">{formData.district}</span>
+                            </div>
+                            <div className="border-t border-outline-variant/20 pt-3 mt-3">
+                              <div className="flex justify-between items-center">
+                                <span className="font-bold text-on-surface">{lang === 'bn' ? 'সাবটোটাল' : 'Subtotal'}</span>
+                                <span className="text-2xl font-bold text-primary">৳{selectedPkg?.price.toLocaleString()}</span>
+                              </div>
+                              <p className="text-xs text-on-surface-variant mt-1">
+                                {lang === 'bn' ? 'পেমেন্ট করার পর আপনার বিজ্ঞাপন প্রকাশিত হবে' : 'Your listing will be published after payment'}
+                              </p>
+                            </div>
                           </div>
                         </div>
-                      </div>
-                    )}
+                      );
+                    })()}
                   </div>
                 )}
 
@@ -705,29 +743,47 @@ const AddListing = () => {
                 <CardContent className="p-6">
                   <h3 className="text-lg font-bold text-primary mb-4">{t('adPricing')}</h3>
                   <div className="space-y-4">
-                    {packages?.map(pkg => (
-                      <div
-                        key={pkg.id}
-                        className={`p-4 rounded-lg transition-all ${
-                          pkg.is_featured
-                            ? 'bg-accent/10 border border-accent/30'
-                            : 'bg-surface-container'
-                        }`}
-                      >
-                        <div className="flex items-center justify-between mb-1">
-                          <span className="font-bold text-on-surface">
-                            {lang === 'bn' ? pkg.name_bn : pkg.name_en}
-                          </span>
-                          {pkg.is_featured && (
-                            <span className="text-xs bg-accent text-accent-foreground px-2 py-0.5 rounded-full font-bold">
-                              {t('featured')}
+                    {packages?.map(pkg => {
+                      const features = pkg.is_featured
+                        ? [
+                            lang === 'bn' ? `${pkg.duration} দিন` : `${pkg.duration} days`,
+                            lang === 'bn' ? 'হোমপেজে ফিচার্ড' : 'Featured',
+                            lang === 'bn' ? 'প্রিমিয়াম ব্যাজ' : 'Premium badge',
+                          ]
+                        : [
+                            lang === 'bn' ? `${pkg.duration} দিন` : `${pkg.duration} days`,
+                            lang === 'bn' ? 'সাধারণ তালিকা' : 'Standard',
+                          ];
+                      return (
+                        <div
+                          key={pkg.id}
+                          className={`p-4 rounded-lg transition-all ${
+                            pkg.is_featured
+                              ? 'bg-accent/10 border border-accent/30'
+                              : 'bg-surface-container'
+                          }`}
+                        >
+                          <div className="flex items-center justify-between mb-1">
+                            <span className="font-bold text-on-surface">
+                              {lang === 'bn' ? pkg.name_bn : pkg.name_en}
                             </span>
-                          )}
+                            {pkg.is_featured && (
+                              <span className="text-xs bg-accent text-accent-foreground px-2 py-0.5 rounded-full font-bold">
+                                {lang === 'bn' ? 'সেরা' : 'BEST'}
+                              </span>
+                            )}
+                          </div>
+                          <p className="text-2xl font-bold text-primary">৳{pkg.price.toLocaleString()}</p>
+                          <ul className="mt-2 space-y-1">
+                            {features.map((f, i) => (
+                              <li key={i} className="flex items-center gap-1.5 text-xs text-on-surface-variant">
+                                <Check className="h-3 w-3 text-primary" /> {f}
+                              </li>
+                            ))}
+                          </ul>
                         </div>
-                        <p className="text-2xl font-bold text-primary">৳{pkg.price}</p>
-                        <p className="text-xs text-on-surface-variant">{pkg.duration} {t('days')}</p>
-                      </div>
-                    ))}
+                      );
+                    })}
                   </div>
                 </CardContent>
               </Card>

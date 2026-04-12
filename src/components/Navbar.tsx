@@ -2,7 +2,7 @@ import { NavLink, Link, useNavigate } from 'react-router-dom';
 import { Button } from '@/components/ui/button';
 import { useI18n } from '@/lib/i18n';
 import { useAuth } from '@/lib/auth';
-import { Heart, Menu, X, Globe, Bell, User } from 'lucide-react';
+import { Heart, Menu, X, Globe, Bell, User, Plus } from 'lucide-react';
 import { useState } from 'react';
 
 const activeClass = "text-primary font-bold border-b-2 border-secondary pb-1 text-sm tracking-tight whitespace-nowrap";

@@ -6,6 +6,7 @@ import { TooltipProvider } from "@/components/ui/tooltip";
 import { I18nProvider } from "@/lib/i18n";
 import { AuthProvider } from "@/lib/auth";
 import Navbar from "@/components/Navbar";
+import ScrollToTop from "@/components/ScrollToTop";
 import Index from "./pages/Index";
 import Listings from "./pages/Listings";
 import LandDetail from "./pages/LandDetail";
@@ -27,6 +28,7 @@ const App = () => (
         <Sonner />
         <BrowserRouter>
           <AuthProvider>
+            <ScrollToTop />
             <Navbar />
             <Routes>
               <Route path="/" element={<Index />} />

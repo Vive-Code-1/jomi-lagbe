@@ -1,55 +1,34 @@
 
 
-## এডমিন ড্যাশবোর্ড — ৫টি ফিচার আপডেট
+## এডমিন ড্যাশবোর্ড ফিক্স — রুট কজ ও সমাধান
 
-### ১. ভাষা সুইচার (বাংলা/ইংরেজি)
-টপ বারে একটি language toggle বাটন যোগ হবে যা `useI18n()` এর `setLang` কল করবে। বাংলা/EN আইকন বাটন।
+### মূল সমস্যা
+`user_roles` টেবিল সম্পূর্ণ খালি — কোনো ইউজারকে admin রোল অ্যাসাইন করা হয়নি। এর ফলে:
+1. `isAdmin` সবসময় `false` — তাই `enabled: !!user && isAdmin` সব query বন্ধ রাখছে (লিস্টিং দেখাচ্ছে না)
+2. RLS policy `has_role(auth.uid(), 'admin')` ফেইল করছে — তাই INSERT/UPDATE/DELETE কাজ করছে না (জমি/প্যাকেজ এড হচ্ছে না)
 
-### ২. এডমিন প্রোফাইল ও পাসওয়ার্ড সেকশন
-সাইডবারে নতুন "Profile" মেনু আইটেম:
-- প্রোফাইল পিকচার আপলোড (land-images বাকেটে `avatars/` ফোল্ডারে সেভ, profiles টেবিলে `avatar_url` কলাম যোগ — migration দরকার)
-- পাসওয়ার্ড চেঞ্জ ফর্ম (`supabase.auth.updateUser({ password })`)
-- নাম এডিট
+### সমাধান
 
-### ৩. এডমিন কন্ট্রোল ম্যানেজমেন্ট
-বর্তমান Listings/Packages/Users সেকশন ইতিমধ্যে CRUD সাপোর্ট করে। এটিকে আরো উন্নত করা হবে:
-- Payments সেকশনে status আপডেট করার অপশন (pending → completed/failed) — migration দরকার: payments UPDATE RLS policy যোগ
-- সব সেকশনে bulk action সাপোর্ট নয়, তবে প্রতিটি আইটেমে clear Edit/Delete বাটন নিশ্চিত করা
-
-### ৪. ডামি ডাটা সিড
-Database insert tool দিয়ে:
-- ৩-৪টি ডামি জমি লিস্টিং
-- ২-৩টি ডামি পেমেন্ট রেকর্ড
-- এগুলো এডমিন প্যানেলে দেখা ও এডিট করা যাবে
-
-### ৫. রিভিউ ম্যানেজমেন্ট ফিচার
-নতুন `reviews` টেবিল তৈরি (migration):
+**১. Database Migration — Admin role assign + Demo data seed:**
 ```sql
-CREATE TABLE public.reviews (
-  id uuid PRIMARY KEY DEFAULT gen_random_uuid(),
-  user_id uuid NOT NULL,
-  land_id uuid REFERENCES public.lands(id) ON DELETE CASCADE,
-  rating integer NOT NULL DEFAULT 5,
-  comment text,
-  reviewer_name text NOT NULL DEFAULT '',
-  status text NOT NULL DEFAULT 'published',
-  created_at timestamptz NOT NULL DEFAULT now()
-);
-ALTER TABLE public.reviews ENABLE ROW LEVEL SECURITY;
--- Admin full access + public read
-```
-- সাইডবারে "রিভিউ" মেনু আইটেম
-- ডামি রিভিউ ডাটা ইনসার্ট (৪-৫টি)
-- রিভিউ টেবিল: নাম, রেটিং (⭐), কমেন্ট, স্ট্যাটাস
-- এডিট ডায়লগ ও ডিলিট বাটন
+-- Admin role assign
+INSERT INTO user_roles (user_id, role) 
+VALUES ('8fb0e53d-4091-45ef-90a6-371606f8ccbe', 'admin');
 
-### Database Migration
-1. `profiles` টেবিলে `avatar_url text` কলাম যোগ
-2. `reviews` টেবিল তৈরি + RLS policies
-3. `payments` টেবিলে admin UPDATE policy যোগ
+-- Demo payments
+INSERT INTO payments (user_id, payment_type, amount, status) VALUES ...
+
+-- Demo lands already exist (11 records)
+-- Demo packages already exist (2 records)  
+-- Demo reviews already exist (5 records)
+```
+
+**২. `src/pages/Admin.tsx` — Insert bug fix:**
+- Land insert এ `user_id: user?.id` এবং `land_type: 'residential'` যোগ করা — এখন এগুলো missing থাকায় কিছু edge case এ সমস্যা হতে পারে
+- Package insert এ validation যোগ — `name_bn` ও `name_en` খালি থাকলে error দেখানো
+- সব mutation error handler এ proper Bengali error message
 
 ### ফাইল পরিবর্তন
-1. **`src/pages/Admin.tsx`** — ভাষা সুইচার, প্রোফাইল সেকশন, রিভিউ সেকশন, পেমেন্ট status এডিট যোগ
-2. **Database migrations** — profiles avatar_url, reviews টেবিল, payments update policy
-3. **Data inserts** — ডামি listings, payments, reviews
+1. **Database migration** — user_roles এ admin assign + demo payments seed
+2. **`src/pages/Admin.tsx`** — land insert এ user_id/land_type যোগ, validation উন্নতি
 

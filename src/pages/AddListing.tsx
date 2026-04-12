@@ -120,12 +120,16 @@ const AddListing = () => {
     },
   });
 
-  const { data: paymentMethods } = useQuery({
+  const { data: paymentMethods, isError: pmError } = useQuery({
     queryKey: ['payment_methods'],
     queryFn: async () => {
-      const { data, error } = await supabase.from('payment_methods' as any).select('*').eq('is_active', true);
-      if (error) throw error;
-      return data as any[];
+      const { data, error } = await supabase.from('payment_methods').select('*').eq('is_active', true);
+      if (error) {
+        console.error('Payment methods fetch error:', error);
+        throw error;
+      }
+      console.log('Payment methods loaded:', data);
+      return data;
     },
   });
 

@@ -392,7 +392,6 @@ const ListingsSection = () => {
                        land.status === 'pending' ? (lang === 'bn' ? 'পেন্ডিং' : 'Pending') :
                        land.status === 'rejected' ? (lang === 'bn' ? 'প্রত্যাখ্যাত' : 'Rejected') : land.status}
                     </button>
-                    </button>
                   </TableCell>
                   <TableCell>
                     <div className="flex gap-1">

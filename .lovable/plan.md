@@ -1,36 +1,55 @@
 
 
-## প্যাকেজ তৈরি ও পেমেন্ট ফিচার
+## এডমিন ড্যাশবোর্ড — সম্পূর্ণ রিডিজাইন
 
-### সমস্যা
-`ad_packages` টেবিলে কোনো ডাটা নেই, তাই Step 4 এ প্যাকেজ দেখাচ্ছে না।
+রেফারেন্স ডিজাইনের মতো প্রিমিয়াম সাইডবার-ভিত্তিক ড্যাশবোর্ড তৈরি হবে যেখানে সাইটের সব কন্টেন্ট ম্যানেজ করা যাবে।
 
-### পরিবর্তন
+### লেআউট
 
-**১. Database Migration — ২টি প্যাকেজ সিড করা:**
-- **Standard Listing** — ৳৫০০, ৩০ দিন, ৫টি ছবি (সাধারণ)
-- **Premium Boost** — ৳১০,০০০, ৬০ দিন, ফিচার্ড + হোমপেজে দেখাবে
-
-```sql
-INSERT INTO ad_packages (name_bn, name_en, price, duration, is_featured) VALUES
-('সাধারণ তালিকা', 'Standard Listing', 5500, 30, false),
-('প্রিমিয়াম বুস্ট', 'Premium Boost', 10000, 60, true);
+```text
+┌──────────────┬──────────────────────────────────┐
+│ Admin Portal │  Dashboard Overview              │
+│ Estate Mgmt  │  ┌────┐ ┌────┐ ┌────┐ ┌────┐   │
+│              │  │Land│ │Ads │ │Earn│ │Inq │   │
+│ ■ Dashboard  │  └────┘ └────┘ └────┘ └────┘   │
+│ ■ My Listings│                                  │
+│ ■ Payments   │  Recent Activities Table         │
+│ ■ Ad Packages│                                  │
+│ ■ Users      │                                  │
+│ ■ Settings   │                                  │
+└──────────────┴──────────────────────────────────┘
 ```
 
-**২. `src/pages/AddListing.tsx` — প্যাকেজ কার্ড UI উন্নত:**
-- রেফারেন্স ডিজাইন অনুযায়ী প্যাকেজ কার্ডে ফিচার লিস্ট দেখানো (Valid for X days, Up to 5 photos, Featured on Home Page)
-- "BEST VALUE" ব্যাজ Premium প্যাকেজে
-- সাইডবারে Subtotal দেখানো (রেফারেন্স ইমেজ অনুযায়ী)
+### সাইডবার মেনু ও ফিচার
 
-**৩. পেমেন্ট ফ্লো — UddoktaPay ইন্টিগ্রেশন:**
-প্রজেক্টে আগে থেকেই UddoktaPay পেমেন্ট গেটওয়ে ব্যবহার হচ্ছে। একটি Edge Function তৈরি হবে:
-- `create-payment` Edge Function — প্যাকেজ সিলেক্ট করে "বিজ্ঞাপন প্রকাশ করুন" ক্লিক করলে UddoktaPay checkout URL তৈরি করবে
-- পেমেন্ট সফল হলে `payments` টেবিলে status `completed` হবে এবং `lands` টেবিলে লিস্টিং অ্যাক্টিভ হবে
-- `verify-payment` Edge Function — UddoktaPay callback হ্যান্ডেল করবে
+**1. Dashboard (ড্যাশবোর্ড)**
+- Stats কার্ড: Total Listings, Active Ads, Total Earnings (৳), New Inquiries
+- Recent Activities টেবিল (সাম্প্রতিক লিস্টিং ও পেমেন্ট)
 
-তবে UddoktaPay API key সেটআপ দরকার হবে। যদি API key না থাকে, তাহলে আপাতত "পেমেন্ট সিস্টেম শীঘ্রই আসছে" মেসেজ দেখাবে এবং ফ্রি-তে লিস্টিং সাবমিট করতে দেবে।
+**2. My Listings (সব লিস্টিং ম্যানেজ)**
+- সকল জমির তালিকা — সার্চ ও ফিল্টার সহ
+- প্রতিটি লিস্টিং Edit / Delete / Toggle Featured / Toggle Status (active/inactive)
+- নতুন লিস্টিং যোগ করার ডায়লগ (ইমেজ আপলোড সহ)
+
+**3. Payments (পেমেন্ট)**
+- সব পেমেন্টের তালিকা — status, amount, date
+- Payment status ফিল্টার
+
+**4. Ad Packages (এড প্যাকেজ ম্যানেজ)**
+- বর্তমান প্যাকেজ দেখা, এডিট, ডিলিট
+- নতুন প্যাকেজ যোগ (নাম, দাম, duration, featured toggle)
+
+**5. Users (ইউজার ম্যানেজমেন্ট)**
+- profiles টেবিল থেকে সব ইউজারের তালিকা
+- ইউজারকে admin role দেওয়া/সরানো
+
+### ডিজাইন
+- Heritage Modernist থিম — `surface` (#fbfbe2) ব্যাকগ্রাউন্ড, `primary` (#004B23) সাইডবার
+- No-border নীতি — background color shifts দিয়ে সেকশন আলাদা
+- Navbar/Footer লুকানো `/admin` রাউটে (Auth পেজের মতো ফুলস্ক্রিন)
 
 ### ফাইল পরিবর্তন
-1. **Database migration** — `ad_packages` এ ২টি প্যাকেজ ইনসার্ট
-2. **`src/pages/AddListing.tsx`** — প্যাকেজ কার্ড UI আপডেট (ফিচার লিস্ট, BEST VALUE ব্যাজ, Subtotal সাইডবার)
+1. **`src/pages/Admin.tsx`** — সম্পূর্ণ রিরাইট: সাইডবার + মাল্টি-সেকশন ড্যাশবোর্ড
+2. **`src/App.tsx`** — `/admin` রাউটে Navbar/Footer হাইড
+3. **Database migration** — profiles টেবিলে admin query এর জন্য কোনো নতুন টেবিল দরকার নেই (বিদ্যমান `user_roles` ও `profiles` ব্যবহার হবে)
 

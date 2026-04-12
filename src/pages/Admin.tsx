@@ -940,7 +940,7 @@ const ProfileSection = () => {
     }
   };
 
-  const avatarUrl = (profile as any)?.avatar_url;
+  const avatarUrl = profile?.avatar_url;
 
   return (
     <div className="max-w-2xl space-y-6">

@@ -31,6 +31,7 @@ const Navbar = () => {
           <NavLink to="/listings" className={linkClass}>{t('listings')}</NavLink>
           <NavLink to="/about" className={linkClass}>{lang === 'bn' ? 'আমাদের সম্পর্কে' : 'About Us'}</NavLink>
           <NavLink to="/contact" className={linkClass}>{lang === 'bn' ? 'যোগাযোগ' : 'Contact'}</NavLink>
+          {user && <NavLink to="/dashboard" className={linkClass}>{lang === 'bn' ? 'ড্যাশবোর্ড' : 'Dashboard'}</NavLink>}
           {user && <NavLink to="/favorites" className={linkClass}>{t('favorites')}</NavLink>}
           {isAdmin && <NavLink to="/admin" className={linkClass}>{t('admin')}</NavLink>}
         </div>

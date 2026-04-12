@@ -19,7 +19,7 @@ import {
   ChevronRight, Star, Globe, UserCircle, MessageSquare, Camera, Lock, Wallet
 } from 'lucide-react';
 
-type Section = 'dashboard' | 'listings' | 'payments' | 'packages' | 'users' | 'reviews' | 'profile' | 'payment-methods';
+type Section = 'dashboard' | 'listings' | 'payments' | 'packages' | 'users' | 'reviews' | 'profile' | 'payment-methods' | 'contacts';
 
 const emptyLand = {
   title_bn: '', title_en: '', description_bn: '', description_en: '',
@@ -63,6 +63,7 @@ const Admin = () => {
     { id: 'users' as Section, icon: Users, label: lang === 'bn' ? 'ইউজার' : 'Users', desc: lang === 'bn' ? 'ইউজার ম্যানেজমেন্ট' : 'User management' },
     { id: 'reviews' as Section, icon: MessageSquare, label: lang === 'bn' ? 'রিভিউ' : 'Reviews', desc: lang === 'bn' ? 'রিভিউ ম্যানেজমেন্ট' : 'Manage reviews' },
     { id: 'payment-methods' as Section, icon: Wallet, label: lang === 'bn' ? 'পেমেন্ট মেথড' : 'Payment Methods', desc: lang === 'bn' ? 'বিকাশ/নগদ সেটিং' : 'bKash/Nagad settings' },
+    { id: 'contacts' as Section, icon: MessageSquare, label: lang === 'bn' ? 'যোগাযোগ বার্তা' : 'Contact Messages', desc: lang === 'bn' ? 'ফর্ম থেকে প্রাপ্ত বার্তা' : 'Messages from contact form' },
     { id: 'profile' as Section, icon: UserCircle, label: lang === 'bn' ? 'প্রোফাইল' : 'Profile', desc: lang === 'bn' ? 'প্রোফাইল ও সিকিউরিটি' : 'Profile & security' },
   ];
 
@@ -156,6 +157,7 @@ const Admin = () => {
           {section === 'users' && <UsersSection />}
           {section === 'reviews' && <ReviewsSection />}
           {section === 'payment-methods' && <PaymentMethodsSection />}
+          {section === 'contacts' && <ContactMessagesSection />}
           {section === 'profile' && <ProfileSection />}
         </main>
       </div>

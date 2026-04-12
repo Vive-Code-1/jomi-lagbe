@@ -9,23 +9,34 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@
 import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from '@/components/ui/accordion';
 import { useState } from 'react';
 import { useToast } from '@/hooks/use-toast';
+import { supabase } from '@/integrations/supabase/client';
 
 const Contact = () => {
   const { lang } = useI18n();
   const { toast } = useToast();
   const [loading, setLoading] = useState(false);
 
-  const handleSubmit = (e: React.FormEvent<HTMLFormElement>) => {
+  const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
     setLoading(true);
-    setTimeout(() => {
-      setLoading(false);
+    const form = e.target as HTMLFormElement;
+    const formData = new FormData(form);
+    const { error } = await supabase.from('contact_messages' as any).insert({
+      name: formData.get('name') as string,
+      email: formData.get('email') as string,
+      subject: formData.get('subject') as string || null,
+      message: formData.get('message') as string,
+    });
+    setLoading(false);
+    if (error) {
+      toast({ title: lang === 'bn' ? 'ত্রুটি হয়েছে!' : 'Error!', description: error.message, variant: 'destructive' });
+    } else {
       toast({
         title: lang === 'bn' ? 'বার্তা পাঠানো হয়েছে!' : 'Message sent!',
         description: lang === 'bn' ? 'আমরা শীঘ্রই আপনার সাথে যোগাযোগ করব।' : 'We will contact you shortly.',
       });
-      (e.target as HTMLFormElement).reset();
-    }, 1000);
+      form.reset();
+    }
   };
 
   const faqs = [
@@ -74,7 +85,7 @@ const Contact = () => {
                   <h3 className="font-bold text-foreground mb-1">
                     {lang === 'bn' ? 'ফোন' : 'Phone'}
                   </h3>
-                  <p className="text-muted-foreground">+880 ৯৬৩-XXXXXX</p>
+                  <p className="text-muted-foreground">01791208768</p>
                 </div>
               </div>
               <div className="flex items-start gap-4">
@@ -85,7 +96,7 @@ const Contact = () => {
                   <h3 className="font-bold text-foreground mb-1">
                     {lang === 'bn' ? 'ইমেইল' : 'Email'}
                   </h3>
-                  <p className="text-muted-foreground">support@jomilagbe.com.bd</p>
+                  <p className="text-muted-foreground">support@webogrowth.com</p>
                 </div>
               </div>
               <div className="flex items-start gap-4">
@@ -123,6 +134,7 @@ const Contact = () => {
                   {lang === 'bn' ? 'আপনার নাম' : 'Your Name'}
                 </Label>
                 <Input
+                  name="name"
                   placeholder={lang === 'bn' ? 'উদা: আব্দুল করিম' : 'e.g. Abdul Karim'}
                   required
                   className="rounded-xl"
@@ -133,6 +145,7 @@ const Contact = () => {
                   {lang === 'bn' ? 'ইমেইল ঠিকানা' : 'Email Address'}
                 </Label>
                 <Input
+                  name="email"
                   type="email"
                   placeholder="karim@email.com"
                   required
@@ -143,7 +156,7 @@ const Contact = () => {
                 <Label className="text-foreground font-medium mb-2 block">
                   {lang === 'bn' ? 'বিষয়' : 'Subject'}
                 </Label>
-                <Select>
+                <Select name="subject">
                   <SelectTrigger className="rounded-xl">
                     <SelectValue placeholder={lang === 'bn' ? 'বিষয় নির্বাচন করুন' : 'Select a subject'} />
                   </SelectTrigger>
@@ -160,6 +173,7 @@ const Contact = () => {
                   {lang === 'bn' ? 'বার্তা' : 'Message'}
                 </Label>
                 <Textarea
+                  name="message"
                   placeholder={lang === 'bn' ? 'আপনার প্রশ্নটি বিস্তারিত লিখুন...' : 'Write your question in detail...'}
                   required
                   rows={5}

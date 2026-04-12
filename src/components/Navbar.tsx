@@ -13,38 +13,39 @@ const Navbar = () => {
 
   return (
     <nav className="fixed top-0 w-full z-50 bg-background/80 backdrop-blur-md">
-      <div className="flex justify-between items-center px-8 h-20 max-w-screen-2xl mx-auto">
-        <div className="flex items-center gap-12">
-          <Link to="/" className="text-2xl font-bold text-primary">
-            জমি লাগবে
+      <div className="relative flex justify-between items-center px-8 h-20 max-w-screen-2xl mx-auto">
+        {/* Logo - Left */}
+        <Link to="/" className="text-2xl font-bold text-primary shrink-0">
+          জমি লাগবে
+        </Link>
+
+        {/* Nav Links - Center */}
+        <div className="hidden md:flex gap-6 items-center absolute left-1/2 -translate-x-1/2">
+          <Link to="/" className="text-primary font-bold border-b-2 border-secondary pb-1 text-sm tracking-tight whitespace-nowrap">
+            {t('home')}
           </Link>
-          <div className="hidden md:flex gap-8 items-center">
-            <Link to="/" className="text-primary font-bold border-b-2 border-secondary pb-1 text-base tracking-tight">
-              {t('home')}
+          <Link to="/listings" className="text-on-surface-variant font-medium text-sm tracking-tight hover:text-primary transition-colors duration-200 whitespace-nowrap">
+            {t('listings')}
+          </Link>
+          <Link to="/packages" className="text-on-surface-variant font-medium text-sm tracking-tight hover:text-primary transition-colors duration-200 whitespace-nowrap">
+            {t('adPackages')}
+          </Link>
+          <Link to="/about" className="text-on-surface-variant font-medium text-sm tracking-tight hover:text-primary transition-colors duration-200 whitespace-nowrap">
+            {lang === 'bn' ? 'আমাদের সম্পর্কে' : 'About Us'}
+          </Link>
+          <Link to="/contact" className="text-on-surface-variant font-medium text-sm tracking-tight hover:text-primary transition-colors duration-200 whitespace-nowrap">
+            {lang === 'bn' ? 'যোগাযোগ' : 'Contact'}
+          </Link>
+          {user && (
+            <Link to="/favorites" className="text-on-surface-variant font-medium text-sm tracking-tight hover:text-primary transition-colors duration-200 whitespace-nowrap">
+              {t('favorites')}
             </Link>
-            <Link to="/listings" className="text-on-surface-variant font-medium text-base tracking-tight hover:text-primary transition-colors duration-200">
-              {t('listings')}
+          )}
+          {isAdmin && (
+            <Link to="/admin" className="text-on-surface-variant font-medium text-sm tracking-tight hover:text-primary transition-colors duration-200 whitespace-nowrap">
+              {t('admin')}
             </Link>
-            <Link to="/packages" className="text-on-surface-variant font-medium text-base tracking-tight hover:text-primary transition-colors duration-200">
-              {t('adPackages')}
-            </Link>
-            <Link to="/about" className="text-on-surface-variant font-medium text-base tracking-tight hover:text-primary transition-colors duration-200">
-              {lang === 'bn' ? 'আমাদের সম্পর্কে' : 'About Us'}
-            </Link>
-            <Link to="/contact" className="text-on-surface-variant font-medium text-base tracking-tight hover:text-primary transition-colors duration-200">
-              {lang === 'bn' ? 'যোগাযোগ' : 'Contact'}
-            </Link>
-            {user && (
-              <Link to="/favorites" className="text-on-surface-variant font-medium text-base tracking-tight hover:text-primary transition-colors duration-200">
-                {t('favorites')}
-              </Link>
-            )}
-            {isAdmin && (
-              <Link to="/admin" className="text-on-surface-variant font-medium text-base tracking-tight hover:text-primary transition-colors duration-200">
-                {t('admin')}
-              </Link>
-            )}
-          </div>
+          )}
         </div>
 
         <div className="hidden md:flex items-center gap-6">

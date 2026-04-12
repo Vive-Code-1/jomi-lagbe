@@ -930,6 +930,7 @@ const ProfileSection = () => {
       const { error: updateErr } = await supabase.from('profiles').update({ avatar_url: avatarUrl }).eq('user_id', user.id);
       if (updateErr) throw updateErr;
       queryClient.invalidateQueries({ queryKey: ['admin-profile'] });
+      queryClient.invalidateQueries({ queryKey: ['sidebar-profile'] });
       toast.success(lang === 'bn' ? 'ছবি আপলোড হয়েছে' : 'Avatar uploaded');
     } catch (err: any) {
       toast.error(err.message);

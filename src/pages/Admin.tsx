@@ -134,9 +134,11 @@ const Admin = () => {
 /* ─── Dashboard ─── */
 const DashboardSection = () => {
   const { lang } = useI18n();
+  const { user, isAdmin } = useAuth();
 
   const { data: stats } = useQuery({
     queryKey: ['admin-stats'],
+    enabled: !!user && isAdmin,
     queryFn: async () => {
       const [landsRes, paymentsRes, profilesRes, earningsRes] = await Promise.all([
         supabase.from('lands').select('id', { count: 'exact', head: true }),
@@ -156,6 +158,7 @@ const DashboardSection = () => {
 
   const { data: recentLands } = useQuery({
     queryKey: ['admin-recent-lands'],
+    enabled: !!user && isAdmin,
     queryFn: async () => {
       const { data } = await supabase.from('lands').select('*').order('created_at', { ascending: false }).limit(5);
       return data || [];
@@ -238,8 +241,11 @@ const ListingsSection = () => {
   const [imageUrl, setImageUrl] = useState('');
   const [search, setSearch] = useState('');
 
+  const { user, isAdmin } = useAuth();
+
   const { data: lands } = useQuery({
     queryKey: ['admin-lands'],
+    enabled: !!user && isAdmin,
     queryFn: async () => {
       const { data, error } = await supabase.from('lands').select('*').order('created_at', { ascending: false });
       if (error) throw error;
@@ -458,10 +464,12 @@ const LandForm = ({ form, setForm, imageUrl, setImageUrl, addImage, removeImage,
 /* ─── Payments ─── */
 const PaymentsSection = () => {
   const { lang } = useI18n();
+  const { user, isAdmin } = useAuth();
   const [filter, setFilter] = useState('all');
 
   const { data: payments } = useQuery({
     queryKey: ['admin-payments'],
+    enabled: !!user && isAdmin,
     queryFn: async () => {
       const { data, error } = await supabase.from('payments').select('*').order('created_at', { ascending: false });
       if (error) throw error;
@@ -532,8 +540,11 @@ const PackagesSection = () => {
   const [editingId, setEditingId] = useState<string | null>(null);
   const [dialogOpen, setDialogOpen] = useState(false);
 
+  const { user, isAdmin } = useAuth();
+
   const { data: packages } = useQuery({
     queryKey: ['admin-packages'],
+    enabled: !!user && isAdmin,
     queryFn: async () => {
       const { data, error } = await supabase.from('ad_packages').select('*').order('price');
       if (error) throw error;
@@ -637,10 +648,12 @@ const PackagesSection = () => {
 /* ─── Users ─── */
 const UsersSection = () => {
   const { lang } = useI18n();
+  const { user, isAdmin } = useAuth();
   const queryClient = useQueryClient();
 
   const { data: profiles } = useQuery({
     queryKey: ['admin-profiles'],
+    enabled: !!user && isAdmin,
     queryFn: async () => {
       const { data, error } = await supabase.from('profiles').select('*').order('created_at', { ascending: false });
       if (error) throw error;
@@ -650,6 +663,7 @@ const UsersSection = () => {
 
   const { data: roles } = useQuery({
     queryKey: ['admin-roles'],
+    enabled: !!user && isAdmin,
     queryFn: async () => {
       const { data, error } = await supabase.from('user_roles').select('*');
       if (error) throw error;

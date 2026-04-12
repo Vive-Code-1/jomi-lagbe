@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, useRef } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { Button } from '@/components/ui/button';
 import { useI18n } from '@/lib/i18n';
@@ -6,7 +6,10 @@ import { useQuery } from '@tanstack/react-query';
 import { supabase } from '@/integrations/supabase/client';
 import LandCard from '@/components/LandCard';
 import Footer from '@/components/Footer';
-import { Search, MapPin, Ruler, Route, Upload, SearchCheck, CheckCircle, Shield, Users, Headphones, Star, ChevronDown } from 'lucide-react';
+import { Search, MapPin, Ruler, Route, Upload, SearchCheck, CheckCircle, Shield, Users, Headphones, Star, ChevronDown, Quote } from 'lucide-react';
+import { Carousel, CarouselContent, CarouselItem, CarouselPrevious, CarouselNext } from '@/components/ui/carousel';
+import Autoplay from 'embla-carousel-autoplay';
+import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from '@/components/ui/accordion';
 import { divisions } from '@/data/districts';
 
 const heroImage = 'https://lh3.googleusercontent.com/aida-public/AB6AXuDfJbrhRcLOg2UDGwhdK3-tfBDXxKRp5ymrrV2SonGV_FkWvylWZcMFh-99TpXXax-Om9uRh9AbRjpy-l84ZsO153sHkLpYQSvEamdD4xyMH5OF_0QtzM39J0CfTCl76PRgv4LJ4SoelIBWUofOqLYpHLEBGibjxzZtEF15Dc3i5UnQt_t3_XNADHIDeX-Hi90AgV7SCmEqfHZwrkhH1xyJbgOH7XDq76vfMhvF35fvGc3hQPacAOHZL-TXVHLNAb6NSqTcJ39zYl0';

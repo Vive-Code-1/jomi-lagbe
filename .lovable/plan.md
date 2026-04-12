@@ -1,39 +1,39 @@
 
 
-## পেমেন্ট মেথড কার্ড না দেখানোর সমস্যা ও সমাধান
+## Contact ফর্ম ডাটা সংগ্রহ + তথ্য আপডেট
 
-### সমস্যা চিহ্নিত
-Step 4 এ প্যাকেজ সিলেক্ট করার পরেও বিকাশ/নগদ পেমেন্ট কার্ড দেখাচ্ছে না, যদিও:
-- ডাটাবেসে ২টি payment method আছে (বিকাশ ও নগদ)
-- API 200 রিটার্ন করছে
-- কোডে রেন্ডারিং লজিক সঠিক আছে
+### পরিবর্তনসমূহ
 
-### সম্ভাব্য কারণ
-`supabase.from('payment_methods' as any)` — এই `as any` cast টাইপ সিস্টেমকে বিভ্রান্ত করতে পারে। যদিও `payment_methods` টেবিল types ফাইলে আছে, `as any` ব্যবহারে Supabase client সঠিকভাবে response parse নাও করতে পারে। এছাড়া, useQuery error হলে UI তে কোনো ফিডব্যাক নেই।
-
-### সমাধান
-
-**`src/pages/AddListing.tsx` ফিক্স:**
-
-1. **`as any` সরানো** — `payment_methods` টেবিল types এ আছে, তাই cast অপ্রয়োজনীয়:
-```tsx
-// আগে:
-const { data, error } = await supabase.from('payment_methods' as any).select('*').eq('is_active', true);
-return data as any[];
-
-// পরে:
-const { data, error } = await supabase.from('payment_methods').select('*').eq('is_active', true);
-return data;
+**১. Database — `contact_messages` টেবিল তৈরি:**
+```sql
+CREATE TABLE contact_messages (
+  id uuid PRIMARY KEY DEFAULT gen_random_uuid(),
+  name text NOT NULL,
+  email text NOT NULL,
+  subject text,
+  message text NOT NULL,
+  is_read boolean DEFAULT false,
+  created_at timestamptz DEFAULT now()
+);
+-- RLS: anyone can insert, admin can read
 ```
 
-2. **Error logging যোগ** — query error ধরতে:
-```tsx
-const { data: paymentMethods, error: pmError } = useQuery({...});
-// console.log for debugging
-```
+**২. `src/pages/Contact.tsx` আপডেট:**
+- ফোন নাম্বার `01791208768` এ পরিবর্তন
+- ইমেইল `support@webogrowth.com` এ পরিবর্তন
+- `handleSubmit` এ Supabase `contact_messages` টেবিলে ডাটা ইনসার্ট করা (setTimeout সরিয়ে)
 
-3. **Fallback UI** — যদি paymentMethods লোড না হয় তাহলে একটি লোডিং/এরর মেসেজ দেখানো
+**৩. `src/components/Footer.tsx` আপডেট:**
+- কপিরাইট টেক্সট: `© 2024 জমি লাগবে। সর্বস্বত্ব সংরক্ষিত। Webogrowth` — "Webogrowth" এ `https://webogrowth.com/` লিংক যোগ
+
+**৪. `src/pages/Admin.tsx` আপডেট:**
+- Section type এ `'contacts'` যোগ
+- সাইডবারে "যোগাযোগ বার্তা" মেনু আইটেম যোগ (MessageSquare আইকন ইতোমধ্যে import আছে)
+- নতুন সেকশনে `contact_messages` টেবিল থেকে ডাটা দেখানো — নাম, ইমেইল, বিষয়, বার্তা, তারিখ, read/unread টগল
 
 ### ফাইল পরিবর্তন
-1. **`src/pages/AddListing.tsx`** — `as any` সরানো, proper typing, error handling যোগ
+1. **Database migration** — `contact_messages` টেবিল + RLS
+2. **`src/pages/Contact.tsx`** — নাম্বার/ইমেইল আপডেট + Supabase ইনসার্ট
+3. **`src/components/Footer.tsx`** — Webogrowth লিংক যোগ
+4. **`src/pages/Admin.tsx`** — contacts সেকশন যোগ
 

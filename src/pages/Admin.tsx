@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, useRef } from 'react';
 import { Navigate, useNavigate } from 'react-router-dom';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
@@ -14,12 +14,12 @@ import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { supabase } from '@/integrations/supabase/client';
 import { toast } from 'sonner';
 import {
-  LayoutDashboard, MapPin, CreditCard, Package, Users, Settings, LogOut,
+  LayoutDashboard, MapPin, CreditCard, Package, Users, LogOut,
   Plus, Pencil, Trash2, DollarSign, TrendingUp, Eye, Search, Menu, X,
-  ChevronRight, Star
+  ChevronRight, Star, Globe, UserCircle, MessageSquare, Camera, Lock
 } from 'lucide-react';
 
-type Section = 'dashboard' | 'listings' | 'payments' | 'packages' | 'users';
+type Section = 'dashboard' | 'listings' | 'payments' | 'packages' | 'users' | 'reviews' | 'profile';
 
 const emptyLand = {
   title_bn: '', title_en: '', description_bn: '', description_en: '',
@@ -32,8 +32,12 @@ const emptyPackage = {
   name_bn: '', name_en: '', price: 0, duration: 7, is_featured: false,
 };
 
+const emptyReview = {
+  reviewer_name: '', rating: 5, comment: '', status: 'published',
+};
+
 const Admin = () => {
-  const { t, lang } = useI18n();
+  const { t, lang, setLang } = useI18n();
   const { user, isAdmin, loading: authLoading, signOut } = useAuth();
   const navigate = useNavigate();
   const [section, setSection] = useState<Section>('dashboard');
@@ -43,15 +47,16 @@ const Admin = () => {
 
   const menuItems = [
     { id: 'dashboard' as Section, icon: LayoutDashboard, label: lang === 'bn' ? 'ড্যাশবোর্ড' : 'Dashboard', desc: lang === 'bn' ? 'সামগ্রিক পরিসংখ্যান' : 'Overview & stats' },
-    { id: 'listings' as Section, icon: MapPin, label: lang === 'bn' ? 'লিস্টিং' : 'My Listings', desc: lang === 'bn' ? 'জমি ম্যানেজ করুন' : 'Manage properties' },
+    { id: 'listings' as Section, icon: MapPin, label: lang === 'bn' ? 'লিস্টিং' : 'Listings', desc: lang === 'bn' ? 'জমি ম্যানেজ করুন' : 'Manage properties' },
     { id: 'payments' as Section, icon: CreditCard, label: lang === 'bn' ? 'পেমেন্ট' : 'Payments', desc: lang === 'bn' ? 'লেনদেনের ইতিহাস' : 'Transaction history' },
     { id: 'packages' as Section, icon: Package, label: lang === 'bn' ? 'এড প্যাকেজ' : 'Ad Packages', desc: lang === 'bn' ? 'প্যাকেজ ম্যানেজ করুন' : 'Manage packages' },
     { id: 'users' as Section, icon: Users, label: lang === 'bn' ? 'ইউজার' : 'Users', desc: lang === 'bn' ? 'ইউজার ম্যানেজমেন্ট' : 'User management' },
+    { id: 'reviews' as Section, icon: MessageSquare, label: lang === 'bn' ? 'রিভিউ' : 'Reviews', desc: lang === 'bn' ? 'রিভিউ ম্যানেজমেন্ট' : 'Manage reviews' },
+    { id: 'profile' as Section, icon: UserCircle, label: lang === 'bn' ? 'প্রোফাইল' : 'Profile', desc: lang === 'bn' ? 'প্রোফাইল ও সিকিউরিটি' : 'Profile & security' },
   ];
 
   return (
     <div className="flex h-screen overflow-hidden bg-background">
-      {/* Mobile overlay */}
       {sidebarOpen && (
         <div className="fixed inset-0 z-40 bg-foreground/30 lg:hidden" onClick={() => setSidebarOpen(false)} />
       )}
@@ -68,7 +73,7 @@ const Admin = () => {
           </button>
         </div>
 
-        <nav className="flex-1 px-3 py-4 space-y-1">
+        <nav className="flex-1 px-3 py-4 space-y-1 overflow-y-auto">
           {menuItems.map((item) => (
             <button
               key={item.id}
@@ -87,17 +92,11 @@ const Admin = () => {
         </nav>
 
         <div className="border-t border-white/10 px-3 py-4 space-y-1">
-          <button
-            onClick={() => navigate('/')}
-            className="flex w-full items-center gap-3 rounded-lg px-4 py-3 text-sm text-white/50 hover:bg-white/10 hover:text-white transition-all"
-          >
+          <button onClick={() => navigate('/')} className="flex w-full items-center gap-3 rounded-lg px-4 py-3 text-sm text-white/50 hover:bg-white/10 hover:text-white transition-all">
             <Eye className="h-[18px] w-[18px]" />
             {lang === 'bn' ? 'সাইট দেখুন' : 'View Site'}
           </button>
-          <button
-            onClick={() => signOut()}
-            className="flex w-full items-center gap-3 rounded-lg px-4 py-3 text-sm text-red-300/80 hover:bg-red-500/10 hover:text-red-300 transition-all"
-          >
+          <button onClick={() => signOut()} className="flex w-full items-center gap-3 rounded-lg px-4 py-3 text-sm text-red-300/80 hover:bg-red-500/10 hover:text-red-300 transition-all">
             <LogOut className="h-[18px] w-[18px]" />
             {t('logout')}
           </button>
@@ -111,12 +110,17 @@ const Admin = () => {
           <button className="lg:hidden text-foreground" onClick={() => setSidebarOpen(true)}>
             <Menu className="h-5 w-5" />
           </button>
-          <div>
+          <div className="flex-1">
             <h2 className="text-lg font-semibold text-foreground">
               {menuItems.find(m => m.id === section)?.label}
             </h2>
             <p className="text-xs text-muted-foreground">{menuItems.find(m => m.id === section)?.desc}</p>
           </div>
+          {/* Language switcher */}
+          <Button variant="outline" size="sm" onClick={() => setLang(lang === 'bn' ? 'en' : 'bn')} className="gap-1.5">
+            <Globe className="h-4 w-4" />
+            {lang === 'bn' ? 'EN' : 'বাং'}
+          </Button>
         </header>
 
         <main className="flex-1 overflow-y-auto p-6">
@@ -125,6 +129,8 @@ const Admin = () => {
           {section === 'payments' && <PaymentsSection />}
           {section === 'packages' && <PackagesSection />}
           {section === 'users' && <UsersSection />}
+          {section === 'reviews' && <ReviewsSection />}
+          {section === 'profile' && <ProfileSection />}
         </main>
       </div>
     </div>
@@ -147,12 +153,7 @@ const DashboardSection = () => {
         supabase.from('payments').select('amount').eq('status', 'completed'),
       ]);
       const totalEarnings = earningsRes.data?.reduce((s, p) => s + (p.amount || 0), 0) || 0;
-      return {
-        totalLands: landsRes.count || 0,
-        totalPayments: paymentsRes.count || 0,
-        totalUsers: profilesRes.count || 0,
-        totalEarnings,
-      };
+      return { totalLands: landsRes.count || 0, totalPayments: paymentsRes.count || 0, totalUsers: profilesRes.count || 0, totalEarnings };
     },
   });
 
@@ -240,7 +241,6 @@ const ListingsSection = () => {
   const [dialogOpen, setDialogOpen] = useState(false);
   const [imageUrl, setImageUrl] = useState('');
   const [search, setSearch] = useState('');
-
   const { user, isAdmin } = useAuth();
 
   const { data: lands } = useQuery({
@@ -271,9 +271,7 @@ const ListingsSection = () => {
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['admin-lands'] });
       queryClient.invalidateQueries({ queryKey: ['admin-stats'] });
-      setDialogOpen(false);
-      setLandForm(emptyLand);
-      setEditingId(null);
+      setDialogOpen(false); setLandForm(emptyLand); setEditingId(null);
       toast.success(t('success'));
     },
     onError: (err: any) => toast.error(err.message),
@@ -284,10 +282,7 @@ const ListingsSection = () => {
       const { error } = await supabase.from('lands').delete().eq('id', id);
       if (error) throw error;
     },
-    onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ['admin-lands'] });
-      toast.success(t('success'));
-    },
+    onSuccess: () => { queryClient.invalidateQueries({ queryKey: ['admin-lands'] }); toast.success(t('success')); },
   });
 
   const toggleFeatured = useMutation({
@@ -307,27 +302,16 @@ const ListingsSection = () => {
   });
 
   const addImage = () => {
-    if (imageUrl.trim()) {
-      setLandForm({ ...landForm, images: [...landForm.images, imageUrl.trim()] });
-      setImageUrl('');
-    }
+    if (imageUrl.trim()) { setLandForm({ ...landForm, images: [...landForm.images, imageUrl.trim()] }); setImageUrl(''); }
   };
-
-  const removeImage = (idx: number) => {
-    setLandForm({ ...landForm, images: landForm.images.filter((_, i) => i !== idx) });
-  };
+  const removeImage = (idx: number) => { setLandForm({ ...landForm, images: landForm.images.filter((_, i) => i !== idx) }); };
 
   return (
     <div className="space-y-4">
       <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
         <div className="relative max-w-sm flex-1">
           <Search className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
-          <Input
-            placeholder={lang === 'bn' ? 'লিস্টিং খুঁজুন...' : 'Search listings...'}
-            value={search}
-            onChange={(e) => setSearch(e.target.value)}
-            className="pl-10"
-          />
+          <Input placeholder={lang === 'bn' ? 'লিস্টিং খুঁজুন...' : 'Search listings...'} value={search} onChange={(e) => setSearch(e.target.value)} className="pl-10" />
         </div>
         <Dialog open={dialogOpen} onOpenChange={setDialogOpen}>
           <DialogTrigger asChild>
@@ -336,15 +320,8 @@ const ListingsSection = () => {
             </Button>
           </DialogTrigger>
           <DialogContent className="max-h-[90vh] overflow-y-auto sm:max-w-2xl">
-            <DialogHeader>
-              <DialogTitle>{editingId ? t('editLand') : t('addLand')}</DialogTitle>
-            </DialogHeader>
-            <LandForm
-              form={landForm} setForm={setLandForm}
-              imageUrl={imageUrl} setImageUrl={setImageUrl}
-              addImage={addImage} removeImage={removeImage}
-              onSave={() => saveLand.mutate()} saving={saveLand.isPending}
-            />
+            <DialogHeader><DialogTitle>{editingId ? t('editLand') : t('addLand')}</DialogTitle></DialogHeader>
+            <LandForm form={landForm} setForm={setLandForm} imageUrl={imageUrl} setImageUrl={setImageUrl} addImage={addImage} removeImage={removeImage} onSave={() => saveLand.mutate()} saving={saveLand.isPending} />
           </DialogContent>
         </Dialog>
       </div>
@@ -369,36 +346,22 @@ const ListingsSection = () => {
                   <TableCell className="text-muted-foreground">{lang === 'bn' ? land.location_bn : land.location_en}</TableCell>
                   <TableCell>৳{land.price?.toLocaleString()}</TableCell>
                   <TableCell>
-                    <Switch
-                      checked={land.is_featured}
-                      onCheckedChange={(c) => toggleFeatured.mutate({ id: land.id, featured: c })}
-                    />
+                    <Switch checked={land.is_featured} onCheckedChange={(c) => toggleFeatured.mutate({ id: land.id, featured: c })} />
                   </TableCell>
                   <TableCell>
-                    <button
-                      onClick={() => toggleStatus.mutate({ id: land.id, status: land.status === 'active' ? 'inactive' : 'active' })}
-                      className={`inline-flex rounded-full px-2 py-0.5 text-xs font-medium cursor-pointer ${land.status === 'active' ? 'bg-primary/10 text-primary' : 'bg-muted text-muted-foreground'}`}
-                    >
+                    <button onClick={() => toggleStatus.mutate({ id: land.id, status: land.status === 'active' ? 'inactive' : 'active' })} className={`inline-flex rounded-full px-2 py-0.5 text-xs font-medium cursor-pointer ${land.status === 'active' ? 'bg-primary/10 text-primary' : 'bg-muted text-muted-foreground'}`}>
                       {land.status}
                     </button>
                   </TableCell>
                   <TableCell>
                     <div className="flex gap-1">
-                      <Button variant="ghost" size="icon" onClick={() => { setLandForm(land); setEditingId(land.id); setDialogOpen(true); }}>
-                        <Pencil className="h-4 w-4" />
-                      </Button>
-                      <Button variant="ghost" size="icon" onClick={() => deleteLand.mutate(land.id)}>
-                        <Trash2 className="h-4 w-4 text-destructive" />
-                      </Button>
+                      <Button variant="ghost" size="icon" onClick={() => { setLandForm(land); setEditingId(land.id); setDialogOpen(true); }}><Pencil className="h-4 w-4" /></Button>
+                      <Button variant="ghost" size="icon" onClick={() => deleteLand.mutate(land.id)}><Trash2 className="h-4 w-4 text-destructive" /></Button>
                     </div>
                   </TableCell>
                 </TableRow>
               )) : (
-                <TableRow>
-                  <TableCell colSpan={6} className="py-8 text-center text-muted-foreground">
-                    {lang === 'bn' ? 'কোনো লিস্টিং পাওয়া যায়নি' : 'No listings found'}
-                  </TableCell>
-                </TableRow>
+                <TableRow><TableCell colSpan={6} className="py-8 text-center text-muted-foreground">{lang === 'bn' ? 'কোনো লিস্টিং পাওয়া যায়নি' : 'No listings found'}</TableCell></TableRow>
               )}
             </TableBody>
           </Table>
@@ -408,7 +371,7 @@ const ListingsSection = () => {
   );
 };
 
-/* ─── Land Form (shared) ─── */
+/* ─── Land Form ─── */
 const LandForm = ({ form, setForm, imageUrl, setImageUrl, addImage, removeImage, onSave, saving }: any) => {
   const { t } = useI18n();
   return (
@@ -454,9 +417,7 @@ const LandForm = ({ form, setForm, imageUrl, setImageUrl, addImage, removeImage,
         <Switch checked={form.is_featured} onCheckedChange={(c) => setForm({ ...form, is_featured: c })} />
         <Label>{t('featured')}</Label>
       </div>
-      <Button onClick={onSave} disabled={saving}>
-        {saving ? t('loading') : t('save')}
-      </Button>
+      <Button onClick={onSave} disabled={saving}>{saving ? t('loading') : t('save')}</Button>
     </div>
   );
 };
@@ -465,6 +426,7 @@ const LandForm = ({ form, setForm, imageUrl, setImageUrl, addImage, removeImage,
 const PaymentsSection = () => {
   const { lang } = useI18n();
   const { user, isAdmin } = useAuth();
+  const queryClient = useQueryClient();
   const [filter, setFilter] = useState('all');
 
   const { data: payments } = useQuery({
@@ -477,7 +439,22 @@ const PaymentsSection = () => {
     },
   });
 
+  const updateStatus = useMutation({
+    mutationFn: async ({ id, status }: { id: string; status: string }) => {
+      const { error } = await supabase.from('payments').update({ status }).eq('id', id);
+      if (error) throw error;
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['admin-payments'] });
+      queryClient.invalidateQueries({ queryKey: ['admin-stats'] });
+      toast.success(lang === 'bn' ? 'স্ট্যাটাস আপডেট হয়েছে' : 'Status updated');
+    },
+    onError: (err: any) => toast.error(err.message),
+  });
+
   const filtered = payments?.filter((p: any) => filter === 'all' || p.status === filter);
+
+  const statusOptions = ['pending', 'completed', 'failed'];
 
   return (
     <div className="space-y-4">
@@ -498,6 +475,7 @@ const PaymentsSection = () => {
                 <TableHead>{lang === 'bn' ? 'পরিমাণ' : 'Amount'}</TableHead>
                 <TableHead>{lang === 'bn' ? 'স্ট্যাটাস' : 'Status'}</TableHead>
                 <TableHead>{lang === 'bn' ? 'তারিখ' : 'Date'}</TableHead>
+                <TableHead></TableHead>
               </TableRow>
             </TableHeader>
             <TableBody>
@@ -511,18 +489,21 @@ const PaymentsSection = () => {
                       p.status === 'completed' ? 'bg-primary/10 text-primary' :
                       p.status === 'pending' ? 'bg-accent/20 text-accent-foreground' :
                       'bg-destructive/10 text-destructive'
-                    }`}>
-                      {p.status}
-                    </span>
+                    }`}>{p.status}</span>
                   </TableCell>
                   <TableCell className="text-muted-foreground">{new Date(p.created_at).toLocaleDateString()}</TableCell>
-                </TableRow>
-              )) : (
-                <TableRow>
-                  <TableCell colSpan={5} className="py-8 text-center text-muted-foreground">
-                    {lang === 'bn' ? 'কোনো পেমেন্ট পাওয়া যায়নি' : 'No payments found'}
+                  <TableCell>
+                    <select
+                      value={p.status}
+                      onChange={(e) => updateStatus.mutate({ id: p.id, status: e.target.value })}
+                      className="rounded border border-border bg-background px-2 py-1 text-xs text-foreground"
+                    >
+                      {statusOptions.map(s => <option key={s} value={s}>{s}</option>)}
+                    </select>
                   </TableCell>
                 </TableRow>
+              )) : (
+                <TableRow><TableCell colSpan={6} className="py-8 text-center text-muted-foreground">{lang === 'bn' ? 'কোনো পেমেন্ট পাওয়া যায়নি' : 'No payments found'}</TableCell></TableRow>
               )}
             </TableBody>
           </Table>
@@ -532,14 +513,13 @@ const PaymentsSection = () => {
   );
 };
 
-/* ─── Ad Packages ─── */
+/* ─── Packages ─── */
 const PackagesSection = () => {
   const { t, lang } = useI18n();
   const queryClient = useQueryClient();
   const [form, setForm] = useState(emptyPackage);
   const [editingId, setEditingId] = useState<string | null>(null);
   const [dialogOpen, setDialogOpen] = useState(false);
-
   const { user, isAdmin } = useAuth();
 
   const { data: packages } = useQuery({
@@ -564,9 +544,7 @@ const PackagesSection = () => {
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['admin-packages'] });
-      setDialogOpen(false);
-      setForm(emptyPackage);
-      setEditingId(null);
+      setDialogOpen(false); setForm(emptyPackage); setEditingId(null);
       toast.success(t('success'));
     },
     onError: (err: any) => toast.error(err.message),
@@ -577,10 +555,7 @@ const PackagesSection = () => {
       const { error } = await supabase.from('ad_packages').delete().eq('id', id);
       if (error) throw error;
     },
-    onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ['admin-packages'] });
-      toast.success(t('success'));
-    },
+    onSuccess: () => { queryClient.invalidateQueries({ queryKey: ['admin-packages'] }); toast.success(t('success')); },
   });
 
   return (
@@ -593,9 +568,7 @@ const PackagesSection = () => {
             </Button>
           </DialogTrigger>
           <DialogContent>
-            <DialogHeader>
-              <DialogTitle>{editingId ? (lang === 'bn' ? 'প্যাকেজ এডিট' : 'Edit Package') : (lang === 'bn' ? 'নতুন প্যাকেজ' : 'New Package')}</DialogTitle>
-            </DialogHeader>
+            <DialogHeader><DialogTitle>{editingId ? (lang === 'bn' ? 'প্যাকেজ এডিট' : 'Edit Package') : (lang === 'bn' ? 'নতুন প্যাকেজ' : 'New Package')}</DialogTitle></DialogHeader>
             <div className="grid gap-4">
               <div className="grid gap-4 sm:grid-cols-2">
                 <div><Label>{lang === 'bn' ? 'নাম (বাংলা)' : 'Name (BN)'}</Label><Input value={form.name_bn} onChange={(e) => setForm({ ...form, name_bn: e.target.value })} /></div>
@@ -609,9 +582,7 @@ const PackagesSection = () => {
                 <Switch checked={form.is_featured} onCheckedChange={(c) => setForm({ ...form, is_featured: c })} />
                 <Label>{t('featured')}</Label>
               </div>
-              <Button onClick={() => savePackage.mutate()} disabled={savePackage.isPending}>
-                {savePackage.isPending ? t('loading') : t('save')}
-              </Button>
+              <Button onClick={() => savePackage.mutate()} disabled={savePackage.isPending}>{savePackage.isPending ? t('loading') : t('save')}</Button>
             </div>
           </DialogContent>
         </Dialog>
@@ -672,8 +643,8 @@ const UsersSection = () => {
   });
 
   const toggleAdmin = useMutation({
-    mutationFn: async ({ userId, isAdmin }: { userId: string; isAdmin: boolean }) => {
-      if (isAdmin) {
+    mutationFn: async ({ userId, currentlyAdmin }: { userId: string; currentlyAdmin: boolean }) => {
+      if (currentlyAdmin) {
         const { error } = await supabase.from('user_roles').delete().eq('user_id', userId).eq('role', 'admin');
         if (error) throw error;
       } else {
@@ -709,23 +680,301 @@ const UsersSection = () => {
                 <TableCell className="font-mono text-xs text-muted-foreground">{p.user_id.slice(0, 8)}...</TableCell>
                 <TableCell className="text-muted-foreground">{new Date(p.created_at).toLocaleDateString()}</TableCell>
                 <TableCell>
-                  <Switch
-                    checked={isUserAdmin(p.user_id)}
-                    onCheckedChange={() => toggleAdmin.mutate({ userId: p.user_id, isAdmin: !!isUserAdmin(p.user_id) })}
-                  />
+                  <Switch checked={!!isUserAdmin(p.user_id)} onCheckedChange={() => toggleAdmin.mutate({ userId: p.user_id, currentlyAdmin: !!isUserAdmin(p.user_id) })} />
                 </TableCell>
               </TableRow>
             )) : (
-              <TableRow>
-                <TableCell colSpan={4} className="py-8 text-center text-muted-foreground">
-                  {lang === 'bn' ? 'কোনো ইউজার পাওয়া যায়নি' : 'No users found'}
-                </TableCell>
-              </TableRow>
+              <TableRow><TableCell colSpan={4} className="py-8 text-center text-muted-foreground">{lang === 'bn' ? 'কোনো ইউজার পাওয়া যায়নি' : 'No users found'}</TableCell></TableRow>
             )}
           </TableBody>
         </Table>
       </CardContent>
     </Card>
+  );
+};
+
+/* ─── Reviews ─── */
+const ReviewsSection = () => {
+  const { lang } = useI18n();
+  const { user, isAdmin } = useAuth();
+  const queryClient = useQueryClient();
+  const [editForm, setEditForm] = useState(emptyReview);
+  const [editingId, setEditingId] = useState<string | null>(null);
+  const [dialogOpen, setDialogOpen] = useState(false);
+
+  const { data: reviews } = useQuery({
+    queryKey: ['admin-reviews'],
+    enabled: !!user && isAdmin,
+    queryFn: async () => {
+      const { data, error } = await supabase.from('reviews').select('*').order('created_at', { ascending: false });
+      if (error) throw error;
+      return data;
+    },
+  });
+
+  const saveReview = useMutation({
+    mutationFn: async () => {
+      if (editingId) {
+        const { error } = await supabase.from('reviews').update({
+          reviewer_name: editForm.reviewer_name,
+          rating: editForm.rating,
+          comment: editForm.comment,
+          status: editForm.status,
+        }).eq('id', editingId);
+        if (error) throw error;
+      }
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['admin-reviews'] });
+      setDialogOpen(false); setEditForm(emptyReview); setEditingId(null);
+      toast.success(lang === 'bn' ? 'রিভিউ আপডেট হয়েছে' : 'Review updated');
+    },
+    onError: (err: any) => toast.error(err.message),
+  });
+
+  const deleteReview = useMutation({
+    mutationFn: async (id: string) => {
+      const { error } = await supabase.from('reviews').delete().eq('id', id);
+      if (error) throw error;
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['admin-reviews'] });
+      toast.success(lang === 'bn' ? 'রিভিউ মুছে ফেলা হয়েছে' : 'Review deleted');
+    },
+  });
+
+  const renderStars = (rating: number) => {
+    return Array.from({ length: 5 }, (_, i) => (
+      <Star key={i} className={`h-4 w-4 ${i < rating ? 'fill-accent text-accent' : 'text-muted-foreground/30'}`} />
+    ));
+  };
+
+  return (
+    <div className="space-y-4">
+      <Card className="border-none bg-card shadow-sm">
+        <CardContent className="p-0">
+          <div className="px-5 py-4 border-b border-border flex items-center justify-between">
+            <h3 className="font-semibold text-foreground">{lang === 'bn' ? 'সব রিভিউ' : 'All Reviews'}</h3>
+            <span className="text-sm text-muted-foreground">{reviews?.length || 0} {lang === 'bn' ? 'টি রিভিউ' : 'reviews'}</span>
+          </div>
+          <Table>
+            <TableHeader>
+              <TableRow>
+                <TableHead>{lang === 'bn' ? 'নাম' : 'Reviewer'}</TableHead>
+                <TableHead>{lang === 'bn' ? 'রেটিং' : 'Rating'}</TableHead>
+                <TableHead>{lang === 'bn' ? 'কমেন্ট' : 'Comment'}</TableHead>
+                <TableHead>{lang === 'bn' ? 'স্ট্যাটাস' : 'Status'}</TableHead>
+                <TableHead>{lang === 'bn' ? 'তারিখ' : 'Date'}</TableHead>
+                <TableHead></TableHead>
+              </TableRow>
+            </TableHeader>
+            <TableBody>
+              {reviews && reviews.length > 0 ? reviews.map((r: any) => (
+                <TableRow key={r.id}>
+                  <TableCell className="font-medium">{r.reviewer_name || '-'}</TableCell>
+                  <TableCell><div className="flex gap-0.5">{renderStars(r.rating)}</div></TableCell>
+                  <TableCell className="max-w-[200px] truncate text-muted-foreground">{r.comment || '-'}</TableCell>
+                  <TableCell>
+                    <span className={`inline-flex rounded-full px-2 py-0.5 text-xs font-medium ${
+                      r.status === 'published' ? 'bg-primary/10 text-primary' : 'bg-accent/20 text-accent-foreground'
+                    }`}>{r.status}</span>
+                  </TableCell>
+                  <TableCell className="text-muted-foreground">{new Date(r.created_at).toLocaleDateString()}</TableCell>
+                  <TableCell>
+                    <div className="flex gap-1">
+                      <Button variant="ghost" size="icon" onClick={() => {
+                        setEditForm({ reviewer_name: r.reviewer_name, rating: r.rating, comment: r.comment || '', status: r.status });
+                        setEditingId(r.id);
+                        setDialogOpen(true);
+                      }}><Pencil className="h-4 w-4" /></Button>
+                      <Button variant="ghost" size="icon" onClick={() => deleteReview.mutate(r.id)}><Trash2 className="h-4 w-4 text-destructive" /></Button>
+                    </div>
+                  </TableCell>
+                </TableRow>
+              )) : (
+                <TableRow><TableCell colSpan={6} className="py-8 text-center text-muted-foreground">{lang === 'bn' ? 'কোনো রিভিউ পাওয়া যায়নি' : 'No reviews found'}</TableCell></TableRow>
+              )}
+            </TableBody>
+          </Table>
+        </CardContent>
+      </Card>
+
+      <Dialog open={dialogOpen} onOpenChange={setDialogOpen}>
+        <DialogContent>
+          <DialogHeader><DialogTitle>{lang === 'bn' ? 'রিভিউ এডিট' : 'Edit Review'}</DialogTitle></DialogHeader>
+          <div className="grid gap-4">
+            <div><Label>{lang === 'bn' ? 'নাম' : 'Reviewer Name'}</Label><Input value={editForm.reviewer_name} onChange={(e) => setEditForm({ ...editForm, reviewer_name: e.target.value })} /></div>
+            <div>
+              <Label>{lang === 'bn' ? 'রেটিং' : 'Rating'}</Label>
+              <div className="flex gap-1 mt-1">
+                {[1, 2, 3, 4, 5].map(n => (
+                  <button key={n} type="button" onClick={() => setEditForm({ ...editForm, rating: n })}>
+                    <Star className={`h-6 w-6 cursor-pointer ${n <= editForm.rating ? 'fill-accent text-accent' : 'text-muted-foreground/30'}`} />
+                  </button>
+                ))}
+              </div>
+            </div>
+            <div><Label>{lang === 'bn' ? 'কমেন্ট' : 'Comment'}</Label><Textarea value={editForm.comment} onChange={(e) => setEditForm({ ...editForm, comment: e.target.value })} /></div>
+            <div>
+              <Label>{lang === 'bn' ? 'স্ট্যাটাস' : 'Status'}</Label>
+              <select value={editForm.status} onChange={(e) => setEditForm({ ...editForm, status: e.target.value })} className="mt-1 w-full rounded border border-border bg-background px-3 py-2 text-sm text-foreground">
+                <option value="published">{lang === 'bn' ? 'প্রকাশিত' : 'Published'}</option>
+                <option value="pending">{lang === 'bn' ? 'পেন্ডিং' : 'Pending'}</option>
+                <option value="hidden">{lang === 'bn' ? 'লুকানো' : 'Hidden'}</option>
+              </select>
+            </div>
+            <Button onClick={() => saveReview.mutate()} disabled={saveReview.isPending}>
+              {saveReview.isPending ? (lang === 'bn' ? 'সেভ হচ্ছে...' : 'Saving...') : (lang === 'bn' ? 'সেভ করুন' : 'Save')}
+            </Button>
+          </div>
+        </DialogContent>
+      </Dialog>
+    </div>
+  );
+};
+
+/* ─── Profile ─── */
+const ProfileSection = () => {
+  const { lang } = useI18n();
+  const { user } = useAuth();
+  const queryClient = useQueryClient();
+  const fileInputRef = useRef<HTMLInputElement>(null);
+  const [newName, setNewName] = useState('');
+  const [currentPassword, setCurrentPassword] = useState('');
+  const [newPassword, setNewPassword] = useState('');
+  const [confirmPassword, setConfirmPassword] = useState('');
+  const [uploading, setUploading] = useState(false);
+
+  const { data: profile } = useQuery({
+    queryKey: ['admin-profile', user?.id],
+    enabled: !!user,
+    queryFn: async () => {
+      const { data, error } = await supabase.from('profiles').select('*').eq('user_id', user!.id).maybeSingle();
+      if (error) throw error;
+      if (data) setNewName(data.full_name || '');
+      return data;
+    },
+  });
+
+  const updateName = useMutation({
+    mutationFn: async () => {
+      const { error } = await supabase.from('profiles').update({ full_name: newName }).eq('user_id', user!.id);
+      if (error) throw error;
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['admin-profile'] });
+      toast.success(lang === 'bn' ? 'নাম আপডেট হয়েছে' : 'Name updated');
+    },
+    onError: (err: any) => toast.error(err.message),
+  });
+
+  const changePassword = useMutation({
+    mutationFn: async () => {
+      if (newPassword !== confirmPassword) throw new Error(lang === 'bn' ? 'পাসওয়ার্ড মিলছে না' : 'Passwords do not match');
+      if (newPassword.length < 6) throw new Error(lang === 'bn' ? 'পাসওয়ার্ড কমপক্ষে ৬ অক্ষর হতে হবে' : 'Password must be at least 6 characters');
+      const { error } = await supabase.auth.updateUser({ password: newPassword });
+      if (error) throw error;
+    },
+    onSuccess: () => {
+      setCurrentPassword(''); setNewPassword(''); setConfirmPassword('');
+      toast.success(lang === 'bn' ? 'পাসওয়ার্ড পরিবর্তন হয়েছে' : 'Password changed');
+    },
+    onError: (err: any) => toast.error(err.message),
+  });
+
+  const handleAvatarUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (!file || !user) return;
+    setUploading(true);
+    try {
+      const ext = file.name.split('.').pop();
+      const path = `avatars/${user.id}.${ext}`;
+      const { error: uploadErr } = await supabase.storage.from('land-images').upload(path, file, { upsert: true });
+      if (uploadErr) throw uploadErr;
+      const { data: urlData } = supabase.storage.from('land-images').getPublicUrl(path);
+      const avatarUrl = urlData.publicUrl + '?t=' + Date.now();
+      const { error: updateErr } = await supabase.from('profiles').update({ avatar_url: avatarUrl } as any).eq('user_id', user.id);
+      if (updateErr) throw updateErr;
+      queryClient.invalidateQueries({ queryKey: ['admin-profile'] });
+      toast.success(lang === 'bn' ? 'ছবি আপলোড হয়েছে' : 'Avatar uploaded');
+    } catch (err: any) {
+      toast.error(err.message);
+    } finally {
+      setUploading(false);
+    }
+  };
+
+  const avatarUrl = (profile as any)?.avatar_url;
+
+  return (
+    <div className="max-w-2xl space-y-6">
+      {/* Avatar */}
+      <Card className="border-none bg-card shadow-sm">
+        <CardContent className="p-6">
+          <h3 className="text-lg font-semibold text-foreground mb-4">{lang === 'bn' ? 'প্রোফাইল ছবি' : 'Profile Picture'}</h3>
+          <div className="flex items-center gap-6">
+            <div className="relative">
+              <div className="h-24 w-24 rounded-full bg-muted flex items-center justify-center overflow-hidden border-2 border-border">
+                {avatarUrl ? (
+                  <img src={avatarUrl} alt="Avatar" className="h-full w-full object-cover" />
+                ) : (
+                  <UserCircle className="h-12 w-12 text-muted-foreground" />
+                )}
+              </div>
+              <button
+                onClick={() => fileInputRef.current?.click()}
+                className="absolute -bottom-1 -right-1 rounded-full bg-primary p-1.5 text-primary-foreground hover:bg-primary/90 transition-colors"
+                disabled={uploading}
+              >
+                <Camera className="h-4 w-4" />
+              </button>
+              <input ref={fileInputRef} type="file" accept="image/*" className="hidden" onChange={handleAvatarUpload} />
+            </div>
+            <div>
+              <p className="font-medium text-foreground">{profile?.full_name || user?.email}</p>
+              <p className="text-sm text-muted-foreground">{user?.email}</p>
+              {uploading && <p className="text-xs text-primary mt-1">{lang === 'bn' ? 'আপলোড হচ্ছে...' : 'Uploading...'}</p>}
+            </div>
+          </div>
+        </CardContent>
+      </Card>
+
+      {/* Name */}
+      <Card className="border-none bg-card shadow-sm">
+        <CardContent className="p-6">
+          <h3 className="text-lg font-semibold text-foreground mb-4">{lang === 'bn' ? 'নাম পরিবর্তন' : 'Update Name'}</h3>
+          <div className="flex gap-3">
+            <Input value={newName} onChange={(e) => setNewName(e.target.value)} placeholder={lang === 'bn' ? 'আপনার নাম' : 'Your name'} className="max-w-sm" />
+            <Button onClick={() => updateName.mutate()} disabled={updateName.isPending}>
+              {updateName.isPending ? '...' : (lang === 'bn' ? 'সেভ' : 'Save')}
+            </Button>
+          </div>
+        </CardContent>
+      </Card>
+
+      {/* Password */}
+      <Card className="border-none bg-card shadow-sm">
+        <CardContent className="p-6">
+          <h3 className="text-lg font-semibold text-foreground mb-4 flex items-center gap-2">
+            <Lock className="h-5 w-5" />
+            {lang === 'bn' ? 'পাসওয়ার্ড পরিবর্তন' : 'Change Password'}
+          </h3>
+          <div className="space-y-3 max-w-sm">
+            <div>
+              <Label>{lang === 'bn' ? 'নতুন পাসওয়ার্ড' : 'New Password'}</Label>
+              <Input type="password" value={newPassword} onChange={(e) => setNewPassword(e.target.value)} />
+            </div>
+            <div>
+              <Label>{lang === 'bn' ? 'পাসওয়ার্ড নিশ্চিত করুন' : 'Confirm Password'}</Label>
+              <Input type="password" value={confirmPassword} onChange={(e) => setConfirmPassword(e.target.value)} />
+            </div>
+            <Button onClick={() => changePassword.mutate()} disabled={changePassword.isPending}>
+              {changePassword.isPending ? '...' : (lang === 'bn' ? 'পাসওয়ার্ড পরিবর্তন করুন' : 'Change Password')}
+            </Button>
+          </div>
+        </CardContent>
+      </Card>
+    </div>
   );
 };
 

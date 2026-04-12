@@ -689,7 +689,7 @@ const UsersSection = () => {
             </TableRow>
           </TableHeader>
           <TableBody>
-            {profiles?.map((p: any) => (
+            {profiles && profiles.length > 0 ? profiles.map((p: any) => (
               <TableRow key={p.id}>
                 <TableCell className="font-medium">{p.full_name || '-'}</TableCell>
                 <TableCell className="font-mono text-xs text-muted-foreground">{p.user_id.slice(0, 8)}...</TableCell>
@@ -701,7 +701,13 @@ const UsersSection = () => {
                   />
                 </TableCell>
               </TableRow>
-            ))}
+            )) : (
+              <TableRow>
+                <TableCell colSpan={4} className="py-8 text-center text-muted-foreground">
+                  {lang === 'bn' ? 'কোনো ইউজার পাওয়া যায়নি' : 'No users found'}
+                </TableCell>
+              </TableRow>
+            )}
           </TableBody>
         </Table>
       </CardContent>

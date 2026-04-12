@@ -42,11 +42,11 @@ const Admin = () => {
   if (!authLoading && (!user || !isAdmin)) return <Navigate to="/" />;
 
   const menuItems = [
-    { id: 'dashboard' as Section, icon: LayoutDashboard, label: lang === 'bn' ? 'ড্যাশবোর্ড' : 'Dashboard' },
-    { id: 'listings' as Section, icon: MapPin, label: lang === 'bn' ? 'লিস্টিং' : 'My Listings' },
-    { id: 'payments' as Section, icon: CreditCard, label: lang === 'bn' ? 'পেমেন্ট' : 'Payments' },
-    { id: 'packages' as Section, icon: Package, label: lang === 'bn' ? 'এড প্যাকেজ' : 'Ad Packages' },
-    { id: 'users' as Section, icon: Users, label: lang === 'bn' ? 'ইউজার' : 'Users' },
+    { id: 'dashboard' as Section, icon: LayoutDashboard, label: lang === 'bn' ? 'ড্যাশবোর্ড' : 'Dashboard', desc: lang === 'bn' ? 'সামগ্রিক পরিসংখ্যান' : 'Overview & stats' },
+    { id: 'listings' as Section, icon: MapPin, label: lang === 'bn' ? 'লিস্টিং' : 'My Listings', desc: lang === 'bn' ? 'জমি ম্যানেজ করুন' : 'Manage properties' },
+    { id: 'payments' as Section, icon: CreditCard, label: lang === 'bn' ? 'পেমেন্ট' : 'Payments', desc: lang === 'bn' ? 'লেনদেনের ইতিহাস' : 'Transaction history' },
+    { id: 'packages' as Section, icon: Package, label: lang === 'bn' ? 'এড প্যাকেজ' : 'Ad Packages', desc: lang === 'bn' ? 'প্যাকেজ ম্যানেজ করুন' : 'Manage packages' },
+    { id: 'users' as Section, icon: Users, label: lang === 'bn' ? 'ইউজার' : 'Users', desc: lang === 'bn' ? 'ইউজার ম্যানেজমেন্ট' : 'User management' },
   ];
 
   return (

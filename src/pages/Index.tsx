@@ -339,7 +339,7 @@ const Index = () => {
       </section>
 
       {/* Client Reviews Carousel - CSS Marquee Infinite Scroll */}
-      <section className="py-20 md:py-24 bg-surface overflow-hidden">
+      <section className="py-20 md:py-24 bg-surface-container-low overflow-hidden">
         <div className="max-w-7xl mx-auto px-6 md:px-8">
           <div className="text-center mb-16">
             <span className="font-bold text-sm text-secondary tracking-widest uppercase">

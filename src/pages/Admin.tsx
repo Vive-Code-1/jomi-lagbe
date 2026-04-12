@@ -260,11 +260,18 @@ const ListingsSection = () => {
 
   const saveLand = useMutation({
     mutationFn: async () => {
+      if (!landForm.title_bn.trim() || !landForm.title_en.trim()) {
+        throw new Error(lang === 'bn' ? 'বাংলা ও ইংরেজি শিরোনাম দিন' : 'Title (BN & EN) is required');
+      }
       if (editingId) {
         const { error } = await supabase.from('lands').update(landForm).eq('id', editingId);
         if (error) throw error;
       } else {
-        const { error } = await supabase.from('lands').insert(landForm);
+        const { error } = await supabase.from('lands').insert({
+          ...landForm,
+          user_id: user?.id,
+          land_type: 'residential',
+        });
         if (error) throw error;
       }
     },
@@ -272,9 +279,9 @@ const ListingsSection = () => {
       queryClient.invalidateQueries({ queryKey: ['admin-lands'] });
       queryClient.invalidateQueries({ queryKey: ['admin-stats'] });
       setDialogOpen(false); setLandForm(emptyLand); setEditingId(null);
-      toast.success(t('success'));
+      toast.success(lang === 'bn' ? 'সফলভাবে সেভ হয়েছে' : 'Saved successfully');
     },
-    onError: (err: any) => toast.error(err.message),
+    onError: (err: any) => toast.error(lang === 'bn' ? `ত্রুটি: ${err.message}` : `Error: ${err.message}`),
   });
 
   const deleteLand = useMutation({
@@ -534,6 +541,9 @@ const PackagesSection = () => {
 
   const savePackage = useMutation({
     mutationFn: async () => {
+      if (!form.name_bn.trim() || !form.name_en.trim()) {
+        throw new Error(lang === 'bn' ? 'বাংলা ও ইংরেজি নাম দিন' : 'Name (BN & EN) is required');
+      }
       if (editingId) {
         const { error } = await supabase.from('ad_packages').update(form).eq('id', editingId);
         if (error) throw error;
@@ -545,9 +555,9 @@ const PackagesSection = () => {
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['admin-packages'] });
       setDialogOpen(false); setForm(emptyPackage); setEditingId(null);
-      toast.success(t('success'));
+      toast.success(lang === 'bn' ? 'সফলভাবে সেভ হয়েছে' : 'Saved successfully');
     },
-    onError: (err: any) => toast.error(err.message),
+    onError: (err: any) => toast.error(lang === 'bn' ? `ত্রুটি: ${err.message}` : `Error: ${err.message}`),
   });
 
   const deletePackage = useMutation({

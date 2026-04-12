@@ -1,22 +1,22 @@
 
 
-## ৩টি সমস্যা সমাধান
+## ন্যাভবার ফিক্স — লিঙ্ক দেখানো ও সেন্টার অ্যালাইন
 
-### ১. ক্যাটেগরি ড্রপডাউনে বাম প্যাডিং
-- `select` এলিমেন্টের `option` গুলোতে `pl-3` বা inline style `paddingLeft` যোগ — তবে native `<option>` এ CSS সীমিত, তাই `select` এলিমেন্টেই `pl-2` প্যাডিং যোগ করা হবে।
+### সমস্যা
+কোডে About Us ও Contact লিঙ্ক আছে, কিন্তু বর্তমান লেআউটে লোগো + সব লিঙ্ক বামে একসাথে থাকায় স্পেস কম হয়ে লিঙ্ক দেখা যাচ্ছে না। এবং ন্যাভ লিঙ্কগুলো মিডেলে নেই।
 
-### ২. ৩টি সেকশনের ব্যাকগ্রাউন্ড আলাদা করা
-বর্তমানে Reviews + Stats + FAQ সব `bg-surface-container-low`:
-- **Reviews সেকশন** (ক্যারোসেল): `bg-surface-container-low` → রাখা হবে
-- **Stats সেকশন** (১০০%, ৫০হাজার+, নিরাপদ, ২৪/৭): আলাদা `section` হিসেবে বের করে `bg-surface` দেওয়া হবে
-- **FAQ সেকশন**: `bg-surface-container` দেওয়া হবে
+### সমাধান — `src/components/Navbar.tsx`
 
-### ৩. Stats সেকশন কার্ড + হোভার + সেন্টার
-- Stats grid কে Reviews সেকশন থেকে আলাদা `section` এ নিয়ে আসা
-- প্রতিটি stat আইটেমকে কার্ড স্টাইল দেওয়া: `shadow-sm border border-outline-variant/20`
-- হোভার ইফেক্ট: `hover:shadow-lg hover:-translate-y-1 transition-all duration-300`
-- গ্রিড সেন্টার অ্যালাইন: `max-w-4xl mx-auto` দিয়ে মিডেল অ্যালাইন
+ন্যাভবারের কাঠামো ৩-কলাম লেআউটে পরিবর্তন:
 
-### ফাইল পরিবর্তন
-- **`src/pages/Index.tsx`** — select প্যাডিং, Stats আলাদা section, কার্ড স্টাইল, FAQ ব্যাকগ্রাউন্ড পরিবর্তন
+```text
+[লোগো]          [Home | Listings | Packages | About | Contact]          [Lang | Login]
+  বামে                          মিডেল সেন্টার                              ডানে
+```
+
+- বাইরের div কে `flex justify-between items-center` রাখা হবে
+- লোগো আলাদা div-এ (বামে)
+- ন্যাভ লিঙ্কগুলো আলাদা div-এ `absolute left-1/2 -translate-x-1/2` দিয়ে পুরোপুরি সেন্টারে
+- ডান পাশের অ্যাকশন (Lang, Login) আলাদা div-এ
+- এতে সব লিঙ্ক দেখা যাবে এবং মিডেলে অ্যালাইন থাকবে
 

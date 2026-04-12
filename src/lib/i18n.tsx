@@ -200,6 +200,13 @@ const translations = {
     confirm: 'Confirm',
     back: 'Back',
     contactUnlockFee: 'Owner Info Unlock Fee',
+    pricePerDecimal: 'Price per Decimal',
+    unlockOwnerNumber: 'Unlock Owner Number',
+    mapLocation: 'Map Location',
+    safetyTips: 'Safety Tips',
+    tip1: 'Visit the land in person before buying.',
+    tip2: 'Verify all documents and records.',
+    tip3: 'Consult a trusted lawyer.',
   },
 } as const;
 

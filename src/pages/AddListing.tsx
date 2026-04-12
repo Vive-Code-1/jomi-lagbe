@@ -261,7 +261,10 @@ const AddListing = () => {
           land_id: landData.id,
           package_id: selectedPkg.id,
           status: 'pending',
-        });
+          sender_number: formData.sender_number || null,
+          sender_transaction_id: formData.sender_transaction_id || null,
+          payment_method_id: formData.payment_method_id || null,
+        } as any);
         if (paymentError) throw paymentError;
       }
 

@@ -42,6 +42,16 @@ const Admin = () => {
   const navigate = useNavigate();
   const [section, setSection] = useState<Section>('dashboard');
   const [sidebarOpen, setSidebarOpen] = useState(false);
+  const queryClient = useQueryClient();
+
+  const { data: sidebarProfile } = useQuery({
+    queryKey: ['sidebar-profile', user?.id],
+    enabled: !!user,
+    queryFn: async () => {
+      const { data } = await supabase.from('profiles').select('full_name, avatar_url').eq('user_id', user!.id).maybeSingle();
+      return data;
+    },
+  });
 
   if (!authLoading && (!user || !isAdmin)) return <Navigate to="/" />;
 
@@ -91,7 +101,21 @@ const Admin = () => {
           ))}
         </nav>
 
-        <div className="border-t border-white/10 px-3 py-4 space-y-1">
+        <div className="border-t border-white/10 px-3 py-4 space-y-2">
+          {/* Admin profile in sidebar */}
+          <div className="flex items-center gap-3 px-4 py-2">
+            <div className="h-9 w-9 rounded-full bg-white/20 flex items-center justify-center overflow-hidden flex-shrink-0">
+              {sidebarProfile?.avatar_url ? (
+                <img src={sidebarProfile.avatar_url} alt="Admin" className="h-full w-full object-cover" />
+              ) : (
+                <UserCircle className="h-5 w-5 text-white/70" />
+              )}
+            </div>
+            <div className="min-w-0">
+              <p className="text-sm font-medium text-white truncate">{sidebarProfile?.full_name || user?.email?.split('@')[0] || 'Admin'}</p>
+              <p className="text-[11px] text-white/40 truncate">{user?.email}</p>
+            </div>
+          </div>
           <button onClick={() => navigate('/')} className="flex w-full items-center gap-3 rounded-lg px-4 py-3 text-sm text-white/50 hover:bg-white/10 hover:text-white transition-all">
             <Eye className="h-[18px] w-[18px]" />
             {lang === 'bn' ? 'সাইট দেখুন' : 'View Site'}
@@ -898,12 +922,12 @@ const ProfileSection = () => {
     setUploading(true);
     try {
       const ext = file.name.split('.').pop();
-      const path = `avatars/${user.id}.${ext}`;
+      const path = `${user.id}/avatar.${ext}`;
       const { error: uploadErr } = await supabase.storage.from('land-images').upload(path, file, { upsert: true });
       if (uploadErr) throw uploadErr;
       const { data: urlData } = supabase.storage.from('land-images').getPublicUrl(path);
       const avatarUrl = urlData.publicUrl + '?t=' + Date.now();
-      const { error: updateErr } = await supabase.from('profiles').update({ avatar_url: avatarUrl } as any).eq('user_id', user.id);
+      const { error: updateErr } = await supabase.from('profiles').update({ avatar_url: avatarUrl }).eq('user_id', user.id);
       if (updateErr) throw updateErr;
       queryClient.invalidateQueries({ queryKey: ['admin-profile'] });
       toast.success(lang === 'bn' ? 'ছবি আপলোড হয়েছে' : 'Avatar uploaded');

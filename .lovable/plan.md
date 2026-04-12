@@ -1,49 +1,36 @@
 
 
-## Auth পেজ রিডিজাইন — Heritage Modernist প্রিমিয়াম ডিজাইন
+## প্যাকেজ তৈরি ও পেমেন্ট ফিচার
 
-### যা হবে
+### সমস্যা
+`ad_packages` টেবিলে কোনো ডাটা নেই, তাই Step 4 এ প্যাকেজ দেখাচ্ছে না।
 
-রেফারেন্স ডিজাইন অনুসারে Auth পেজটি সম্পূর্ণ নতুনভাবে ডিজাইন করা হবে — split-screen layout যেখানে বাম পাশে ব্র্যান্ডিং ইমেজ + টেক্সট এবং ডান পাশে লগইন/সাইন আপ ফর্ম।
+### পরিবর্তন
 
-### ডিজাইন স্ট্রাকচার
+**১. Database Migration — ২টি প্যাকেজ সিড করা:**
+- **Standard Listing** — ৳৫০০, ৩০ দিন, ৫টি ছবি (সাধারণ)
+- **Premium Boost** — ৳১০,০০০, ৬০ দিন, ফিচার্ড + হোমপেজে দেখাবে
 
-```text
-┌─────────────────────┬─────────────────────┐
-│                     │                     │
-│  editorial-gradient │   স্বাগতম           │
-│  + background image │   ইমেইল ঠিকানা     │
-│                     │   পাসওয়ার্ড         │
-│  জমি লাগবে          │   [লগ ইন করুন]      │
-│  আপনার ভবিষতের     │   ─── অথবা ───      │
-│  ভিত্তি গড়ে তুলুন  │   [Google]          │
-│                     │   একাউন্ট নেই?      │
-│  THE HERITAGE       │                     │
-│  MODERNIST          │                     │
-└─────────────────────┴─────────────────────┘
+```sql
+INSERT INTO ad_packages (name_bn, name_en, price, duration, is_featured) VALUES
+('সাধারণ তালিকা', 'Standard Listing', 5500, 30, false),
+('প্রিমিয়াম বুস্ট', 'Premium Boost', 10000, 60, true);
 ```
 
-### পরিবর্তন — `src/pages/Auth.tsx`
+**২. `src/pages/AddListing.tsx` — প্যাকেজ কার্ড UI উন্নত:**
+- রেফারেন্স ডিজাইন অনুযায়ী প্যাকেজ কার্ডে ফিচার লিস্ট দেখানো (Valid for X days, Up to 5 photos, Featured on Home Page)
+- "BEST VALUE" ব্যাজ Premium প্যাকেজে
+- সাইডবারে Subtotal দেখানো (রেফারেন্স ইমেজ অনুযায়ী)
 
-- **Layout**: Card-based সিম্পল লেআউট সরিয়ে full-page split-screen (md:flex-row)
-- **বাম প্যানেল** (ডেস্কটপে দেখাবে):
-  - `editorial-gradient` ব্যাকগ্রাউন্ড (primary → darker green, 135deg)
-  - ব্র্যান্ড নেম "জমি লাগবে", হেডলাইন, সাবটেক্সট
-  - "THE HERITAGE MODERNIST" ট্যাগলাইন
-- **ডান প্যানেল** (ফর্ম):
-  - "স্বাগতম" / "নতুন একাউন্ট" হেডিং
-  - সাবটেক্সট
-  - Full Name (শুধু register মোডে)
-  - Email + Password ফিল্ড (label সহ, বড় padding, rounded-xl)
-  - প্রাইমারি বাটন (editorial-gradient স্টাইল)
-  - "অথবা" ডিভাইডার
-  - Google সোশ্যাল লগইন বাটন
-  - "একাউন্ট নেই? নতুন একাউন্ট খুলুন" টগল
-- **মোবাইলে**: শুধু ডান প্যানেল দেখাবে, উপরে ব্র্যান্ড নেম
-- **Navbar লুকানো**: Auth পেজে Navbar + Footer দেখাবে না (ক্লিন ফুলস্ক্রিন লুক)
-- ফুটারে কপিরাইট টেক্সট
+**৩. পেমেন্ট ফ্লো — UddoktaPay ইন্টিগ্রেশন:**
+প্রজেক্টে আগে থেকেই UddoktaPay পেমেন্ট গেটওয়ে ব্যবহার হচ্ছে। একটি Edge Function তৈরি হবে:
+- `create-payment` Edge Function — প্যাকেজ সিলেক্ট করে "বিজ্ঞাপন প্রকাশ করুন" ক্লিক করলে UddoktaPay checkout URL তৈরি করবে
+- পেমেন্ট সফল হলে `payments` টেবিলে status `completed` হবে এবং `lands` টেবিলে লিস্টিং অ্যাক্টিভ হবে
+- `verify-payment` Edge Function — UddoktaPay callback হ্যান্ডেল করবে
+
+তবে UddoktaPay API key সেটআপ দরকার হবে। যদি API key না থাকে, তাহলে আপাতত "পেমেন্ট সিস্টেম শীঘ্রই আসছে" মেসেজ দেখাবে এবং ফ্রি-তে লিস্টিং সাবমিট করতে দেবে।
 
 ### ফাইল পরিবর্তন
-1. **`src/pages/Auth.tsx`** — সম্পূর্ণ রিডিজাইন
-2. **`src/App.tsx`** — Auth রাউটে Navbar/Footer হাইড করার লজিক (যদি দরকার হয়)
+1. **Database migration** — `ad_packages` এ ২টি প্যাকেজ ইনসার্ট
+2. **`src/pages/AddListing.tsx`** — প্যাকেজ কার্ড UI আপডেট (ফিচার লিস্ট, BEST VALUE ব্যাজ, Subtotal সাইডবার)
 

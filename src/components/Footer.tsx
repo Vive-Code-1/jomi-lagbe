@@ -20,9 +20,9 @@ const Footer = () => {
             {lang === 'bn' ? 'কোম্পানি' : 'Company'}
           </h4>
           <ul className="space-y-4">
-            <li><a className="text-[#aef2bb]/80 hover:text-white transition-all" href="#">{lang === 'bn' ? 'আমাদের সম্পর্কে' : 'About Us'}</a></li>
+            <li><Link to="/about" className="text-[#aef2bb]/80 hover:text-white transition-all">{lang === 'bn' ? 'আমাদের সম্পর্কে' : 'About Us'}</Link></li>
             <li><a className="text-[#aef2bb]/80 hover:text-white transition-all" href="#">{lang === 'bn' ? 'কিভাবে কাজ করে' : 'How it Works'}</a></li>
-            <li><a className="text-[#aef2bb]/80 hover:text-white transition-all" href="#">{lang === 'bn' ? 'যোগাযোগ' : 'Contact Support'}</a></li>
+            <li><Link to="/contact" className="text-[#aef2bb]/80 hover:text-white transition-all">{lang === 'bn' ? 'যোগাযোগ' : 'Contact Support'}</Link></li>
           </ul>
         </div>
         <div>

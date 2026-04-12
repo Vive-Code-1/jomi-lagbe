@@ -28,6 +28,12 @@ const Navbar = () => {
             <Link to="/packages" className="text-on-surface-variant font-medium text-base tracking-tight hover:text-primary transition-colors duration-200">
               {t('adPackages')}
             </Link>
+            <Link to="/about" className="text-on-surface-variant font-medium text-base tracking-tight hover:text-primary transition-colors duration-200">
+              {lang === 'bn' ? 'আমাদের সম্পর্কে' : 'About Us'}
+            </Link>
+            <Link to="/contact" className="text-on-surface-variant font-medium text-base tracking-tight hover:text-primary transition-colors duration-200">
+              {lang === 'bn' ? 'যোগাযোগ' : 'Contact'}
+            </Link>
             {user && (
               <Link to="/favorites" className="text-on-surface-variant font-medium text-base tracking-tight hover:text-primary transition-colors duration-200">
                 {t('favorites')}
@@ -84,6 +90,8 @@ const Navbar = () => {
             <Link to="/" onClick={() => setMobileOpen(false)} className="text-primary font-semibold">{t('home')}</Link>
             <Link to="/listings" onClick={() => setMobileOpen(false)} className="text-on-surface-variant font-medium">{t('listings')}</Link>
             <Link to="/packages" onClick={() => setMobileOpen(false)} className="text-on-surface-variant font-medium">{t('adPackages')}</Link>
+            <Link to="/about" onClick={() => setMobileOpen(false)} className="text-on-surface-variant font-medium">{lang === 'bn' ? 'আমাদের সম্পর্কে' : 'About Us'}</Link>
+            <Link to="/contact" onClick={() => setMobileOpen(false)} className="text-on-surface-variant font-medium">{lang === 'bn' ? 'যোগাযোগ' : 'Contact'}</Link>
             {user && <Link to="/favorites" onClick={() => setMobileOpen(false)} className="text-on-surface-variant font-medium">{t('favorites')}</Link>}
             {isAdmin && <Link to="/admin" onClick={() => setMobileOpen(false)} className="text-on-surface-variant font-medium">{t('admin')}</Link>}
             <Button variant="ghost" size="sm" onClick={() => setLang(lang === 'bn' ? 'en' : 'bn')} className="justify-start text-primary">

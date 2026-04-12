@@ -407,6 +407,7 @@ const Index = () => {
           );
         })()}
 
+        <div className="max-w-7xl mx-auto px-6 md:px-8">
           {/* Stats row */}
           <div className="grid grid-cols-2 md:grid-cols-4 gap-6 mt-16">
             <div className="flex flex-col items-center justify-center p-6 bg-surface-container-low rounded-xl text-center">

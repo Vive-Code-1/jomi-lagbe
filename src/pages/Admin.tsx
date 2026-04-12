@@ -57,13 +57,13 @@ const Admin = () => {
       )}
 
       {/* Sidebar */}
-      <aside className={`fixed inset-y-0 left-0 z-50 flex w-64 flex-col bg-sidebar-background text-sidebar-foreground transition-transform lg:static lg:translate-x-0 ${sidebarOpen ? 'translate-x-0' : '-translate-x-full'}`}>
-        <div className="flex items-center justify-between px-6 py-6">
+      <aside className={`fixed inset-y-0 left-0 z-50 flex w-64 flex-col bg-sidebar text-white transition-transform lg:static lg:translate-x-0 ${sidebarOpen ? 'translate-x-0' : '-translate-x-full'}`}>
+        <div className="flex items-center justify-between px-6 py-6 border-b border-white/10">
           <div>
-            <h1 className="font-serif text-lg font-bold text-sidebar-accent">জমি লাগবে</h1>
-            <p className="text-[11px] uppercase tracking-[0.2em] text-sidebar-foreground/50">Admin Portal</p>
+            <h1 className="font-serif text-xl font-bold text-white">জমি লাগবে</h1>
+            <p className="text-[11px] uppercase tracking-[0.2em] text-white/40">Admin Portal</p>
           </div>
-          <button className="lg:hidden text-sidebar-foreground/60" onClick={() => setSidebarOpen(false)}>
+          <button className="lg:hidden text-white/60 hover:text-white" onClick={() => setSidebarOpen(false)}>
             <X className="h-5 w-5" />
           </button>
         </div>
@@ -75,8 +75,8 @@ const Admin = () => {
               onClick={() => { setSection(item.id); setSidebarOpen(false); }}
               className={`flex w-full items-center gap-3 rounded-lg px-4 py-3 text-sm font-medium transition-all ${
                 section === item.id
-                  ? 'bg-sidebar-accent/20 text-sidebar-accent'
-                  : 'text-sidebar-foreground/70 hover:bg-sidebar-foreground/10 hover:text-sidebar-foreground'
+                  ? 'bg-white/15 text-white'
+                  : 'text-white/60 hover:bg-white/10 hover:text-white'
               }`}
             >
               <item.icon className="h-[18px] w-[18px]" />
@@ -86,17 +86,17 @@ const Admin = () => {
           ))}
         </nav>
 
-        <div className="border-t border-sidebar-border px-3 py-4 space-y-1">
+        <div className="border-t border-white/10 px-3 py-4 space-y-1">
           <button
             onClick={() => navigate('/')}
-            className="flex w-full items-center gap-3 rounded-lg px-4 py-3 text-sm text-sidebar-foreground/60 hover:bg-sidebar-foreground/10 hover:text-sidebar-foreground transition-all"
+            className="flex w-full items-center gap-3 rounded-lg px-4 py-3 text-sm text-white/50 hover:bg-white/10 hover:text-white transition-all"
           >
             <Eye className="h-[18px] w-[18px]" />
             {lang === 'bn' ? 'সাইট দেখুন' : 'View Site'}
           </button>
           <button
             onClick={() => signOut()}
-            className="flex w-full items-center gap-3 rounded-lg px-4 py-3 text-sm text-destructive/80 hover:bg-destructive/10 transition-all"
+            className="flex w-full items-center gap-3 rounded-lg px-4 py-3 text-sm text-red-300/80 hover:bg-red-500/10 hover:text-red-300 transition-all"
           >
             <LogOut className="h-[18px] w-[18px]" />
             {t('logout')}

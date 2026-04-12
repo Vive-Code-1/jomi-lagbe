@@ -175,6 +175,34 @@ const Listings = () => {
               </div>
             </div>
 
+            {/* Land Type / Category */}
+            <div className="mb-8">
+              <label className="block font-label text-xs font-bold uppercase tracking-widest text-on-surface-variant mb-4">
+                {lang === 'bn' ? 'জমির ধরন' : 'Land Type'}
+              </label>
+              <div className="grid grid-cols-2 gap-2">
+                {[
+                  { val: 'all', label: lang === 'bn' ? 'সবগুলো' : 'All' },
+                  { val: 'residential', label: lang === 'bn' ? 'আবাসিক' : 'Residential' },
+                  { val: 'commercial', label: lang === 'bn' ? 'বাণিজ্যিক' : 'Commercial' },
+                  { val: 'agriculture', label: lang === 'bn' ? 'কৃষি' : 'Agriculture' },
+                  { val: 'industrial', label: lang === 'bn' ? 'শিল্প' : 'Industrial' },
+                ].map(s => (
+                  <button
+                    key={s.val}
+                    onClick={() => { setLandTypeFilter(s.val); setCurrentPage(1); }}
+                    className={`px-3 py-2 text-xs rounded-md font-medium transition-colors ${
+                      landTypeFilter === s.val
+                        ? 'bg-primary text-primary-foreground'
+                        : 'bg-surface-container-lowest border border-outline-variant/30 hover:bg-surface-container'
+                    }`}
+                  >
+                    {s.label}
+                  </button>
+                ))}
+              </div>
+            </div>
+
             {/* Location - All 64 Districts */}
             <div className="mb-8">
               <label className="block font-label text-xs font-bold uppercase tracking-widest text-on-surface-variant mb-4">

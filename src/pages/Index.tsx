@@ -6,7 +6,8 @@ import { useQuery } from '@tanstack/react-query';
 import { supabase } from '@/integrations/supabase/client';
 import LandCard from '@/components/LandCard';
 import Footer from '@/components/Footer';
-import { Search, MapPin, Ruler, Route, Upload, SearchCheck, CheckCircle, Shield, Users, Headphones, Star } from 'lucide-react';
+import { Search, MapPin, Ruler, Route, Upload, SearchCheck, CheckCircle, Shield, Users, Headphones, Star, ChevronDown } from 'lucide-react';
+import { divisions } from '@/data/districts';
 
 const heroImage = 'https://lh3.googleusercontent.com/aida-public/AB6AXuDfJbrhRcLOg2UDGwhdK3-tfBDXxKRp5ymrrV2SonGV_FkWvylWZcMFh-99TpXXax-Om9uRh9AbRjpy-l84ZsO153sHkLpYQSvEamdD4xyMH5OF_0QtzM39J0CfTCl76PRgv4LJ4SoelIBWUofOqLYpHLEBGibjxzZtEF15Dc3i5UnQt_t3_XNADHIDeX-Hi90AgV7SCmEqfHZwrkhH1xyJbgOH7XDq76vfMhvF35fvGc3hQPacAOHZL-TXVHLNAb6NSqTcJ39zYl0';
 
@@ -28,6 +29,7 @@ const Index = () => {
   const { t, lang } = useI18n();
   const navigate = useNavigate();
   const [searchQuery, setSearchQuery] = useState('');
+  const [selectedDistrict, setSelectedDistrict] = useState('');
 
   const { data: featuredLands, isLoading } = useQuery({
     queryKey: ['featured-lands'],
@@ -45,7 +47,10 @@ const Index = () => {
   });
 
   const handleSearch = () => {
-    navigate(`/listings?search=${encodeURIComponent(searchQuery)}`);
+    const params = new URLSearchParams();
+    if (searchQuery) params.set('search', searchQuery);
+    if (selectedDistrict) params.set('district', selectedDistrict);
+    navigate(`/listings?${params.toString()}`);
   };
 
   return (
@@ -74,13 +79,37 @@ const Index = () => {
           <div className="bg-surface/90 backdrop-blur-md p-4 md:p-6 rounded-xl shadow-xl max-w-4xl mx-auto flex flex-col md:flex-row gap-4 items-center">
             <div className="flex-1 w-full text-left px-4 md:border-r border-outline-variant/50">
               <label className="block text-xs uppercase tracking-widest font-bold text-outline mb-1 font-label">
-                {lang === 'bn' ? 'লোকেশন' : 'Location'}
+                {lang === 'bn' ? 'জেলা নির্বাচন' : 'Select District'}
               </label>
               <div className="flex items-center gap-2">
                 <MapPin className="h-5 w-5 text-primary" />
+                <select
+                  className="w-full bg-transparent border-none focus:ring-0 font-semibold text-on-surface outline-none cursor-pointer appearance-none"
+                  value={selectedDistrict}
+                  onChange={(e) => setSelectedDistrict(e.target.value)}
+                >
+                  <option value="">{lang === 'bn' ? 'সব জেলা' : 'All Districts'}</option>
+                  {divisions.map(div => (
+                    <optgroup key={div.name_en} label={lang === 'bn' ? div.name_bn : div.name_en}>
+                      {div.districts.map(d => (
+                        <option key={d.name_en} value={d.name_en}>
+                          {lang === 'bn' ? d.name_bn : d.name_en}
+                        </option>
+                      ))}
+                    </optgroup>
+                  ))}
+                </select>
+              </div>
+            </div>
+            <div className="flex-1 w-full text-left px-4 md:border-r border-outline-variant/50">
+              <label className="block text-xs uppercase tracking-widest font-bold text-outline mb-1 font-label">
+                {lang === 'bn' ? 'কীওয়ার্ড' : 'Keyword'}
+              </label>
+              <div className="flex items-center gap-2">
+                <Search className="h-5 w-5 text-primary" />
                 <input
                   className="w-full bg-transparent border-none focus:ring-0 font-semibold text-on-surface placeholder:text-outline-variant outline-none"
-                  placeholder={lang === 'bn' ? 'কোথায় খুঁজছেন?' : 'Where are you looking?'}
+                  placeholder={lang === 'bn' ? 'জমির ধরন, এলাকা...' : 'Land type, area...'}
                   value={searchQuery}
                   onChange={(e) => setSearchQuery(e.target.value)}
                   onKeyDown={(e) => e.key === 'Enter' && handleSearch()}

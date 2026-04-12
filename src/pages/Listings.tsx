@@ -6,6 +6,7 @@ import { useQuery } from '@tanstack/react-query';
 import { supabase } from '@/integrations/supabase/client';
 import Footer from '@/components/Footer';
 import { Search, MapPin, Ruler, Route, Heart, ChevronLeft, ChevronRight, ArrowRight, Map } from 'lucide-react';
+import { divisions } from '@/data/districts';
 
 const Listings = () => {
   const { t, lang } = useI18n();
@@ -13,8 +14,9 @@ const Listings = () => {
   const [searchParams] = useSearchParams();
   const initialSearch = searchParams.get('search') || '';
 
+  const initialDistrict = searchParams.get('district') || '';
   const [search, setSearch] = useState(initialSearch);
-  const [areaFilter, setAreaFilter] = useState('all');
+  const [areaFilter, setAreaFilter] = useState(initialDistrict || 'all');
   const [minPrice, setMinPrice] = useState('');
   const [maxPrice, setMaxPrice] = useState('');
   const [sizeFilter, setSizeFilter] = useState('all');
@@ -49,7 +51,7 @@ const Listings = () => {
       const title = lang === 'bn' ? l.title_bn : l.title_en;
       const loc = lang === 'bn' ? l.location_bn : l.location_en;
       const searchMatch = !search || title.toLowerCase().includes(search.toLowerCase()) || loc.toLowerCase().includes(search.toLowerCase());
-      const areaMatch = areaFilter === 'all' || loc === areaFilter;
+      const areaMatch = areaFilter === 'all' || loc.toLowerCase().includes(areaFilter.toLowerCase());
       const priceMinMatch = !minPrice || l.price >= Number(minPrice);
       const priceMaxMatch = !maxPrice || l.price <= Number(maxPrice);
       
@@ -167,18 +169,26 @@ const Listings = () => {
               </div>
             </div>
 
-            {/* Location */}
+            {/* Location - All 64 Districts */}
             <div className="mb-8">
               <label className="block font-label text-xs font-bold uppercase tracking-widest text-on-surface-variant mb-4">
-                {lang === 'bn' ? 'লোকেশন' : 'Location'}
+                {lang === 'bn' ? 'জেলা নির্বাচন' : 'Select District'}
               </label>
               <select
                 value={areaFilter}
                 onChange={(e) => { setAreaFilter(e.target.value); setCurrentPage(1); }}
                 className="w-full bg-surface-container-lowest border border-outline-variant/30 rounded-md py-2 px-3 text-sm focus:ring-primary focus:border-primary font-medium"
               >
-                <option value="all">{lang === 'bn' ? 'সব এলাকা' : 'All Areas'}</option>
-                {areas.map(a => <option key={a} value={a}>{a}</option>)}
+                <option value="all">{lang === 'bn' ? 'সব জেলা' : 'All Districts'}</option>
+                {divisions.map(div => (
+                  <optgroup key={div.name_en} label={lang === 'bn' ? div.name_bn : div.name_en}>
+                    {div.districts.map(d => (
+                      <option key={d.name_en} value={d.name_en}>
+                        {lang === 'bn' ? d.name_bn : d.name_en}
+                      </option>
+                    ))}
+                  </optgroup>
+                ))}
               </select>
             </div>
 

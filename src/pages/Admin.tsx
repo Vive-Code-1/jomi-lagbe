@@ -1172,4 +1172,93 @@ const ProfileSection = () => {
   );
 };
 
+/* ─── Contact Messages ─── */
+const ContactMessagesSection = () => {
+  const { lang } = useI18n();
+  const { user, isAdmin } = useAuth();
+  const queryClient = useQueryClient();
+
+  const { data: messages, isLoading } = useQuery({
+    queryKey: ['admin-contact-messages'],
+    enabled: !!user && isAdmin,
+    queryFn: async () => {
+      const { data, error } = await supabase.from('contact_messages' as any).select('*').order('created_at', { ascending: false });
+      if (error) throw error;
+      return data as any[];
+    },
+  });
+
+  const toggleRead = useMutation({
+    mutationFn: async ({ id, is_read }: { id: string; is_read: boolean }) => {
+      const { error } = await supabase.from('contact_messages' as any).update({ is_read } as any).eq('id', id);
+      if (error) throw error;
+    },
+    onSuccess: () => queryClient.invalidateQueries({ queryKey: ['admin-contact-messages'] }),
+  });
+
+  const deleteMessage = useMutation({
+    mutationFn: async (id: string) => {
+      const { error } = await supabase.from('contact_messages' as any).delete().eq('id', id);
+      if (error) throw error;
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['admin-contact-messages'] });
+      toast.success(lang === 'bn' ? 'বার্তা মুছে ফেলা হয়েছে' : 'Message deleted');
+    },
+  });
+
+  const unreadCount = messages?.filter((m: any) => !m.is_read).length || 0;
+
+  return (
+    <div className="space-y-4">
+      <div className="flex items-center justify-between">
+        <p className="text-sm text-muted-foreground">
+          {lang === 'bn' ? `${unreadCount}টি অপঠিত বার্তা` : `${unreadCount} unread messages`}
+        </p>
+      </div>
+      <Card className="border-none bg-card shadow-sm">
+        <CardContent className="p-0">
+          <Table>
+            <TableHeader>
+              <TableRow>
+                <TableHead>{lang === 'bn' ? 'নাম' : 'Name'}</TableHead>
+                <TableHead>{lang === 'bn' ? 'ইমেইল' : 'Email'}</TableHead>
+                <TableHead>{lang === 'bn' ? 'বিষয়' : 'Subject'}</TableHead>
+                <TableHead>{lang === 'bn' ? 'বার্তা' : 'Message'}</TableHead>
+                <TableHead>{lang === 'bn' ? 'তারিখ' : 'Date'}</TableHead>
+                <TableHead>{lang === 'bn' ? 'অ্যাকশন' : 'Actions'}</TableHead>
+              </TableRow>
+            </TableHeader>
+            <TableBody>
+              {isLoading ? (
+                <TableRow><TableCell colSpan={6} className="text-center py-8 text-muted-foreground">{lang === 'bn' ? 'লোড হচ্ছে...' : 'Loading...'}</TableCell></TableRow>
+              ) : messages && messages.length > 0 ? messages.map((msg: any) => (
+                <TableRow key={msg.id} className={msg.is_read ? '' : 'bg-primary/5'}>
+                  <TableCell className="font-medium">{msg.name}</TableCell>
+                  <TableCell className="text-muted-foreground">{msg.email}</TableCell>
+                  <TableCell className="text-muted-foreground">{msg.subject || '-'}</TableCell>
+                  <TableCell className="max-w-[200px] truncate text-muted-foreground">{msg.message}</TableCell>
+                  <TableCell className="text-muted-foreground text-xs">{new Date(msg.created_at).toLocaleDateString('bn-BD')}</TableCell>
+                  <TableCell>
+                    <div className="flex items-center gap-2">
+                      <Button variant="ghost" size="sm" onClick={() => toggleRead.mutate({ id: msg.id, is_read: !msg.is_read })}>
+                        <Eye className="h-4 w-4" />
+                      </Button>
+                      <Button variant="ghost" size="sm" className="text-destructive" onClick={() => deleteMessage.mutate(msg.id)}>
+                        <Trash2 className="h-4 w-4" />
+                      </Button>
+                    </div>
+                  </TableCell>
+                </TableRow>
+              )) : (
+                <TableRow><TableCell colSpan={6} className="text-center py-8 text-muted-foreground">{lang === 'bn' ? 'কোনো বার্তা পাওয়া যায়নি' : 'No messages found'}</TableCell></TableRow>
+              )}
+            </TableBody>
+          </Table>
+        </CardContent>
+      </Card>
+    </div>
+  );
+};
+
 export default Admin;

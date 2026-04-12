@@ -897,6 +897,7 @@ const ProfileSection = () => {
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['admin-profile'] });
+      queryClient.invalidateQueries({ queryKey: ['sidebar-profile'] });
       toast.success(lang === 'bn' ? 'নাম আপডেট হয়েছে' : 'Name updated');
     },
     onError: (err: any) => toast.error(err.message),

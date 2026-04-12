@@ -1,5 +1,5 @@
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
-import { BrowserRouter, Route, Routes } from "react-router-dom";
+import { BrowserRouter, Route, Routes, useLocation } from "react-router-dom";
 import { Toaster as Sonner } from "@/components/ui/sonner";
 import { Toaster } from "@/components/ui/toaster";
 import { TooltipProvider } from "@/components/ui/tooltip";
@@ -21,6 +21,31 @@ import NotFound from "./pages/NotFound";
 
 const queryClient = new QueryClient();
 
+const AppLayout = () => {
+  const location = useLocation();
+  const isAuthPage = location.pathname === '/auth';
+
+  return (
+    <>
+      <ScrollToTop />
+      {!isAuthPage && <Navbar />}
+      <Routes>
+        <Route path="/" element={<Index />} />
+        <Route path="/listings" element={<Listings />} />
+        <Route path="/land/:id" element={<LandDetail />} />
+        <Route path="/auth" element={<Auth />} />
+        <Route path="/favorites" element={<Favorites />} />
+        <Route path="/packages" element={<Packages />} />
+        <Route path="/admin" element={<Admin />} />
+        <Route path="/add-listing" element={<AddListing />} />
+        <Route path="/about" element={<About />} />
+        <Route path="/contact" element={<Contact />} />
+        <Route path="*" element={<NotFound />} />
+      </Routes>
+    </>
+  );
+};
+
 const App = () => (
   <QueryClientProvider client={queryClient}>
     <I18nProvider>
@@ -29,21 +54,7 @@ const App = () => (
         <Sonner />
         <BrowserRouter>
           <AuthProvider>
-            <ScrollToTop />
-            <Navbar />
-            <Routes>
-              <Route path="/" element={<Index />} />
-              <Route path="/listings" element={<Listings />} />
-              <Route path="/land/:id" element={<LandDetail />} />
-              <Route path="/auth" element={<Auth />} />
-              <Route path="/favorites" element={<Favorites />} />
-              <Route path="/packages" element={<Packages />} />
-              <Route path="/admin" element={<Admin />} />
-              <Route path="/add-listing" element={<AddListing />} />
-              <Route path="/about" element={<About />} />
-              <Route path="/contact" element={<Contact />} />
-              <Route path="*" element={<NotFound />} />
-            </Routes>
+            <AppLayout />
           </AuthProvider>
         </BrowserRouter>
       </TooltipProvider>

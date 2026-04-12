@@ -743,29 +743,47 @@ const AddListing = () => {
                 <CardContent className="p-6">
                   <h3 className="text-lg font-bold text-primary mb-4">{t('adPricing')}</h3>
                   <div className="space-y-4">
-                    {packages?.map(pkg => (
-                      <div
-                        key={pkg.id}
-                        className={`p-4 rounded-lg transition-all ${
-                          pkg.is_featured
-                            ? 'bg-accent/10 border border-accent/30'
-                            : 'bg-surface-container'
-                        }`}
-                      >
-                        <div className="flex items-center justify-between mb-1">
-                          <span className="font-bold text-on-surface">
-                            {lang === 'bn' ? pkg.name_bn : pkg.name_en}
-                          </span>
-                          {pkg.is_featured && (
-                            <span className="text-xs bg-accent text-accent-foreground px-2 py-0.5 rounded-full font-bold">
-                              {t('featured')}
+                    {packages?.map(pkg => {
+                      const features = pkg.is_featured
+                        ? [
+                            lang === 'bn' ? `${pkg.duration} দিন` : `${pkg.duration} days`,
+                            lang === 'bn' ? 'হোমপেজে ফিচার্ড' : 'Featured',
+                            lang === 'bn' ? 'প্রিমিয়াম ব্যাজ' : 'Premium badge',
+                          ]
+                        : [
+                            lang === 'bn' ? `${pkg.duration} দিন` : `${pkg.duration} days`,
+                            lang === 'bn' ? 'সাধারণ তালিকা' : 'Standard',
+                          ];
+                      return (
+                        <div
+                          key={pkg.id}
+                          className={`p-4 rounded-lg transition-all ${
+                            pkg.is_featured
+                              ? 'bg-accent/10 border border-accent/30'
+                              : 'bg-surface-container'
+                          }`}
+                        >
+                          <div className="flex items-center justify-between mb-1">
+                            <span className="font-bold text-on-surface">
+                              {lang === 'bn' ? pkg.name_bn : pkg.name_en}
                             </span>
-                          )}
+                            {pkg.is_featured && (
+                              <span className="text-xs bg-accent text-accent-foreground px-2 py-0.5 rounded-full font-bold">
+                                {lang === 'bn' ? 'সেরা' : 'BEST'}
+                              </span>
+                            )}
+                          </div>
+                          <p className="text-2xl font-bold text-primary">৳{pkg.price.toLocaleString()}</p>
+                          <ul className="mt-2 space-y-1">
+                            {features.map((f, i) => (
+                              <li key={i} className="flex items-center gap-1.5 text-xs text-on-surface-variant">
+                                <Check className="h-3 w-3 text-primary" /> {f}
+                              </li>
+                            ))}
+                          </ul>
                         </div>
-                        <p className="text-2xl font-bold text-primary">৳{pkg.price}</p>
-                        <p className="text-xs text-on-surface-variant">{pkg.duration} {t('days')}</p>
-                      </div>
-                    ))}
+                      );
+                    })}
                   </div>
                 </CardContent>
               </Card>

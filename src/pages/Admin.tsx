@@ -111,9 +111,12 @@ const Admin = () => {
           <button className="lg:hidden text-foreground" onClick={() => setSidebarOpen(true)}>
             <Menu className="h-5 w-5" />
           </button>
-          <h2 className="text-lg font-semibold text-foreground">
-            {menuItems.find(m => m.id === section)?.label}
-          </h2>
+          <div>
+            <h2 className="text-lg font-semibold text-foreground">
+              {menuItems.find(m => m.id === section)?.label}
+            </h2>
+            <p className="text-xs text-muted-foreground">{menuItems.find(m => m.id === section)?.desc}</p>
+          </div>
         </header>
 
         <main className="flex-1 overflow-y-auto p-6">

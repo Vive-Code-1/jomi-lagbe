@@ -55,7 +55,7 @@ const Footer = () => {
         </div>
       </div>
       <div className="border-t border-white/10 px-12 py-8 text-center text-[#aef2bb]/60 text-xs">
-        <p>© 2024 জমি লাগবে। সর্বস্বত্ব সংরক্ষিত।</p>
+        <p>© 2024 জমি লাগবে। সর্বস্বত্ব সংরক্ষিত। <a href="https://webogrowth.com/" target="_blank" rel="noopener noreferrer" className="text-secondary-container hover:text-white transition-all underline">Webogrowth</a></p>
       </div>
     </footer>
   );

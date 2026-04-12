@@ -202,7 +202,7 @@ const DashboardSection = () => {
               </TableRow>
             </TableHeader>
             <TableBody>
-              {recentLands?.map((land: any) => (
+              {recentLands && recentLands.length > 0 ? recentLands.map((land: any) => (
                 <TableRow key={land.id}>
                   <TableCell className="font-medium">{lang === 'bn' ? land.title_bn : land.title_en}</TableCell>
                   <TableCell className="text-muted-foreground">{lang === 'bn' ? land.location_bn : land.location_en}</TableCell>
@@ -213,7 +213,13 @@ const DashboardSection = () => {
                     </span>
                   </TableCell>
                 </TableRow>
-              ))}
+              )) : (
+                <TableRow>
+                  <TableCell colSpan={4} className="py-8 text-center text-muted-foreground">
+                    {lang === 'bn' ? 'কোনো লিস্টিং পাওয়া যায়নি' : 'No listings found'}
+                  </TableCell>
+                </TableRow>
+              )}
             </TableBody>
           </Table>
         </CardContent>

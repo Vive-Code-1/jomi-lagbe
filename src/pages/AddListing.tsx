@@ -120,6 +120,15 @@ const AddListing = () => {
     },
   });
 
+  const { data: paymentMethods } = useQuery({
+    queryKey: ['payment_methods'],
+    queryFn: async () => {
+      const { data, error } = await supabase.from('payment_methods' as any).select('*').eq('is_active', true);
+      if (error) throw error;
+      return data as any[];
+    },
+  });
+
   const selectedDivision = divisions.find(
     d => (lang === 'bn' ? d.name_bn : d.name_en) === formData.division
   );

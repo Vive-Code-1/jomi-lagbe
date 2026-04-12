@@ -10,7 +10,7 @@ import { Textarea } from '@/components/ui/textarea';
 import { Card, CardContent } from '@/components/ui/card';
 import { divisions } from '@/data/districts';
 import { toast } from 'sonner';
-import { Check, Plus, X, Shield, Star, Loader2 } from 'lucide-react';
+import { Check, Upload, X, Shield, Star, Loader2, ImagePlus } from 'lucide-react';
 import Footer from '@/components/Footer';
 
 interface FormData {
@@ -45,13 +45,16 @@ const initialFormData: FormData = {
   road_width: '',
   address_bn: '',
   address_en: '',
-  images: [''],
+  images: [],
   title_bn: '',
   title_en: '',
   package_id: '',
   owner_name: '',
   owner_phone: '',
 };
+
+const MAX_IMAGES = 5;
+const MAX_FILE_SIZE = 5 * 1024 * 1024; // 5MB
 
 const steps = [
   { num: 1, key: 'stepBasicInfo' },
@@ -67,7 +70,7 @@ const AddListing = () => {
   const [currentStep, setCurrentStep] = useState(1);
   const [formData, setFormData] = useState<FormData>(initialFormData);
   const [submitting, setSubmitting] = useState(false);
-
+  const [uploading, setUploading] = useState(false);
   useEffect(() => {
     if (!authLoading && !user) {
       toast.error(t('loginRequired'));
@@ -92,19 +95,55 @@ const AddListing = () => {
     setFormData(prev => ({ ...prev, [field]: value }));
   };
 
-  const addImageUrl = () => {
-    setFormData(prev => ({ ...prev, images: [...prev.images, ''] }));
+  const handleFileUpload = async (files: FileList | null) => {
+    if (!files || !user) return;
+    const fileArray = Array.from(files);
+    
+    if (formData.images.length + fileArray.length > MAX_IMAGES) {
+      toast.error(lang === 'bn' ? `সর্বোচ্চ ${MAX_IMAGES}টি ছবি আপলোড করা যাবে` : `Maximum ${MAX_IMAGES} images allowed`);
+      return;
+    }
+
+    for (const file of fileArray) {
+      if (file.size > MAX_FILE_SIZE) {
+        toast.error(lang === 'bn' ? `${file.name} — ফাইল সাইজ ৫MB এর বেশি` : `${file.name} exceeds 5MB limit`);
+        return;
+      }
+      if (!file.type.startsWith('image/')) {
+        toast.error(lang === 'bn' ? `${file.name} — শুধু ছবি ফাইল গ্রহণযোগ্য` : `${file.name} is not an image`);
+        return;
+      }
+    }
+
+    setUploading(true);
+    try {
+      const newUrls: string[] = [];
+      for (const file of fileArray) {
+        const ext = file.name.split('.').pop();
+        const path = `${user.id}/${Date.now()}-${Math.random().toString(36).slice(2)}.${ext}`;
+        const { error } = await supabase.storage.from('land-images').upload(path, file);
+        if (error) throw error;
+        const { data: urlData } = supabase.storage.from('land-images').getPublicUrl(path);
+        newUrls.push(urlData.publicUrl);
+      }
+      setFormData(prev => ({ ...prev, images: [...prev.images, ...newUrls] }));
+      toast.success(lang === 'bn' ? 'ছবি আপলোড সফল' : 'Images uploaded successfully');
+    } catch (err: any) {
+      toast.error(err.message || 'Upload failed');
+    } finally {
+      setUploading(false);
+    }
   };
 
-  const updateImageUrl = (index: number, value: string) => {
-    setFormData(prev => {
-      const images = [...prev.images];
-      images[index] = value;
-      return { ...prev, images };
-    });
-  };
-
-  const removeImageUrl = (index: number) => {
+  const removeImage = async (index: number) => {
+    const url = formData.images[index];
+    // Try to delete from storage
+    try {
+      const pathMatch = url.split('/land-images/')[1];
+      if (pathMatch) {
+        await supabase.storage.from('land-images').remove([decodeURIComponent(pathMatch)]);
+      }
+    } catch {}
     setFormData(prev => ({
       ...prev,
       images: prev.images.filter((_, i) => i !== index),
@@ -462,27 +501,58 @@ const AddListing = () => {
                     </div>
 
                     <div>
-                      <label className="block text-sm font-medium text-on-surface-variant mb-2">{t('imageUrls')}</label>
-                      <div className="space-y-3">
-                        {formData.images.map((url, i) => (
-                          <div key={i} className="flex gap-2">
-                            <Input
-                              value={url}
-                              onChange={e => updateImageUrl(i, e.target.value)}
-                              placeholder="https://example.com/image.jpg"
-                              className="bg-surface-container border-outline-variant/20 flex-1"
-                            />
-                            {formData.images.length > 1 && (
-                              <Button variant="ghost" size="icon" onClick={() => removeImageUrl(i)} className="text-destructive shrink-0">
-                                <X className="h-4 w-4" />
-                              </Button>
-                            )}
-                          </div>
-                        ))}
-                        <Button variant="outline" size="sm" onClick={addImageUrl} className="border-primary text-primary">
-                          <Plus className="h-4 w-4 mr-1" />{t('addImageUrl')}
-                        </Button>
-                      </div>
+                      <label className="block text-sm font-medium text-on-surface-variant mb-2">
+                        {lang === 'bn' ? 'ছবি আপলোড করুন' : 'Upload Images'} ({formData.images.length}/{MAX_IMAGES})
+                      </label>
+
+                      {/* Image Previews */}
+                      {formData.images.length > 0 && (
+                        <div className="grid grid-cols-2 sm:grid-cols-3 gap-3 mb-4">
+                          {formData.images.map((url, i) => (
+                            <div key={i} className="relative group aspect-video rounded-lg overflow-hidden bg-surface-container">
+                              <img src={url} alt={`Upload ${i + 1}`} className="w-full h-full object-cover" />
+                              <button
+                                type="button"
+                                onClick={() => removeImage(i)}
+                                className="absolute top-1.5 right-1.5 bg-destructive text-destructive-foreground rounded-full p-1 opacity-0 group-hover:opacity-100 transition-opacity"
+                              >
+                                <X className="h-3.5 w-3.5" />
+                              </button>
+                            </div>
+                          ))}
+                        </div>
+                      )}
+
+                      {/* Upload Area */}
+                      {formData.images.length < MAX_IMAGES && (
+                        <label
+                          className="flex flex-col items-center justify-center w-full h-40 rounded-xl border-2 border-dashed border-primary/30 bg-surface-container hover:bg-surface-container-high cursor-pointer transition-colors"
+                          onDragOver={e => { e.preventDefault(); e.stopPropagation(); }}
+                          onDrop={e => { e.preventDefault(); e.stopPropagation(); handleFileUpload(e.dataTransfer.files); }}
+                        >
+                          <input
+                            type="file"
+                            accept="image/*"
+                            multiple
+                            className="hidden"
+                            onChange={e => handleFileUpload(e.target.files)}
+                            disabled={uploading}
+                          />
+                          {uploading ? (
+                            <Loader2 className="h-8 w-8 animate-spin text-primary mb-2" />
+                          ) : (
+                            <ImagePlus className="h-8 w-8 text-primary/50 mb-2" />
+                          )}
+                          <span className="text-sm text-on-surface-variant">
+                            {uploading
+                              ? (lang === 'bn' ? 'আপলোড হচ্ছে...' : 'Uploading...')
+                              : (lang === 'bn' ? 'ক্লিক করুন বা ড্র্যাগ করুন' : 'Click or drag images here')}
+                          </span>
+                          <span className="text-xs text-on-surface-variant/60 mt-1">
+                            {lang === 'bn' ? 'সর্বোচ্চ ৫টি ছবি, প্রতিটি ৫MB' : 'Max 5 images, 5MB each'}
+                          </span>
+                        </label>
+                      )}
                     </div>
                   </div>
                 )}

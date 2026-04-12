@@ -513,6 +513,8 @@ const PaymentsSection = () => {
                 <TableHead>ID</TableHead>
                 <TableHead>Type</TableHead>
                 <TableHead>{lang === 'bn' ? 'পরিমাণ' : 'Amount'}</TableHead>
+                <TableHead>{lang === 'bn' ? 'প্রেরকের নাম্বার' : 'Sender'}</TableHead>
+                <TableHead>{lang === 'bn' ? 'TxID' : 'TxID'}</TableHead>
                 <TableHead>{lang === 'bn' ? 'স্ট্যাটাস' : 'Status'}</TableHead>
                 <TableHead>{lang === 'bn' ? 'তারিখ' : 'Date'}</TableHead>
                 <TableHead></TableHead>
@@ -524,6 +526,8 @@ const PaymentsSection = () => {
                   <TableCell className="font-mono text-xs text-muted-foreground">{p.id.slice(0, 8)}</TableCell>
                   <TableCell>{p.payment_type}</TableCell>
                   <TableCell className="font-medium">৳{p.amount?.toLocaleString()}</TableCell>
+                  <TableCell className="text-xs text-muted-foreground">{(p as any).sender_number || '-'}</TableCell>
+                  <TableCell className="font-mono text-xs text-muted-foreground">{(p as any).sender_transaction_id || '-'}</TableCell>
                   <TableCell>
                     <span className={`inline-flex rounded-full px-2 py-0.5 text-xs font-medium ${
                       p.status === 'completed' ? 'bg-primary/10 text-primary' :
@@ -543,7 +547,7 @@ const PaymentsSection = () => {
                   </TableCell>
                 </TableRow>
               )) : (
-                <TableRow><TableCell colSpan={6} className="py-8 text-center text-muted-foreground">{lang === 'bn' ? 'কোনো পেমেন্ট পাওয়া যায়নি' : 'No payments found'}</TableCell></TableRow>
+                <TableRow><TableCell colSpan={8} className="py-8 text-center text-muted-foreground">{lang === 'bn' ? 'কোনো পেমেন্ট পাওয়া যায়নি' : 'No payments found'}</TableCell></TableRow>
               )}
             </TableBody>
           </Table>

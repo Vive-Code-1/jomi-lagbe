@@ -171,6 +171,33 @@ export type Database = {
         }
         Relationships: []
       }
+      payment_methods: {
+        Row: {
+          account_number: string
+          created_at: string
+          id: string
+          is_active: boolean
+          method_name: string
+          payment_type: string
+        }
+        Insert: {
+          account_number: string
+          created_at?: string
+          id?: string
+          is_active?: boolean
+          method_name: string
+          payment_type?: string
+        }
+        Update: {
+          account_number?: string
+          created_at?: string
+          id?: string
+          is_active?: boolean
+          method_name?: string
+          payment_type?: string
+        }
+        Relationships: []
+      }
       payments: {
         Row: {
           amount: number
@@ -178,7 +205,10 @@ export type Database = {
           id: string
           land_id: string | null
           package_id: string | null
+          payment_method_id: string | null
           payment_type: string
+          sender_number: string | null
+          sender_transaction_id: string | null
           status: string
           transaction_id: string | null
           user_id: string
@@ -189,7 +219,10 @@ export type Database = {
           id?: string
           land_id?: string | null
           package_id?: string | null
+          payment_method_id?: string | null
           payment_type: string
+          sender_number?: string | null
+          sender_transaction_id?: string | null
           status?: string
           transaction_id?: string | null
           user_id: string
@@ -200,7 +233,10 @@ export type Database = {
           id?: string
           land_id?: string | null
           package_id?: string | null
+          payment_method_id?: string | null
           payment_type?: string
+          sender_number?: string | null
+          sender_transaction_id?: string | null
           status?: string
           transaction_id?: string | null
           user_id?: string
@@ -218,6 +254,13 @@ export type Database = {
             columns: ["package_id"]
             isOneToOne: false
             referencedRelation: "ad_packages"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "payments_payment_method_id_fkey"
+            columns: ["payment_method_id"]
+            isOneToOne: false
+            referencedRelation: "payment_methods"
             referencedColumns: ["id"]
           },
         ]

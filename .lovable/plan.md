@@ -1,38 +1,22 @@
 
 
-## About Us ও Contact Us পেজ তৈরি
+## ৩টি সমস্যা সমাধান
 
-### যা করা হবে
+### ১. ক্যাটেগরি ড্রপডাউনে বাম প্যাডিং
+- `select` এলিমেন্টের `option` গুলোতে `pl-3` বা inline style `paddingLeft` যোগ — তবে native `<option>` এ CSS সীমিত, তাই `select` এলিমেন্টেই `pl-2` প্যাডিং যোগ করা হবে।
 
-রেফারেন্স HTML ফাইল থেকে ডিজাইন হুবহু কপি করে ২টি আলাদা পেজ তৈরি করা হবে:
+### ২. ৩টি সেকশনের ব্যাকগ্রাউন্ড আলাদা করা
+বর্তমানে Reviews + Stats + FAQ সব `bg-surface-container-low`:
+- **Reviews সেকশন** (ক্যারোসেল): `bg-surface-container-low` → রাখা হবে
+- **Stats সেকশন** (১০০%, ৫০হাজার+, নিরাপদ, ২৪/৭): আলাদা `section` হিসেবে বের করে `bg-surface` দেওয়া হবে
+- **FAQ সেকশন**: `bg-surface-container` দেওয়া হবে
 
-1. **About Us পেজ** (`/about`) — Hero সেকশন (মিশন, স্ট্যাটস) + Bento Grid সেকশন ("কেন আমরা আলাদা?")
-2. **Contact Us পেজ** (`/contact`) — কন্টাক্ট ফর্ম + যোগাযোগ তথ্য (ফোন, ইমেইল, ঠিকানা, ম্যাপ) + FAQ সেকশন
+### ৩. Stats সেকশন কার্ড + হোভার + সেন্টার
+- Stats grid কে Reviews সেকশন থেকে আলাদা `section` এ নিয়ে আসা
+- প্রতিটি stat আইটেমকে কার্ড স্টাইল দেওয়া: `shadow-sm border border-outline-variant/20`
+- হোভার ইফেক্ট: `hover:shadow-lg hover:-translate-y-1 transition-all duration-300`
+- গ্রিড সেন্টার অ্যালাইন: `max-w-4xl mx-auto` দিয়ে মিডেল অ্যালাইন
 
 ### ফাইল পরিবর্তন
-
-1. **`src/pages/About.tsx`** (নতুন ফাইল)
-   - Hero: "OUR MISSION" ব্যাজ, "ভূমি মালিকানা হোক সহজ ও বিশ্বস্ত" হেডলাইন, বর্ণনা, ১০+ বছর ও ৫০০০+ ডিল স্ট্যাটস কার্ড, ডানে বড় ইমেজ
-   - Bento Grid: ৪টি কার্ড — যাচাইকৃত লিস্টিং (বড়, ইমেজসহ), আধুনিক ম্যাপ সুবিধা (সবুজ ব্যাকগ্রাউন্ড), নিরাপদ পেমেন্ট, ২৪/৭ সাপোর্ট (বড়, ইমেজসহ)
-   - Lucide আইকন ব্যবহার (ShieldCheck, Map, CreditCard, Headphones)
-   - Footer ইনক্লুড
-
-2. **`src/pages/Contact.tsx`** (নতুন ফাইল)
-   - বামে: "যোগাযোগ করুন" হেডিং, ফোন/ইমেইল/ঠিকানা তথ্য আইকনসহ, ম্যাপ ইমেজ
-   - ডানে: কন্টাক্ট ফর্ম (নাম, ইমেইল, বিষয় সিলেক্ট, বার্তা টেক্সটএরিয়া, সাবমিট বাটন)
-   - FAQ সেকশন: ৩টি প্রশ্ন-উত্তর Accordion স্টাইলে
-   - Footer ইনক্লুড
-
-3. **`src/App.tsx`**
-   - `/about` ও `/contact` রাউট যোগ
-
-4. **`src/components/Navbar.tsx`** ও **`src/components/Footer.tsx`**
-   - About Us ও Contact Us লিঙ্ক যোগ/আপডেট
-
-### টেকনিক্যাল ডিটেইলস
-
-- রেফারেন্স ইমেজের Google হোস্টেড ইমেজ URL সরাসরি ব্যবহার করা হবে
-- বাংলা/ইংরেজি দুই ভাষায় কনটেন্ট (`useI18n` হুক দিয়ে)
-- Heritage Modernist ডিজাইন সিস্টেম অনুসরণ: surface ব্যাকগ্রাউন্ড, primary/secondary কালার, bento-card hover effect
-- shadcn Accordion কম্পোনেন্ট FAQ-তে ব্যবহার
+- **`src/pages/Index.tsx`** — select প্যাডিং, Stats আলাদা section, কার্ড স্টাইল, FAQ ব্যাকগ্রাউন্ড পরিবর্তন
 

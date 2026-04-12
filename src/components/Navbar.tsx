@@ -2,7 +2,7 @@ import { NavLink, Link, useNavigate } from 'react-router-dom';
 import { Button } from '@/components/ui/button';
 import { useI18n } from '@/lib/i18n';
 import { useAuth } from '@/lib/auth';
-import { Heart, Menu, X, Globe, Bell, User } from 'lucide-react';
+import { Heart, Menu, X, Globe, Bell, User, Plus } from 'lucide-react';
 import { useState } from 'react';
 
 const activeClass = "text-primary font-bold border-b-2 border-secondary pb-1 text-sm tracking-tight whitespace-nowrap";
@@ -36,7 +36,13 @@ const Navbar = () => {
           {isAdmin && <NavLink to="/admin" className={linkClass}>{t('admin')}</NavLink>}
         </div>
 
-        <div className="hidden md:flex items-center gap-6">
+        <div className="hidden md:flex items-center gap-4">
+          {user && (
+            <Button size="sm" onClick={() => navigate('/add-listing')} className="bg-primary text-primary-foreground rounded-lg font-bold px-4">
+              <Plus className="h-4 w-4 mr-1" />
+              {lang === 'bn' ? 'বিজ্ঞাপন দিন' : 'Add Listing'}
+            </Button>
+          )}
           <Button variant="ghost" size="sm" onClick={() => setLang(lang === 'bn' ? 'en' : 'bn')} className="text-primary hover:text-primary">
             <Globe className="h-4 w-4 mr-1" />
             {lang === 'bn' ? 'EN' : 'বাং'}
@@ -75,6 +81,12 @@ const Navbar = () => {
             <Button variant="ghost" size="sm" onClick={() => setLang(lang === 'bn' ? 'en' : 'bn')} className="justify-start text-primary">
               <Globe className="h-4 w-4 mr-1" />{lang === 'bn' ? 'EN' : 'বাং'}
             </Button>
+            {user && (
+              <Button size="sm" onClick={() => { navigate('/add-listing'); setMobileOpen(false); }} className="bg-primary text-primary-foreground font-bold">
+                <Plus className="h-4 w-4 mr-1" />
+                {lang === 'bn' ? 'বিজ্ঞাপন দিন' : 'Add Listing'}
+              </Button>
+            )}
             {user ? (
               <Button variant="outline" size="sm" onClick={() => { signOut(); navigate('/'); setMobileOpen(false); }} className="border-primary text-primary">
                 {t('logout')}

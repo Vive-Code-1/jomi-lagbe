@@ -123,6 +123,7 @@ export type Database = {
           title_bn: string
           title_en: string
           updated_at: string
+          user_id: string | null
         }
         Insert: {
           area_size?: number
@@ -144,6 +145,7 @@ export type Database = {
           title_bn: string
           title_en: string
           updated_at?: string
+          user_id?: string | null
         }
         Update: {
           area_size?: number
@@ -165,6 +167,7 @@ export type Database = {
           title_bn?: string
           title_en?: string
           updated_at?: string
+          user_id?: string | null
         }
         Relationships: []
       }

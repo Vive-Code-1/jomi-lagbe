@@ -36,7 +36,13 @@ const Navbar = () => {
           {isAdmin && <NavLink to="/admin" className={linkClass}>{t('admin')}</NavLink>}
         </div>
 
-        <div className="hidden md:flex items-center gap-6">
+        <div className="hidden md:flex items-center gap-4">
+          {user && (
+            <Button size="sm" onClick={() => navigate('/add-listing')} className="bg-primary text-primary-foreground rounded-lg font-bold px-4">
+              <Plus className="h-4 w-4 mr-1" />
+              {lang === 'bn' ? 'বিজ্ঞাপন দিন' : 'Add Listing'}
+            </Button>
+          )}
           <Button variant="ghost" size="sm" onClick={() => setLang(lang === 'bn' ? 'en' : 'bn')} className="text-primary hover:text-primary">
             <Globe className="h-4 w-4 mr-1" />
             {lang === 'bn' ? 'EN' : 'বাং'}

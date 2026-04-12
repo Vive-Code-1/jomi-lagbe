@@ -232,7 +232,7 @@ const AddListing = () => {
         owner_phone: formData.owner_phone,
         images: formData.images.filter(url => url.trim() !== ''),
         is_featured: selectedPkg?.is_featured || false,
-        status: 'active',
+        status: 'pending',
         user_id: user.id,
       }).select().single();
 

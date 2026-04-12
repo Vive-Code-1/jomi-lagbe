@@ -93,7 +93,7 @@ const Index = () => {
                 <div className="flex items-center gap-2">
                   <MapPin className="h-4 w-4 text-primary flex-shrink-0" />
                   <select
-                    className="w-full bg-transparent border-none focus:ring-0 font-semibold text-sm text-on-surface outline-none cursor-pointer appearance-none"
+                    className="w-full bg-transparent border-none focus:ring-0 font-semibold text-sm text-on-surface outline-none cursor-pointer appearance-none pl-1"
                     value={selectedDistrict}
                     onChange={(e) => setSelectedDistrict(e.target.value)}
                   >
@@ -119,7 +119,7 @@ const Index = () => {
                 <div className="flex items-center gap-2">
                   <Ruler className="h-4 w-4 text-primary flex-shrink-0" />
                   <select
-                    className="w-full bg-transparent border-none focus:ring-0 font-semibold text-sm text-on-surface outline-none cursor-pointer appearance-none"
+                    className="w-full bg-transparent border-none focus:ring-0 font-semibold text-sm text-on-surface outline-none cursor-pointer appearance-none pl-1"
                     value={selectedLandType}
                     onChange={(e) => setSelectedLandType(e.target.value)}
                   >
@@ -407,25 +407,28 @@ const Index = () => {
           );
         })()}
 
-        <div className="max-w-7xl mx-auto px-6 md:px-8">
-          {/* Stats row */}
-          <div className="grid grid-cols-2 md:grid-cols-4 gap-6 mt-16">
-            <div className="flex flex-col items-center justify-center p-6 bg-surface-container-low rounded-xl text-center">
+      </section>
+
+      {/* Stats Section */}
+      <section className="py-20 md:py-24 bg-surface px-6 md:px-8">
+        <div className="max-w-4xl mx-auto">
+          <div className="grid grid-cols-2 md:grid-cols-4 gap-6">
+            <div className="flex flex-col items-center justify-center p-6 bg-card rounded-xl text-center border border-outline-variant/20 shadow-sm hover:shadow-lg hover:-translate-y-1 transition-all duration-300">
               <Shield className="h-8 w-8 text-primary mb-3" />
               <span className="text-2xl font-bold text-primary">১০০%</span>
               <p className="text-xs text-outline font-bold uppercase mt-1">{lang === 'bn' ? 'যাচাইকৃত তথ্য' : 'Verified Docs'}</p>
             </div>
-            <div className="flex flex-col items-center justify-center p-6 bg-surface-container-low rounded-xl text-center">
+            <div className="flex flex-col items-center justify-center p-6 bg-card rounded-xl text-center border border-outline-variant/20 shadow-sm hover:shadow-lg hover:-translate-y-1 transition-all duration-300">
               <Users className="h-8 w-8 text-secondary mb-3" />
               <span className="text-2xl font-bold text-primary">৫০হাজার+</span>
               <p className="text-xs text-outline font-bold uppercase mt-1">{lang === 'bn' ? 'সক্রিয় ইউজার' : 'Active Users'}</p>
             </div>
-            <div className="flex flex-col items-center justify-center p-6 bg-surface-container-low rounded-xl text-center">
+            <div className="flex flex-col items-center justify-center p-6 bg-card rounded-xl text-center border border-outline-variant/20 shadow-sm hover:shadow-lg hover:-translate-y-1 transition-all duration-300">
               <Shield className="h-8 w-8 text-primary mb-3" />
               <span className="text-2xl font-bold text-primary">{lang === 'bn' ? 'নিরাপদ' : 'Secure'}</span>
               <p className="text-xs text-outline font-bold uppercase mt-1">{lang === 'bn' ? 'নিরাপদ লেনদেন' : 'Secure Transactions'}</p>
             </div>
-            <div className="flex flex-col items-center justify-center p-6 bg-surface-container-low rounded-xl text-center">
+            <div className="flex flex-col items-center justify-center p-6 bg-card rounded-xl text-center border border-outline-variant/20 shadow-sm hover:shadow-lg hover:-translate-y-1 transition-all duration-300">
               <Headphones className="h-8 w-8 text-secondary mb-3" />
               <span className="text-2xl font-bold text-primary">২৪/৭</span>
               <p className="text-xs text-outline font-bold uppercase mt-1">{lang === 'bn' ? 'সাপোর্ট' : 'Expert Support'}</p>
@@ -435,7 +438,7 @@ const Index = () => {
       </section>
 
       {/* FAQ Section */}
-      <section className="py-20 md:py-24 bg-surface-container-low px-6 md:px-8">
+      <section className="py-20 md:py-24 bg-surface-container px-6 md:px-8">
         <div className="max-w-7xl mx-auto">
           <div className="text-center mb-16">
             <span className="font-bold text-sm text-secondary tracking-widest uppercase">

@@ -70,7 +70,7 @@ const AddListing = () => {
   const [currentStep, setCurrentStep] = useState(1);
   const [formData, setFormData] = useState<FormData>(initialFormData);
   const [submitting, setSubmitting] = useState(false);
-
+  const [uploading, setUploading] = useState(false);
   useEffect(() => {
     if (!authLoading && !user) {
       toast.error(t('loginRequired'));
@@ -95,19 +95,55 @@ const AddListing = () => {
     setFormData(prev => ({ ...prev, [field]: value }));
   };
 
-  const addImageUrl = () => {
-    setFormData(prev => ({ ...prev, images: [...prev.images, ''] }));
+  const handleFileUpload = async (files: FileList | null) => {
+    if (!files || !user) return;
+    const fileArray = Array.from(files);
+    
+    if (formData.images.length + fileArray.length > MAX_IMAGES) {
+      toast.error(lang === 'bn' ? `সর্বোচ্চ ${MAX_IMAGES}টি ছবি আপলোড করা যাবে` : `Maximum ${MAX_IMAGES} images allowed`);
+      return;
+    }
+
+    for (const file of fileArray) {
+      if (file.size > MAX_FILE_SIZE) {
+        toast.error(lang === 'bn' ? `${file.name} — ফাইল সাইজ ৫MB এর বেশি` : `${file.name} exceeds 5MB limit`);
+        return;
+      }
+      if (!file.type.startsWith('image/')) {
+        toast.error(lang === 'bn' ? `${file.name} — শুধু ছবি ফাইল গ্রহণযোগ্য` : `${file.name} is not an image`);
+        return;
+      }
+    }
+
+    setUploading(true);
+    try {
+      const newUrls: string[] = [];
+      for (const file of fileArray) {
+        const ext = file.name.split('.').pop();
+        const path = `${user.id}/${Date.now()}-${Math.random().toString(36).slice(2)}.${ext}`;
+        const { error } = await supabase.storage.from('land-images').upload(path, file);
+        if (error) throw error;
+        const { data: urlData } = supabase.storage.from('land-images').getPublicUrl(path);
+        newUrls.push(urlData.publicUrl);
+      }
+      setFormData(prev => ({ ...prev, images: [...prev.images, ...newUrls] }));
+      toast.success(lang === 'bn' ? 'ছবি আপলোড সফল' : 'Images uploaded successfully');
+    } catch (err: any) {
+      toast.error(err.message || 'Upload failed');
+    } finally {
+      setUploading(false);
+    }
   };
 
-  const updateImageUrl = (index: number, value: string) => {
-    setFormData(prev => {
-      const images = [...prev.images];
-      images[index] = value;
-      return { ...prev, images };
-    });
-  };
-
-  const removeImageUrl = (index: number) => {
+  const removeImage = async (index: number) => {
+    const url = formData.images[index];
+    // Try to delete from storage
+    try {
+      const pathMatch = url.split('/land-images/')[1];
+      if (pathMatch) {
+        await supabase.storage.from('land-images').remove([decodeURIComponent(pathMatch)]);
+      }
+    } catch {}
     setFormData(prev => ({
       ...prev,
       images: prev.images.filter((_, i) => i !== index),

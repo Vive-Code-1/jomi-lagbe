@@ -18,6 +18,7 @@ import AddListing from "./pages/AddListing";
 import About from "./pages/About";
 import Contact from "./pages/Contact";
 import NotFound from "./pages/NotFound";
+import UserDashboard from "./pages/UserDashboard";
 
 const queryClient = new QueryClient();
 

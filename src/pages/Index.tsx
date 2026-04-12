@@ -1,4 +1,4 @@
-import { useState, useRef } from 'react';
+import { useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { Button } from '@/components/ui/button';
 import { useI18n } from '@/lib/i18n';
@@ -6,9 +6,7 @@ import { useQuery } from '@tanstack/react-query';
 import { supabase } from '@/integrations/supabase/client';
 import LandCard from '@/components/LandCard';
 import Footer from '@/components/Footer';
-import { Search, MapPin, Ruler, Route, Upload, SearchCheck, CheckCircle, Shield, Users, Headphones, Star, ChevronDown, Quote } from 'lucide-react';
-import { Carousel, CarouselContent, CarouselItem, CarouselPrevious, CarouselNext } from '@/components/ui/carousel';
-import Autoplay from 'embla-carousel-autoplay';
+import { Search, MapPin, Ruler, Upload, SearchCheck, CheckCircle, Shield, Users, Headphones, Star, Quote } from 'lucide-react';
 import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from '@/components/ui/accordion';
 import { divisions } from '@/data/districts';
 
@@ -125,7 +123,7 @@ const Index = () => {
                     value={selectedLandType}
                     onChange={(e) => setSelectedLandType(e.target.value)}
                   >
-                    <option value="">{lang === 'bn' ? 'সব ক্যাটেগরি' : 'All Categories'}</option>
+                    <option value="">{lang === 'bn' ? 'জমির ধরন নির্বাচন করুন' : 'Select Land Type'}</option>
                     <option value="residential">{lang === 'bn' ? 'আবাসিক' : 'Residential'}</option>
                     <option value="commercial">{lang === 'bn' ? 'বাণিজ্যিক' : 'Commercial'}</option>
                     <option value="agriculture">{lang === 'bn' ? 'কৃষি' : 'Agriculture'}</option>
@@ -340,9 +338,9 @@ const Index = () => {
         </div>
       </section>
 
-      {/* Client Reviews Carousel */}
-      <section className="py-20 md:py-24 bg-surface px-6 md:px-8 overflow-hidden">
-        <div className="max-w-7xl mx-auto">
+      {/* Client Reviews Carousel - CSS Marquee Infinite Scroll */}
+      <section className="py-20 md:py-24 bg-surface overflow-hidden">
+        <div className="max-w-7xl mx-auto px-6 md:px-8">
           <div className="text-center mb-16">
             <span className="font-bold text-sm text-secondary tracking-widest uppercase">
               {lang === 'bn' ? 'ক্লায়েন্ট রিভিউ' : 'Client Reviews'}
@@ -351,63 +349,65 @@ const Index = () => {
               {lang === 'bn' ? 'বিশ্বস্ত ১০,০০০+ গ্রাহক' : 'Trusted by 10,000+ Clients'}
             </h2>
           </div>
+        </div>
 
-          <Carousel
-            opts={{ loop: true, align: 'start' }}
-            plugins={[Autoplay({ delay: 4000, stopOnInteraction: false })]}
-            className="w-full"
-          >
-            <CarouselContent className="-ml-4">
-              {[
-                { name_bn: 'তানভীর আহমেদ', name_en: 'Tanvir Ahmed', role_bn: 'যাচাইকৃত ক্রেতা', role_en: 'Verified Buyer', initial: 'ত',
-                  text_bn: '"Purbachal এ জমি কেনা নিয়ে খুব চিন্তিত ছিলাম। জমি লাগবে প্ল্যাটফর্মের মাধ্যমে আমি সরাসরি মালিকের সাথে কথা বলে ৫ কাঠার প্লটটি নিরাপদভাবে ক্রয় করেছি।"',
-                  text_en: '"I was worried about buying land in Purbachal. Through Jomi Lagbe, I talked directly with the owner and safely purchased a 5 katha plot."', rating: 5 },
-                { name_bn: 'এম এ রহমান', name_en: 'M A Rahman', role_bn: 'জমি মালিক', role_en: 'Land Owner', initial: 'র',
-                  text_bn: '"আমার পৈত্রিক সম্পত্তি বিক্রি করার জন্য অনেক দালাল ঘুরেছি। অবশেষে জমি লাগবে তে অ্যাড দিয়ে মাত্র ১০ দিনে একজন সিরিয়াস ইনভেস্টর পেয়ে গেলাম।"',
-                  text_en: '"I went through many brokers to sell my ancestral property. Finally, I posted on Jomi Lagbe and found a serious investor in just 10 days."', rating: 5 },
-                { name_bn: 'ফারহানা ইসলাম', name_en: 'Farhana Islam', role_bn: 'বিনিয়োগকারী', role_en: 'Investor', initial: 'ফ',
-                  text_bn: '"কৃষি জমিতে বিনিয়োগ করতে চেয়েছিলাম। জমি লাগবে থেকে ময়মনসিংহে ১০ বিঘা উর্বর জমি পেয়েছি একদম যাচাইকৃত দলিল সহ।"',
-                  text_en: '"I wanted to invest in agricultural land. Found 10 bigha fertile land in Mymensingh through Jomi Lagbe with fully verified documents."', rating: 5 },
-                { name_bn: 'কামরুল হাসান', name_en: 'Kamrul Hasan', role_bn: 'যাচাইকৃত ক্রেতা', role_en: 'Verified Buyer', initial: 'ক',
-                  text_bn: '"ঢাকার আশেপাশে কমার্শিয়াল প্লট খুঁজছিলাম। জমি লাগবে তে ফিল্টার করে সহজেই গাজীপুরে পারফেক্ট লোকেশন পেয়ে গেলাম।"',
-                  text_en: '"Was looking for commercial plots near Dhaka. Used Jomi Lagbe filters and easily found the perfect location in Gazipur."', rating: 5 },
-                { name_bn: 'সাবরিনা চৌধুরী', name_en: 'Sabrina Chowdhury', role_bn: 'জমি মালিক', role_en: 'Land Owner', initial: 'স',
-                  text_bn: '"প্ল্যাটফর্মটি অসাধারণ! আমার জমির বিজ্ঞাপন দেওয়ার ২ সপ্তাহের মধ্যে ৫ জন আগ্রহী ক্রেতা পেয়েছি। সত্যিই কাজের।"',
-                  text_en: '"The platform is amazing! Within 2 weeks of posting my land ad, I got 5 interested buyers. Truly effective."', rating: 5 },
-                { name_bn: 'আরিফুল ইসলাম', name_en: 'Ariful Islam', role_bn: 'বিনিয়োগকারী', role_en: 'Investor', initial: 'আ',
-                  text_bn: '"চট্টগ্রামে ইন্ডাস্ট্রিয়াল জমি খুঁজতে গিয়ে জমি লাগবে আমার জন্য সবচেয়ে ভালো অভিজ্ঞতা দিয়েছে। ম্যাপ ও ভেরিফাইড ডকুমেন্ট দেখে সিদ্ধান্ত নিতে সুবিধা হয়েছে।"',
-                  text_en: '"Jomi Lagbe gave me the best experience while searching for industrial land in Chittagong. The map and verified documents made decision-making easy."', rating: 5 },
-                { name_bn: 'নাজমুল হক', name_en: 'Nazmul Hoque', role_bn: 'যাচাইকৃত ক্রেতা', role_en: 'Verified Buyer', initial: 'ন',
-                  text_bn: '"সাভারে বাড়ির জন্য প্লট কিনেছি জমি লাগবে থেকে। মালিকের সাথে সরাসরি কথা বলে ডিল করেছি, কোনো দালালের ঝামেলা নেই।"',
-                  text_en: '"Bought a plot for a house in Savar from Jomi Lagbe. Dealt directly with the owner, no broker hassle."', rating: 4 },
-                { name_bn: 'রুমানা আক্তার', name_en: 'Rumana Akter', role_bn: 'জমি মালিক', role_en: 'Land Owner', initial: 'রু',
-                  text_bn: '"রাজশাহীতে আমার কৃষি জমি বিক্রি করতে জমি লাগবে ব্যবহার করেছি। সহজ প্রক্রিয়া, দ্রুত ক্রেতা পেয়েছি।"',
-                  text_en: '"Used Jomi Lagbe to sell my agricultural land in Rajshahi. Simple process, found a buyer quickly."', rating: 5 },
-              ].map((review, i) => (
-                <CarouselItem key={i} className="pl-4 md:basis-1/2 lg:basis-1/3">
-                  <div className="bg-surface-container-low p-8 rounded-xl shadow-sm h-full flex flex-col">
-                    <Quote className="h-8 w-8 text-secondary/30 mb-4" />
-                    <div className="flex gap-1 text-secondary mb-4">
-                      {[...Array(review.rating)].map((_, j) => <Star key={j} className="h-4 w-4 fill-current" />)}
-                    </div>
-                    <p className="text-on-surface leading-relaxed mb-6 italic flex-1 text-sm">
-                      {lang === 'bn' ? review.text_bn : review.text_en}
-                    </p>
-                    <div className="flex items-center gap-4 mt-auto">
-                      <div className="w-10 h-10 rounded-full bg-primary/10 flex items-center justify-center text-primary font-bold text-sm">{review.initial}</div>
-                      <div>
-                        <h4 className="font-bold text-primary text-sm">{lang === 'bn' ? review.name_bn : review.name_en}</h4>
-                        <p className="text-xs text-outline font-bold uppercase">{lang === 'bn' ? review.role_bn : review.role_en}</p>
+        {(() => {
+          const reviews = [
+            { name_bn: 'তানভীর আহমেদ', name_en: 'Tanvir Ahmed', role_bn: 'যাচাইকৃত ক্রেতা', role_en: 'Verified Buyer', initial: 'ত',
+              text_bn: '"Purbachal এ জমি কেনা নিয়ে খুব চিন্তিত ছিলাম। জমি লাগবে প্ল্যাটফর্মের মাধ্যমে আমি সরাসরি মালিকের সাথে কথা বলে ৫ কাঠার প্লটটি নিরাপদভাবে ক্রয় করেছি।"',
+              text_en: '"I was worried about buying land in Purbachal. Through Jomi Lagbe, I talked directly with the owner and safely purchased a 5 katha plot."', rating: 5 },
+            { name_bn: 'এম এ রহমান', name_en: 'M A Rahman', role_bn: 'জমি মালিক', role_en: 'Land Owner', initial: 'র',
+              text_bn: '"আমার পৈত্রিক সম্পত্তি বিক্রি করার জন্য অনেক দালাল ঘুরেছি। অবশেষে জমি লাগবে তে অ্যাড দিয়ে মাত্র ১০ দিনে একজন সিরিয়াস ইনভেস্টর পেয়ে গেলাম।"',
+              text_en: '"I went through many brokers to sell my ancestral property. Finally, I posted on Jomi Lagbe and found a serious investor in just 10 days."', rating: 5 },
+            { name_bn: 'ফারহানা ইসলাম', name_en: 'Farhana Islam', role_bn: 'বিনিয়োগকারী', role_en: 'Investor', initial: 'ফ',
+              text_bn: '"কৃষি জমিতে বিনিয়োগ করতে চেয়েছিলাম। জমি লাগবে থেকে ময়মনসিংহে ১০ বিঘা উর্বর জমি পেয়েছি একদম যাচাইকৃত দলিল সহ।"',
+              text_en: '"I wanted to invest in agricultural land. Found 10 bigha fertile land in Mymensingh through Jomi Lagbe with fully verified documents."', rating: 5 },
+            { name_bn: 'কামরুল হাসান', name_en: 'Kamrul Hasan', role_bn: 'যাচাইকৃত ক্রেতা', role_en: 'Verified Buyer', initial: 'ক',
+              text_bn: '"ঢাকার আশেপাশে কমার্শিয়াল প্লট খুঁজছিলাম। জমি লাগবে তে ফিল্টার করে সহজেই গাজীপুরে পারফেক্ট লোকেশন পেয়ে গেলাম।"',
+              text_en: '"Was looking for commercial plots near Dhaka. Used Jomi Lagbe filters and easily found the perfect location in Gazipur."', rating: 5 },
+            { name_bn: 'সাবরিনা চৌধুরী', name_en: 'Sabrina Chowdhury', role_bn: 'জমি মালিক', role_en: 'Land Owner', initial: 'স',
+              text_bn: '"প্ল্যাটফর্মটি অসাধারণ! আমার জমির বিজ্ঞাপন দেওয়ার ২ সপ্তাহের মধ্যে ৫ জন আগ্রহী ক্রেতা পেয়েছি। সত্যিই কাজের।"',
+              text_en: '"The platform is amazing! Within 2 weeks of posting my land ad, I got 5 interested buyers. Truly effective."', rating: 5 },
+            { name_bn: 'আরিফুল ইসলাম', name_en: 'Ariful Islam', role_bn: 'বিনিয়োগকারী', role_en: 'Investor', initial: 'আ',
+              text_bn: '"চট্টগ্রামে ইন্ডাস্ট্রিয়াল জমি খুঁজতে গিয়ে জমি লাগবে আমার জন্য সবচেয়ে ভালো অভিজ্ঞতা দিয়েছে। ম্যাপ ও ভেরিফাইড ডকুমেন্ট দেখে সিদ্ধান্ত নিতে সুবিধা হয়েছে।"',
+              text_en: '"Jomi Lagbe gave me the best experience while searching for industrial land in Chittagong. The map and verified documents made decision-making easy."', rating: 5 },
+            { name_bn: 'নাজমুল হক', name_en: 'Nazmul Hoque', role_bn: 'যাচাইকৃত ক্রেতা', role_en: 'Verified Buyer', initial: 'ন',
+              text_bn: '"সাভারে বাড়ির জন্য প্লট কিনেছি জমি লাগবে থেকে। মালিকের সাথে সরাসরি কথা বলে ডিল করেছি, কোনো দালালের ঝামেলা নেই।"',
+              text_en: '"Bought a plot for a house in Savar from Jomi Lagbe. Dealt directly with the owner, no broker hassle."', rating: 4 },
+            { name_bn: 'রুমানা আক্তার', name_en: 'Rumana Akter', role_bn: 'জমি মালিক', role_en: 'Land Owner', initial: 'রু',
+              text_bn: '"রাজশাহীতে আমার কৃষি জমি বিক্রি করতে জমি লাগবে ব্যবহার করেছি। সহজ প্রক্রিয়া, দ্রুত ক্রেতা পেয়েছি।"',
+              text_en: '"Used Jomi Lagbe to sell my agricultural land in Rajshahi. Simple process, found a buyer quickly."', rating: 5 },
+          ];
+          const duplicated = [...reviews, ...reviews];
+          return (
+            <div className="marquee-container">
+              <div className="marquee-track">
+                {duplicated.map((review, i) => (
+                  <div key={i} className="marquee-item">
+                    <div className="bg-surface-container-low p-8 rounded-xl shadow-sm h-full flex flex-col min-w-[320px] max-w-[380px]">
+                      <Quote className="h-8 w-8 text-secondary/30 mb-4" />
+                      <div className="flex gap-1 text-secondary mb-4">
+                        {[...Array(review.rating)].map((_, j) => <Star key={j} className="h-4 w-4 fill-current" />)}
+                      </div>
+                      <p className="text-on-surface leading-relaxed mb-6 italic flex-1 text-sm">
+                        {lang === 'bn' ? review.text_bn : review.text_en}
+                      </p>
+                      <div className="flex items-center gap-4 mt-auto">
+                        <div className="w-10 h-10 rounded-full bg-primary/10 flex items-center justify-center text-primary font-bold text-sm">{review.initial}</div>
+                        <div>
+                          <h4 className="font-bold text-primary text-sm">{lang === 'bn' ? review.name_bn : review.name_en}</h4>
+                          <p className="text-xs text-outline font-bold uppercase">{lang === 'bn' ? review.role_bn : review.role_en}</p>
+                        </div>
                       </div>
                     </div>
                   </div>
-                </CarouselItem>
-              ))}
-            </CarouselContent>
-            <CarouselPrevious className="hidden md:flex -left-4 bg-surface-container-low border-outline-variant/30 text-primary" />
-            <CarouselNext className="hidden md:flex -right-4 bg-surface-container-low border-outline-variant/30 text-primary" />
-          </Carousel>
+                ))}
+              </div>
+            </div>
+          );
+        })()}
 
+        <div className="max-w-7xl mx-auto px-6 md:px-8">
           {/* Stats row */}
           <div className="grid grid-cols-2 md:grid-cols-4 gap-6 mt-16">
             <div className="flex flex-col items-center justify-center p-6 bg-surface-container-low rounded-xl text-center">

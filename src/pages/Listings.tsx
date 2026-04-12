@@ -124,9 +124,9 @@ const Listings = () => {
               </label>
               <div className="grid grid-cols-2 gap-2">
                 {[
-                  { val: '3-5', label: '৩-৫ কাঠা' },
-                  { val: '5-10', label: '৫-১০ কাঠা' },
-                  { val: '10+', label: '১০+ কাঠা' },
+                  { val: '3-5', label: lang === 'bn' ? '৩-৫ কাঠা' : '3-5 Katha' },
+                  { val: '5-10', label: lang === 'bn' ? '৫-১০ কাঠা' : '5-10 Katha' },
+                  { val: '10+', label: lang === 'bn' ? '১০+ কাঠা' : '10+ Katha' },
                   { val: 'all', label: lang === 'bn' ? 'সবগুলো' : 'All' },
                 ].map(s => (
                   <button

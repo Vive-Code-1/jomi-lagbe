@@ -29,7 +29,6 @@ const Navbar = () => {
         <div className="hidden md:flex gap-6 items-center absolute left-1/2 -translate-x-1/2">
           <NavLink to="/" end className={linkClass}>{t('home')}</NavLink>
           <NavLink to="/listings" className={linkClass}>{t('listings')}</NavLink>
-          <NavLink to="/packages" className={linkClass}>{t('adPackages')}</NavLink>
           <NavLink to="/about" className={linkClass}>{lang === 'bn' ? 'আমাদের সম্পর্কে' : 'About Us'}</NavLink>
           <NavLink to="/contact" className={linkClass}>{lang === 'bn' ? 'যোগাযোগ' : 'Contact'}</NavLink>
           {user && <NavLink to="/favorites" className={linkClass}>{t('favorites')}</NavLink>}
@@ -73,7 +72,6 @@ const Navbar = () => {
           <div className="flex flex-col gap-4">
             <NavLink to="/" end onClick={() => setMobileOpen(false)} className={mobileLinkClass}>{t('home')}</NavLink>
             <NavLink to="/listings" onClick={() => setMobileOpen(false)} className={mobileLinkClass}>{t('listings')}</NavLink>
-            <NavLink to="/packages" onClick={() => setMobileOpen(false)} className={mobileLinkClass}>{t('adPackages')}</NavLink>
             <NavLink to="/about" onClick={() => setMobileOpen(false)} className={mobileLinkClass}>{lang === 'bn' ? 'আমাদের সম্পর্কে' : 'About Us'}</NavLink>
             <NavLink to="/contact" onClick={() => setMobileOpen(false)} className={mobileLinkClass}>{lang === 'bn' ? 'যোগাযোগ' : 'Contact'}</NavLink>
             {user && <NavLink to="/favorites" onClick={() => setMobileOpen(false)} className={mobileLinkClass}>{t('favorites')}</NavLink>}

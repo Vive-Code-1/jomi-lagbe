@@ -10,7 +10,7 @@ import { Textarea } from '@/components/ui/textarea';
 import { Card, CardContent } from '@/components/ui/card';
 import { divisions } from '@/data/districts';
 import { toast } from 'sonner';
-import { Check, Plus, X, Shield, Star, Loader2 } from 'lucide-react';
+import { Check, Upload, X, Shield, Star, Loader2, ImagePlus } from 'lucide-react';
 import Footer from '@/components/Footer';
 
 interface FormData {
@@ -45,13 +45,16 @@ const initialFormData: FormData = {
   road_width: '',
   address_bn: '',
   address_en: '',
-  images: [''],
+  images: [],
   title_bn: '',
   title_en: '',
   package_id: '',
   owner_name: '',
   owner_phone: '',
 };
+
+const MAX_IMAGES = 5;
+const MAX_FILE_SIZE = 5 * 1024 * 1024; // 5MB
 
 const steps = [
   { num: 1, key: 'stepBasicInfo' },

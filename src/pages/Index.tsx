@@ -30,6 +30,9 @@ const Index = () => {
   const navigate = useNavigate();
   const [searchQuery, setSearchQuery] = useState('');
   const [selectedDistrict, setSelectedDistrict] = useState('');
+  const [selectedLandType, setSelectedLandType] = useState('');
+  const [budgetMin, setBudgetMin] = useState('');
+  const [budgetMax, setBudgetMax] = useState('');
 
   const { data: featuredLands, isLoading } = useQuery({
     queryKey: ['featured-lands'],
@@ -50,6 +53,9 @@ const Index = () => {
     const params = new URLSearchParams();
     if (searchQuery) params.set('search', searchQuery);
     if (selectedDistrict) params.set('district', selectedDistrict);
+    if (selectedLandType) params.set('landType', selectedLandType);
+    if (budgetMin) params.set('minPrice', budgetMin);
+    if (budgetMax) params.set('maxPrice', budgetMax);
     navigate(`/listings?${params.toString()}`);
   };
 
@@ -76,53 +82,91 @@ const Index = () => {
           </p>
 
           {/* Search Bar */}
-          <div className="bg-surface/90 backdrop-blur-md p-4 md:p-6 rounded-xl shadow-xl max-w-4xl mx-auto flex flex-col md:flex-row gap-4 items-center">
-            <div className="flex-1 w-full text-left px-4 md:border-r border-outline-variant/50">
-              <label className="block text-xs uppercase tracking-widest font-bold text-outline mb-1 font-label">
-                {lang === 'bn' ? 'জেলা নির্বাচন' : 'Select District'}
-              </label>
-              <div className="flex items-center gap-2">
-                <MapPin className="h-5 w-5 text-primary" />
-                <select
-                  className="w-full bg-transparent border-none focus:ring-0 font-semibold text-on-surface outline-none cursor-pointer appearance-none"
-                  value={selectedDistrict}
-                  onChange={(e) => setSelectedDistrict(e.target.value)}
+          <div className="bg-surface-container-lowest/95 backdrop-blur-md p-3 md:p-4 rounded-2xl shadow-xl max-w-5xl mx-auto">
+            <div className="flex flex-col md:flex-row items-stretch">
+              {/* Location */}
+              <div className="flex-1 px-4 py-3 md:border-r border-outline-variant/30">
+                <label className="block text-[10px] uppercase tracking-[0.15em] font-bold text-outline mb-1.5 font-label">
+                  {lang === 'bn' ? 'লোকেশন' : 'LOCATION'}
+                </label>
+                <div className="flex items-center gap-2">
+                  <MapPin className="h-4 w-4 text-primary flex-shrink-0" />
+                  <select
+                    className="w-full bg-transparent border-none focus:ring-0 font-semibold text-sm text-on-surface outline-none cursor-pointer appearance-none"
+                    value={selectedDistrict}
+                    onChange={(e) => setSelectedDistrict(e.target.value)}
+                  >
+                    <option value="">{lang === 'bn' ? 'কোথায় খুঁজছেন?' : 'Where are you looking?'}</option>
+                    {divisions.map(div => (
+                      <optgroup key={div.name_en} label={lang === 'bn' ? div.name_bn : div.name_en}>
+                        {div.districts.map(d => (
+                          <option key={d.name_en} value={d.name_en}>
+                            {lang === 'bn' ? d.name_bn : d.name_en}
+                          </option>
+                        ))}
+                      </optgroup>
+                    ))}
+                  </select>
+                </div>
+              </div>
+
+              {/* Land Type */}
+              <div className="flex-1 px-4 py-3 md:border-r border-outline-variant/30">
+                <label className="block text-[10px] uppercase tracking-[0.15em] font-bold text-outline mb-1.5 font-label">
+                  {lang === 'bn' ? 'জমির ধরন' : 'LAND TYPE'}
+                </label>
+                <div className="flex items-center gap-2">
+                  <Ruler className="h-4 w-4 text-primary flex-shrink-0" />
+                  <select
+                    className="w-full bg-transparent border-none focus:ring-0 font-semibold text-sm text-on-surface outline-none cursor-pointer appearance-none"
+                    value={selectedLandType}
+                    onChange={(e) => setSelectedLandType(e.target.value)}
+                  >
+                    <option value="">{lang === 'bn' ? 'সব ক্যাটেগরি' : 'All Categories'}</option>
+                    <option value="residential">{lang === 'bn' ? 'আবাসিক' : 'Residential'}</option>
+                    <option value="commercial">{lang === 'bn' ? 'বাণিজ্যিক' : 'Commercial'}</option>
+                    <option value="agriculture">{lang === 'bn' ? 'কৃষি' : 'Agriculture'}</option>
+                    <option value="industrial">{lang === 'bn' ? 'শিল্প' : 'Industrial'}</option>
+                  </select>
+                </div>
+              </div>
+
+              {/* Budget Range */}
+              <div className="flex-1 px-4 py-3 md:border-r border-outline-variant/30">
+                <label className="block text-[10px] uppercase tracking-[0.15em] font-bold text-outline mb-1.5 font-label">
+                  {lang === 'bn' ? 'বাজেট রেঞ্জ' : 'BUDGET RANGE'}
+                </label>
+                <div className="flex items-center gap-2">
+                  <span className="text-primary font-bold text-sm flex-shrink-0">৳</span>
+                  <input
+                    type="number"
+                    className="w-full bg-transparent border-none focus:ring-0 font-semibold text-sm text-on-surface placeholder:text-outline-variant outline-none"
+                    placeholder={lang === 'bn' ? 'সর্বনিম্ন' : 'Min'}
+                    value={budgetMin}
+                    onChange={(e) => setBudgetMin(e.target.value)}
+                  />
+                  <span className="text-outline-variant">—</span>
+                  <input
+                    type="number"
+                    className="w-full bg-transparent border-none focus:ring-0 font-semibold text-sm text-on-surface placeholder:text-outline-variant outline-none"
+                    placeholder={lang === 'bn' ? 'সর্বোচ্চ' : 'Max'}
+                    value={budgetMax}
+                    onChange={(e) => setBudgetMax(e.target.value)}
+                  />
+                </div>
+              </div>
+
+              {/* Search Button */}
+              <div className="flex items-center px-2 py-3 md:py-0">
+                <button
+                  onClick={handleSearch}
+                  className="w-full md:w-auto bg-primary hover:opacity-90 text-primary-foreground px-8 py-3.5 rounded-xl font-bold flex items-center justify-center gap-2 transition-all duration-200 active:scale-95 whitespace-nowrap shadow-lg shadow-primary/20"
                 >
-                  <option value="">{lang === 'bn' ? 'সব জেলা' : 'All Districts'}</option>
-                  {divisions.map(div => (
-                    <optgroup key={div.name_en} label={lang === 'bn' ? div.name_bn : div.name_en}>
-                      {div.districts.map(d => (
-                        <option key={d.name_en} value={d.name_en}>
-                          {lang === 'bn' ? d.name_bn : d.name_en}
-                        </option>
-                      ))}
-                    </optgroup>
-                  ))}
-                </select>
+                  <Search className="h-5 w-5" />
+                  {lang === 'bn' ? 'জমি খুঁজুন' : 'Search Land'}
+                </button>
               </div>
             </div>
-            <div className="flex-1 w-full text-left px-4 md:border-r border-outline-variant/50">
-              <label className="block text-xs uppercase tracking-widest font-bold text-outline mb-1 font-label">
-                {lang === 'bn' ? 'কীওয়ার্ড' : 'Keyword'}
-              </label>
-              <div className="flex items-center gap-2">
-                <Search className="h-5 w-5 text-primary" />
-                <input
-                  className="w-full bg-transparent border-none focus:ring-0 font-semibold text-on-surface placeholder:text-outline-variant outline-none"
-                  placeholder={lang === 'bn' ? 'জমির ধরন, এলাকা...' : 'Land type, area...'}
-                  value={searchQuery}
-                  onChange={(e) => setSearchQuery(e.target.value)}
-                  onKeyDown={(e) => e.key === 'Enter' && handleSearch()}
-                />
-              </div>
-            </div>
-            <button
-              onClick={handleSearch}
-              className="bg-primary hover:opacity-90 text-primary-foreground px-8 py-4 rounded-lg font-bold flex items-center gap-2 transition-all duration-200 active:scale-95 whitespace-nowrap"
-            >
-              <Search className="h-5 w-5" />
-              {lang === 'bn' ? 'জমি খুঁজুন' : 'Search Land'}
-            </button>
           </div>
         </div>
       </section>

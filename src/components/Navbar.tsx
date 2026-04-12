@@ -81,6 +81,12 @@ const Navbar = () => {
             <Button variant="ghost" size="sm" onClick={() => setLang(lang === 'bn' ? 'en' : 'bn')} className="justify-start text-primary">
               <Globe className="h-4 w-4 mr-1" />{lang === 'bn' ? 'EN' : 'বাং'}
             </Button>
+            {user && (
+              <Button size="sm" onClick={() => { navigate('/add-listing'); setMobileOpen(false); }} className="bg-primary text-primary-foreground font-bold">
+                <Plus className="h-4 w-4 mr-1" />
+                {lang === 'bn' ? 'বিজ্ঞাপন দিন' : 'Add Listing'}
+              </Button>
+            )}
             {user ? (
               <Button variant="outline" size="sm" onClick={() => { signOut(); navigate('/'); setMobileOpen(false); }} className="border-primary text-primary">
                 {t('logout')}

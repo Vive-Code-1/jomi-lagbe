@@ -71,12 +71,39 @@ const AddListing = () => {
   const [formData, setFormData] = useState<FormData>(initialFormData);
   const [submitting, setSubmitting] = useState(false);
   const [uploading, setUploading] = useState(false);
-  useEffect(() => {
-    if (!authLoading && !user) {
-      toast.error(t('loginRequired'));
-      navigate('/auth');
-    }
-  }, [user, authLoading, navigate, t]);
+  // Show login prompt instead of redirecting
+  if (!authLoading && !user) {
+    return (
+      <div className="pt-24 pb-12 min-h-screen bg-muted/30">
+        <div className="max-w-lg mx-auto px-4">
+          <Card className="text-center">
+            <CardContent className="py-12 space-y-6">
+              <div className="w-16 h-16 bg-primary/10 rounded-full flex items-center justify-center mx-auto">
+                <Shield className="h-8 w-8 text-primary" />
+              </div>
+              <h2 className="text-2xl font-bold text-foreground">
+                {lang === 'bn' ? 'বিজ্ঞাপন দিতে লগইন করুন' : 'Login to Add Listing'}
+              </h2>
+              <p className="text-muted-foreground">
+                {lang === 'bn'
+                  ? 'জমি বিক্রির বিজ্ঞাপন দিতে আপনাকে প্রথমে লগইন বা রেজিস্ট্রেশন করতে হবে।'
+                  : 'You need to login or create an account to post a land listing.'}
+              </p>
+              <div className="flex flex-col gap-3">
+                <Button size="lg" onClick={() => navigate('/auth?redirect=/add-listing')} className="w-full">
+                  {lang === 'bn' ? 'লগইন করুন' : 'Login'}
+                </Button>
+                <Button variant="outline" size="lg" onClick={() => navigate('/auth?redirect=/add-listing&mode=register')} className="w-full">
+                  {lang === 'bn' ? 'নতুন একাউন্ট তৈরি করুন' : 'Create Account'}
+                </Button>
+              </div>
+            </CardContent>
+          </Card>
+        </div>
+        <Footer />
+      </div>
+    );
+  }
 
   const { data: packages } = useQuery({
     queryKey: ['ad_packages'],

@@ -155,6 +155,7 @@ const Admin = () => {
           {section === 'packages' && <PackagesSection />}
           {section === 'users' && <UsersSection />}
           {section === 'reviews' && <ReviewsSection />}
+          {section === 'payment-methods' && <PaymentMethodsSection />}
           {section === 'profile' && <ProfileSection />}
         </main>
       </div>
@@ -381,8 +382,16 @@ const ListingsSection = () => {
                     <Switch checked={land.is_featured} onCheckedChange={(c) => toggleFeatured.mutate({ id: land.id, featured: c })} />
                   </TableCell>
                   <TableCell>
-                    <button onClick={() => toggleStatus.mutate({ id: land.id, status: land.status === 'active' ? 'inactive' : 'active' })} className={`inline-flex rounded-full px-2 py-0.5 text-xs font-medium cursor-pointer ${land.status === 'active' ? 'bg-primary/10 text-primary' : 'bg-muted text-muted-foreground'}`}>
-                      {land.status}
+                    <button onClick={() => toggleStatus.mutate({ id: land.id, status: land.status === 'active' ? 'pending' : land.status === 'pending' ? 'rejected' : 'active' })} className={`inline-flex rounded-full px-2 py-0.5 text-xs font-medium cursor-pointer ${
+                      land.status === 'active' ? 'bg-green-100 text-green-800' : 
+                      land.status === 'pending' ? 'bg-yellow-100 text-yellow-800' : 
+                      land.status === 'rejected' ? 'bg-red-100 text-red-800' :
+                      'bg-muted text-muted-foreground'
+                    }`}>
+                      {land.status === 'active' ? (lang === 'bn' ? 'ভেরিফাইড' : 'Verified') : 
+                       land.status === 'pending' ? (lang === 'bn' ? 'পেন্ডিং' : 'Pending') :
+                       land.status === 'rejected' ? (lang === 'bn' ? 'প্রত্যাখ্যাত' : 'Rejected') : land.status}
+                    </button>
                     </button>
                   </TableCell>
                   <TableCell>

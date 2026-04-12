@@ -200,8 +200,15 @@ const AddListing = () => {
         return !!(formData.division && formData.district);
       case 3:
         return !!(formData.title_bn && formData.title_en);
-      case 4:
-        return !!formData.package_id;
+      case 4: {
+        const selectedPkg = packages?.find(p => p.id === formData.package_id);
+        const needsPayment = selectedPkg && selectedPkg.price > 0 && paymentMethods && paymentMethods.length > 0;
+        if (!formData.package_id) return false;
+        if (needsPayment) {
+          return !!(formData.payment_method_id && formData.sender_number.trim() && formData.sender_transaction_id.trim());
+        }
+        return true;
+      }
       default:
         return false;
     }
@@ -222,7 +229,15 @@ const AddListing = () => {
   const handleSubmit = async () => {
     if (!user) return;
     if (!validateStep(4)) {
-      toast.error(t('fillRequired'));
+      const selectedPkg = packages?.find(p => p.id === formData.package_id);
+      const needsPayment = selectedPkg && selectedPkg.price > 0 && paymentMethods && paymentMethods.length > 0;
+      if (needsPayment && !formData.payment_method_id) {
+        toast.error(lang === 'bn' ? 'পেমেন্ট মেথড নির্বাচন করুন' : 'Please select a payment method');
+      } else if (needsPayment && (!formData.sender_number.trim() || !formData.sender_transaction_id.trim())) {
+        toast.error(lang === 'bn' ? 'প্রেরকের নাম্বার ও ট্রানজেকশন আইডি দিন' : 'Enter sender number and transaction ID');
+      } else {
+        toast.error(t('fillRequired'));
+      }
       return;
     }
 

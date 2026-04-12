@@ -8,6 +8,27 @@ import Footer from '@/components/Footer';
 import { Search, MapPin, Ruler, Route, Heart, ChevronLeft, ChevronRight, ArrowRight, Map } from 'lucide-react';
 import { divisions } from '@/data/districts';
 
+const normalizeText = (value: string) => value.trim().toLowerCase();
+
+const districtAliasGroups = [
+  ['bogra', 'bogura', 'বগুড়া', 'বগুরা'],
+  ['chittagong', 'chattogram', 'চট্টগ্রাম'],
+  ["cox's bazar", "cক্সবাজার", 'coxsbazar', "cox'sbazar", 'কক্সবাজার'],
+  ['jessore', 'jashore', 'যশোর'],
+] as const;
+
+const getSearchVariants = (value: string) => {
+  const normalized = normalizeText(value);
+  const matchedGroup = districtAliasGroups.find((group) => group.some((item) => normalizeText(item) === normalized));
+  return matchedGroup ? matchedGroup.map(normalizeText) : [normalized];
+};
+
+const matchesAnyVariant = (value: string | null | undefined, query: string) => {
+  if (!query) return true;
+  const normalizedValue = normalizeText(value ?? '');
+  return getSearchVariants(query).some((variant) => normalizedValue.includes(variant));
+};
+
 const Listings = () => {
   const { t, lang } = useI18n();
   const { user } = useAuth();
@@ -53,12 +74,12 @@ const Listings = () => {
     if (!lands) return [];
     let result = lands.filter((l: any) => {
       const title = lang === 'bn' ? l.title_bn : l.title_en;
-      const loc = lang === 'bn' ? l.location_bn : l.location_en;
-      const searchMatch = !search || title.toLowerCase().includes(search.toLowerCase()) || loc.toLowerCase().includes(search.toLowerCase());
-      const areaMatch = areaFilter === 'all' || loc.toLowerCase().includes(areaFilter.toLowerCase());
+      const locations = [l.location_bn, l.location_en].filter(Boolean);
+      const searchMatch = !search || [title, l.title_bn, l.title_en, ...locations].some((value) => matchesAnyVariant(value, search));
+      const areaMatch = areaFilter === 'all' || locations.some((value) => matchesAnyVariant(value, areaFilter));
       const priceMinMatch = !minPrice || l.price >= Number(minPrice);
       const priceMaxMatch = !maxPrice || l.price <= Number(maxPrice);
-      
+
       let sizeMatch = true;
       if (sizeFilter === '3-5') sizeMatch = l.area_size >= 3 && l.area_size <= 5;
       else if (sizeFilter === '5-10') sizeMatch = l.area_size >= 5 && l.area_size <= 10;

@@ -501,27 +501,58 @@ const AddListing = () => {
                     </div>
 
                     <div>
-                      <label className="block text-sm font-medium text-on-surface-variant mb-2">{t('imageUrls')}</label>
-                      <div className="space-y-3">
-                        {formData.images.map((url, i) => (
-                          <div key={i} className="flex gap-2">
-                            <Input
-                              value={url}
-                              onChange={e => updateImageUrl(i, e.target.value)}
-                              placeholder="https://example.com/image.jpg"
-                              className="bg-surface-container border-outline-variant/20 flex-1"
-                            />
-                            {formData.images.length > 1 && (
-                              <Button variant="ghost" size="icon" onClick={() => removeImageUrl(i)} className="text-destructive shrink-0">
-                                <X className="h-4 w-4" />
-                              </Button>
-                            )}
-                          </div>
-                        ))}
-                        <Button variant="outline" size="sm" onClick={addImageUrl} className="border-primary text-primary">
-                          <Plus className="h-4 w-4 mr-1" />{t('addImageUrl')}
-                        </Button>
-                      </div>
+                      <label className="block text-sm font-medium text-on-surface-variant mb-2">
+                        {lang === 'bn' ? 'ছবি আপলোড করুন' : 'Upload Images'} ({formData.images.length}/{MAX_IMAGES})
+                      </label>
+
+                      {/* Image Previews */}
+                      {formData.images.length > 0 && (
+                        <div className="grid grid-cols-2 sm:grid-cols-3 gap-3 mb-4">
+                          {formData.images.map((url, i) => (
+                            <div key={i} className="relative group aspect-video rounded-lg overflow-hidden bg-surface-container">
+                              <img src={url} alt={`Upload ${i + 1}`} className="w-full h-full object-cover" />
+                              <button
+                                type="button"
+                                onClick={() => removeImage(i)}
+                                className="absolute top-1.5 right-1.5 bg-destructive text-destructive-foreground rounded-full p-1 opacity-0 group-hover:opacity-100 transition-opacity"
+                              >
+                                <X className="h-3.5 w-3.5" />
+                              </button>
+                            </div>
+                          ))}
+                        </div>
+                      )}
+
+                      {/* Upload Area */}
+                      {formData.images.length < MAX_IMAGES && (
+                        <label
+                          className="flex flex-col items-center justify-center w-full h-40 rounded-xl border-2 border-dashed border-primary/30 bg-surface-container hover:bg-surface-container-high cursor-pointer transition-colors"
+                          onDragOver={e => { e.preventDefault(); e.stopPropagation(); }}
+                          onDrop={e => { e.preventDefault(); e.stopPropagation(); handleFileUpload(e.dataTransfer.files); }}
+                        >
+                          <input
+                            type="file"
+                            accept="image/*"
+                            multiple
+                            className="hidden"
+                            onChange={e => handleFileUpload(e.target.files)}
+                            disabled={uploading}
+                          />
+                          {uploading ? (
+                            <Loader2 className="h-8 w-8 animate-spin text-primary mb-2" />
+                          ) : (
+                            <ImagePlus className="h-8 w-8 text-primary/50 mb-2" />
+                          )}
+                          <span className="text-sm text-on-surface-variant">
+                            {uploading
+                              ? (lang === 'bn' ? 'আপলোড হচ্ছে...' : 'Uploading...')
+                              : (lang === 'bn' ? 'ক্লিক করুন বা ড্র্যাগ করুন' : 'Click or drag images here')}
+                          </span>
+                          <span className="text-xs text-on-surface-variant/60 mt-1">
+                            {lang === 'bn' ? 'সর্বোচ্চ ৫টি ছবি, প্রতিটি ৫MB' : 'Max 5 images, 5MB each'}
+                          </span>
+                        </label>
+                      )}
                     </div>
                   </div>
                 )}

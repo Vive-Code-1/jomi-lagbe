@@ -24,11 +24,13 @@ const queryClient = new QueryClient();
 const AppLayout = () => {
   const location = useLocation();
   const isAuthPage = location.pathname === '/auth';
+  const isAdminPage = location.pathname.startsWith('/admin');
+  const hideChrome = isAuthPage || isAdminPage;
 
   return (
     <>
       <ScrollToTop />
-      {!isAuthPage && <Navbar />}
+      {!hideChrome && <Navbar />}
       <Routes>
         <Route path="/" element={<Index />} />
         <Route path="/listings" element={<Listings />} />

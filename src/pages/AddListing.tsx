@@ -229,7 +229,15 @@ const AddListing = () => {
   const handleSubmit = async () => {
     if (!user) return;
     if (!validateStep(4)) {
-      toast.error(t('fillRequired'));
+      const selectedPkg = packages?.find(p => p.id === formData.package_id);
+      const needsPayment = selectedPkg && selectedPkg.price > 0 && paymentMethods && paymentMethods.length > 0;
+      if (needsPayment && !formData.payment_method_id) {
+        toast.error(lang === 'bn' ? 'পেমেন্ট মেথড নির্বাচন করুন' : 'Please select a payment method');
+      } else if (needsPayment && (!formData.sender_number.trim() || !formData.sender_transaction_id.trim())) {
+        toast.error(lang === 'bn' ? 'প্রেরকের নাম্বার ও ট্রানজেকশন আইডি দিন' : 'Enter sender number and transaction ID');
+      } else {
+        toast.error(t('fillRequired'));
+      }
       return;
     }
 

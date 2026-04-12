@@ -111,6 +111,7 @@ export type Database = {
           id: string
           images: string[] | null
           is_featured: boolean
+          land_type: string
           location_bn: string
           location_en: string
           owner_address: string | null
@@ -131,6 +132,7 @@ export type Database = {
           id?: string
           images?: string[] | null
           is_featured?: boolean
+          land_type?: string
           location_bn?: string
           location_en?: string
           owner_address?: string | null
@@ -151,6 +153,7 @@ export type Database = {
           id?: string
           images?: string[] | null
           is_featured?: boolean
+          land_type?: string
           location_bn?: string
           location_en?: string
           owner_address?: string | null

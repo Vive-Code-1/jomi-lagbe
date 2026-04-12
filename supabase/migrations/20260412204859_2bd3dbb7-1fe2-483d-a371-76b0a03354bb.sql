@@ -1,0 +1,1 @@
+ALTER TABLE public.lands ADD COLUMN land_type text NOT NULL DEFAULT 'residential';

@@ -15,10 +15,14 @@ const Listings = () => {
   const initialSearch = searchParams.get('search') || '';
 
   const initialDistrict = searchParams.get('district') || '';
+  const initialLandType = searchParams.get('landType') || '';
+  const initialMinPrice = searchParams.get('minPrice') || '';
+  const initialMaxPrice = searchParams.get('maxPrice') || '';
   const [search, setSearch] = useState(initialSearch);
   const [areaFilter, setAreaFilter] = useState(initialDistrict || 'all');
-  const [minPrice, setMinPrice] = useState('');
-  const [maxPrice, setMaxPrice] = useState('');
+  const [minPrice, setMinPrice] = useState(initialMinPrice);
+  const [maxPrice, setMaxPrice] = useState(initialMaxPrice);
+  const [landTypeFilter, setLandTypeFilter] = useState(initialLandType || 'all');
   const [sizeFilter, setSizeFilter] = useState('all');
   const [roadFilter, setRoadFilter] = useState<string[]>([]);
   const [sortBy, setSortBy] = useState('newest');
@@ -64,7 +68,9 @@ const Listings = () => {
       if (roadFilter.includes('20+')) roadMatch = roadMatch && l.road_width >= 20;
       if (roadFilter.includes('40+')) roadMatch = roadMatch && l.road_width >= 40;
 
-      return searchMatch && areaMatch && priceMinMatch && priceMaxMatch && sizeMatch && roadMatch;
+      const landTypeMatch = landTypeFilter === 'all' || l.land_type === landTypeFilter;
+
+      return searchMatch && areaMatch && priceMinMatch && priceMaxMatch && sizeMatch && roadMatch && landTypeMatch;
     });
 
     if (sortBy === 'price-asc') result.sort((a: any, b: any) => a.price - b.price);
@@ -72,7 +78,7 @@ const Listings = () => {
     else if (sortBy === 'size-desc') result.sort((a: any, b: any) => b.area_size - a.area_size);
 
     return result;
-  }, [lands, search, areaFilter, minPrice, maxPrice, sizeFilter, roadFilter, sortBy, lang]);
+  }, [lands, search, areaFilter, minPrice, maxPrice, sizeFilter, roadFilter, sortBy, lang, landTypeFilter]);
 
   const totalPages = Math.ceil(filtered.length / perPage);
   const paginatedLands = filtered.slice((currentPage - 1) * perPage, currentPage * perPage);
@@ -83,7 +89,7 @@ const Listings = () => {
   };
 
   const clearFilters = () => {
-    setSearch(''); setAreaFilter('all'); setMinPrice(''); setMaxPrice(''); setSizeFilter('all'); setRoadFilter([]); setCurrentPage(1);
+    setSearch(''); setAreaFilter('all'); setMinPrice(''); setMaxPrice(''); setSizeFilter('all'); setRoadFilter([]); setLandTypeFilter('all'); setCurrentPage(1);
   };
 
   return (
@@ -165,6 +171,34 @@ const Listings = () => {
                     />
                     <span className="group-hover:text-primary transition-colors">{r.label}</span>
                   </label>
+                ))}
+              </div>
+            </div>
+
+            {/* Land Type / Category */}
+            <div className="mb-8">
+              <label className="block font-label text-xs font-bold uppercase tracking-widest text-on-surface-variant mb-4">
+                {lang === 'bn' ? 'জমির ধরন' : 'Land Type'}
+              </label>
+              <div className="grid grid-cols-2 gap-2">
+                {[
+                  { val: 'all', label: lang === 'bn' ? 'সবগুলো' : 'All' },
+                  { val: 'residential', label: lang === 'bn' ? 'আবাসিক' : 'Residential' },
+                  { val: 'commercial', label: lang === 'bn' ? 'বাণিজ্যিক' : 'Commercial' },
+                  { val: 'agriculture', label: lang === 'bn' ? 'কৃষি' : 'Agriculture' },
+                  { val: 'industrial', label: lang === 'bn' ? 'শিল্প' : 'Industrial' },
+                ].map(s => (
+                  <button
+                    key={s.val}
+                    onClick={() => { setLandTypeFilter(s.val); setCurrentPage(1); }}
+                    className={`px-3 py-2 text-xs rounded-md font-medium transition-colors ${
+                      landTypeFilter === s.val
+                        ? 'bg-primary text-primary-foreground'
+                        : 'bg-surface-container-lowest border border-outline-variant/30 hover:bg-surface-container'
+                    }`}
+                  >
+                    {s.label}
+                  </button>
                 ))}
               </div>
             </div>

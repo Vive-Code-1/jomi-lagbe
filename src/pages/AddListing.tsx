@@ -268,8 +268,8 @@ const AddListing = () => {
         if (paymentError) throw paymentError;
       }
 
-      toast.success(t('listingSuccess'));
-      navigate('/');
+      toast.success(lang === 'bn' ? 'আপনার বিজ্ঞাপন সাবমিট হয়েছে। অ্যাডমিন ভেরিফাই করার পর প্রকাশিত হবে।' : 'Listing submitted! It will be published after admin verification.');
+      navigate('/dashboard');
     } catch (err: any) {
       toast.error(err.message || t('error'));
     } finally {

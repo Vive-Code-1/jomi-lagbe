@@ -312,7 +312,7 @@ const Listings = () => {
                 const location = lang === 'bn' ? land.location_bn : land.location_en;
                 return (
                   <div key={land.id} className="group bg-surface-container-lowest rounded-xl overflow-hidden transition-all duration-300 hover:-translate-y-1 hover:shadow-[0px_24px_48px_rgba(27,29,14,0.08)]">
-                    <div className="relative h-64 overflow-hidden">
+                    <Link to={`/land/${land.id}`} className="relative h-64 overflow-hidden block">
                       <img
                         className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-110"
                         src={land.images?.[0] || '/placeholder.svg'}
@@ -331,12 +331,12 @@ const Listings = () => {
                           ৳ {land.price.toLocaleString()} / {lang === 'bn' ? 'কাঠা' : 'Katha'}
                         </span>
                       </div>
-                    </div>
+                    </Link>
                     <div className="p-6">
                       <div className="flex justify-between items-start mb-4">
-                        <h3 className="font-headline font-bold text-xl text-primary group-hover:text-secondary transition-colors line-clamp-1">
+                        <Link to={`/land/${land.id}`} className="font-headline font-bold text-xl text-primary group-hover:text-secondary transition-colors line-clamp-1">
                           {title}
-                        </h3>
+                        </Link>
                         <button className="text-on-surface-variant hover:text-destructive transition-colors flex-shrink-0 ml-2">
                           <Heart className="h-5 w-5" />
                         </button>

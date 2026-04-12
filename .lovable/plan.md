@@ -1,29 +1,25 @@
 
 
-## ২টি পরিবর্তন — ইমেজ আপলোড ফিচার ও ন্যাভবার আপডেট
+## "বিজ্ঞাপন দিন" বাটন সবার জন্য দেখানো + লগইন রিডাইরেক্ট ফ্লো
 
-### ১. ন্যাভবার থেকে "এড প্যাকেজ" মেনু সরানো
+### পরিবর্তন
 
-**`src/components/Navbar.tsx`:**
-- ডেস্কটপ ও মোবাইল উভয় মেনু থেকে `/packages` NavLink সরিয়ে ফেলা হবে
-- "বিজ্ঞাপন দিন" (Add Listing) বাটন ন্যাভ লিঙ্কের সাথে সেন্টারে দেখানো হবে (লগইন থাকলে)
+**১. `src/components/Navbar.tsx`:**
+- "বিজ্ঞাপন দিন" বাটন থেকে `{user && ...}` গার্ড সরিয়ে সবসময় দেখানো হবে (ডেস্কটপ + মোবাইল)
+- বাটন ক্লিক করলে সরাসরি `/add-listing` এ navigate করবে
 
-### ২. ইমেজ আপলোড ফিচার (URL এর বদলে ফাইল আপলোড)
+**২. `src/pages/AddListing.tsx`:**
+- লগইন না থাকলে সরাসরি `/auth` এ রিডাইরেক্ট না করে, পেজেই একটি লগইন/রেজিস্ট্রেশন প্রম্পট দেখানো হবে
+- "বিজ্ঞাপন দিতে লগইন করুন" মেসেজ + লগইন বাটন দেখাবে
+- লগইন বাটনে ক্লিক করলে `/auth?redirect=/add-listing` এ নিয়ে যাবে
 
-**Database Migration:**
-- `land-images` নামে একটি public storage bucket তৈরি
-- RLS পলিসি: authenticated ইউজাররা আপলোড করতে পারবে, সবাই দেখতে পারবে
-
-**`src/pages/AddListing.tsx`:**
-- Step 3 (Media) সেকশনে URL ইনপুট ফিল্ড সরিয়ে ফাইল আপলোড UI দেওয়া হবে
-- ড্র্যাগ-এন্ড-ড্রপ এরিয়া + "ছবি নির্বাচন করুন" বাটন
-- আপলোড করা ছবির প্রিভিউ থাম্বনেইল দেখানো হবে (X বাটন দিয়ে রিমুভ)
-- সর্বোচ্চ ৫টি ছবি, প্রতিটি সর্বোচ্চ 5MB
-- আপলোড লজিক: `supabase.storage.from('land-images').upload(...)` → public URL পেয়ে `formData.images` অ্যারেতে সেভ
-- `FormData` এর `images` ফিল্ড আগের মতোই string URL অ্যারে থাকবে, শুধু সোর্স হবে storage
+**৩. `src/pages/Auth.tsx`:**
+- URL থেকে `redirect` query param পড়বে
+- লগইন/রেজিস্ট্রেশন সফল হলে `redirect` প্যারামিটারে যে পাথ আছে সেখানে নিয়ে যাবে (ডিফল্ট `/`)
+- এতে নতুন একাউন্ট করলেও সরাসরি `/add-listing` পেজে ফিরে আসবে
 
 ### ফাইল পরিবর্তন
-1. **Database migration** — `land-images` storage bucket + RLS policies
-2. **`src/pages/AddListing.tsx`** — URL ইনপুট → ফাইল আপলোড UI + Supabase Storage integration
-3. **`src/components/Navbar.tsx`** — `/packages` লিঙ্ক সরানো
+1. `src/components/Navbar.tsx` — বাটন সবসময় দেখানো
+2. `src/pages/AddListing.tsx` — লগইন না থাকলে প্রম্পট UI দেখানো (রিডাইরেক্ট নয়)
+3. `src/pages/Auth.tsx` — redirect query param সাপোর্ট
 

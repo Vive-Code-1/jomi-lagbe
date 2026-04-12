@@ -200,8 +200,15 @@ const AddListing = () => {
         return !!(formData.division && formData.district);
       case 3:
         return !!(formData.title_bn && formData.title_en);
-      case 4:
-        return !!formData.package_id;
+      case 4: {
+        const selectedPkg = packages?.find(p => p.id === formData.package_id);
+        const needsPayment = selectedPkg && selectedPkg.price > 0 && paymentMethods && paymentMethods.length > 0;
+        if (!formData.package_id) return false;
+        if (needsPayment) {
+          return !!(formData.payment_method_id && formData.sender_number.trim() && formData.sender_transaction_id.trim());
+        }
+        return true;
+      }
       default:
         return false;
     }

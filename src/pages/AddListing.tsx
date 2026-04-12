@@ -31,6 +31,9 @@ interface FormData {
   package_id: string;
   owner_name: string;
   owner_phone: string;
+  sender_number: string;
+  sender_transaction_id: string;
+  payment_method_id: string;
 }
 
 const initialFormData: FormData = {
@@ -51,6 +54,9 @@ const initialFormData: FormData = {
   package_id: '',
   owner_name: '',
   owner_phone: '',
+  sender_number: '',
+  sender_transaction_id: '',
+  payment_method_id: '',
 };
 
 const MAX_IMAGES = 5;
@@ -111,6 +117,15 @@ const AddListing = () => {
       const { data, error } = await supabase.from('ad_packages').select('*').order('price', { ascending: true });
       if (error) throw error;
       return data;
+    },
+  });
+
+  const { data: paymentMethods } = useQuery({
+    queryKey: ['payment_methods'],
+    queryFn: async () => {
+      const { data, error } = await supabase.from('payment_methods' as any).select('*').eq('is_active', true);
+      if (error) throw error;
+      return data as any[];
     },
   });
 
@@ -232,7 +247,7 @@ const AddListing = () => {
         owner_phone: formData.owner_phone,
         images: formData.images.filter(url => url.trim() !== ''),
         is_featured: selectedPkg?.is_featured || false,
-        status: 'active',
+        status: 'pending',
         user_id: user.id,
       }).select().single();
 
@@ -246,12 +261,15 @@ const AddListing = () => {
           land_id: landData.id,
           package_id: selectedPkg.id,
           status: 'pending',
-        });
+          sender_number: formData.sender_number || null,
+          sender_transaction_id: formData.sender_transaction_id || null,
+          payment_method_id: formData.payment_method_id || null,
+        } as any);
         if (paymentError) throw paymentError;
       }
 
-      toast.success(t('listingSuccess'));
-      navigate('/');
+      toast.success(lang === 'bn' ? 'আপনার বিজ্ঞাপন সাবমিট হয়েছে। অ্যাডমিন ভেরিফাই করার পর প্রকাশিত হবে।' : 'Listing submitted! It will be published after admin verification.');
+      navigate('/dashboard');
     } catch (err: any) {
       toast.error(err.message || t('error'));
     } finally {
@@ -684,6 +702,74 @@ const AddListing = () => {
                         </div>
                       );
                     })()}
+
+                    {/* Payment Method Cards */}
+                    {formData.package_id && paymentMethods && paymentMethods.length > 0 && (
+                      <div className="mt-6 space-y-4">
+                        <h3 className="text-lg font-bold text-primary">
+                          {lang === 'bn' ? 'পেমেন্ট মেথড বেছে নিন' : 'Choose Payment Method'}
+                        </h3>
+                        <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                          {paymentMethods.map((m: any) => {
+                            const isSelected = formData.payment_method_id === m.id;
+                            return (
+                              <button
+                                key={m.id}
+                                type="button"
+                                onClick={() => updateField('payment_method_id', m.id)}
+                                className={`p-4 rounded-xl text-left transition-all border-2 ${
+                                  isSelected
+                                    ? 'border-primary bg-primary/5 ring-2 ring-primary/20'
+                                    : 'border-outline-variant/20 bg-surface-container hover:border-primary/40'
+                                }`}
+                              >
+                                <div className="flex items-center justify-between mb-2">
+                                  <span className="font-bold text-foreground text-lg">{m.method_name}</span>
+                                  {isSelected && <Check className="h-5 w-5 text-primary" />}
+                                </div>
+                                <p className="text-xl font-mono font-bold text-primary">{m.account_number}</p>
+                                <p className="text-xs text-muted-foreground mt-1">
+                                  {m.payment_type === 'send_money'
+                                    ? (lang === 'bn' ? 'সেন্ড মানি' : 'Send Money')
+                                    : (lang === 'bn' ? 'ক্যাশ আউট' : 'Cash Out')}
+                                </p>
+                              </button>
+                            );
+                          })}
+                        </div>
+
+                        {/* Sender Info */}
+                        {formData.payment_method_id && (
+                          <div className="mt-4 p-5 rounded-xl bg-surface-container border border-outline-variant/20 space-y-4">
+                            <h4 className="font-semibold text-foreground">
+                              {lang === 'bn' ? 'পেমেন্ট তথ্য দিন' : 'Enter Payment Details'}
+                            </h4>
+                            <div>
+                              <label className="block text-sm font-medium text-on-surface-variant mb-1.5">
+                                {lang === 'bn' ? 'আপনার নাম্বার (যেখান থেকে পাঠিয়েছেন)' : 'Your Number (sender)'}
+                              </label>
+                              <Input
+                                value={formData.sender_number}
+                                onChange={e => updateField('sender_number', e.target.value)}
+                                placeholder="01XXXXXXXXX"
+                                className="bg-surface-container border-outline-variant/20"
+                              />
+                            </div>
+                            <div>
+                              <label className="block text-sm font-medium text-on-surface-variant mb-1.5">
+                                {lang === 'bn' ? 'ট্রানজেকশন আইডি' : 'Transaction ID'}
+                              </label>
+                              <Input
+                                value={formData.sender_transaction_id}
+                                onChange={e => updateField('sender_transaction_id', e.target.value)}
+                                placeholder="e.g. ABC123XYZ"
+                                className="bg-surface-container border-outline-variant/20"
+                              />
+                            </div>
+                          </div>
+                        )}
+                      </div>
+                    )}
                   </div>
                 )}
 

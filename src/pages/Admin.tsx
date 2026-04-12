@@ -16,10 +16,10 @@ import { toast } from 'sonner';
 import {
   LayoutDashboard, MapPin, CreditCard, Package, Users, LogOut,
   Plus, Pencil, Trash2, DollarSign, TrendingUp, Eye, Search, Menu, X,
-  ChevronRight, Star, Globe, UserCircle, MessageSquare, Camera, Lock
+  ChevronRight, Star, Globe, UserCircle, MessageSquare, Camera, Lock, Wallet
 } from 'lucide-react';
 
-type Section = 'dashboard' | 'listings' | 'payments' | 'packages' | 'users' | 'reviews' | 'profile';
+type Section = 'dashboard' | 'listings' | 'payments' | 'packages' | 'users' | 'reviews' | 'profile' | 'payment-methods';
 
 const emptyLand = {
   title_bn: '', title_en: '', description_bn: '', description_en: '',
@@ -62,6 +62,7 @@ const Admin = () => {
     { id: 'packages' as Section, icon: Package, label: lang === 'bn' ? 'এড প্যাকেজ' : 'Ad Packages', desc: lang === 'bn' ? 'প্যাকেজ ম্যানেজ করুন' : 'Manage packages' },
     { id: 'users' as Section, icon: Users, label: lang === 'bn' ? 'ইউজার' : 'Users', desc: lang === 'bn' ? 'ইউজার ম্যানেজমেন্ট' : 'User management' },
     { id: 'reviews' as Section, icon: MessageSquare, label: lang === 'bn' ? 'রিভিউ' : 'Reviews', desc: lang === 'bn' ? 'রিভিউ ম্যানেজমেন্ট' : 'Manage reviews' },
+    { id: 'payment-methods' as Section, icon: Wallet, label: lang === 'bn' ? 'পেমেন্ট মেথড' : 'Payment Methods', desc: lang === 'bn' ? 'বিকাশ/নগদ সেটিং' : 'bKash/Nagad settings' },
     { id: 'profile' as Section, icon: UserCircle, label: lang === 'bn' ? 'প্রোফাইল' : 'Profile', desc: lang === 'bn' ? 'প্রোফাইল ও সিকিউরিটি' : 'Profile & security' },
   ];
 
@@ -154,6 +155,7 @@ const Admin = () => {
           {section === 'packages' && <PackagesSection />}
           {section === 'users' && <UsersSection />}
           {section === 'reviews' && <ReviewsSection />}
+          {section === 'payment-methods' && <PaymentMethodsSection />}
           {section === 'profile' && <ProfileSection />}
         </main>
       </div>
@@ -380,8 +382,15 @@ const ListingsSection = () => {
                     <Switch checked={land.is_featured} onCheckedChange={(c) => toggleFeatured.mutate({ id: land.id, featured: c })} />
                   </TableCell>
                   <TableCell>
-                    <button onClick={() => toggleStatus.mutate({ id: land.id, status: land.status === 'active' ? 'inactive' : 'active' })} className={`inline-flex rounded-full px-2 py-0.5 text-xs font-medium cursor-pointer ${land.status === 'active' ? 'bg-primary/10 text-primary' : 'bg-muted text-muted-foreground'}`}>
-                      {land.status}
+                    <button onClick={() => toggleStatus.mutate({ id: land.id, status: land.status === 'active' ? 'pending' : land.status === 'pending' ? 'rejected' : 'active' })} className={`inline-flex rounded-full px-2 py-0.5 text-xs font-medium cursor-pointer ${
+                      land.status === 'active' ? 'bg-green-100 text-green-800' : 
+                      land.status === 'pending' ? 'bg-yellow-100 text-yellow-800' : 
+                      land.status === 'rejected' ? 'bg-red-100 text-red-800' :
+                      'bg-muted text-muted-foreground'
+                    }`}>
+                      {land.status === 'active' ? (lang === 'bn' ? 'ভেরিফাইড' : 'Verified') : 
+                       land.status === 'pending' ? (lang === 'bn' ? 'পেন্ডিং' : 'Pending') :
+                       land.status === 'rejected' ? (lang === 'bn' ? 'প্রত্যাখ্যাত' : 'Rejected') : land.status}
                     </button>
                   </TableCell>
                   <TableCell>
@@ -504,6 +513,8 @@ const PaymentsSection = () => {
                 <TableHead>ID</TableHead>
                 <TableHead>Type</TableHead>
                 <TableHead>{lang === 'bn' ? 'পরিমাণ' : 'Amount'}</TableHead>
+                <TableHead>{lang === 'bn' ? 'প্রেরকের নাম্বার' : 'Sender'}</TableHead>
+                <TableHead>{lang === 'bn' ? 'TxID' : 'TxID'}</TableHead>
                 <TableHead>{lang === 'bn' ? 'স্ট্যাটাস' : 'Status'}</TableHead>
                 <TableHead>{lang === 'bn' ? 'তারিখ' : 'Date'}</TableHead>
                 <TableHead></TableHead>
@@ -515,6 +526,8 @@ const PaymentsSection = () => {
                   <TableCell className="font-mono text-xs text-muted-foreground">{p.id.slice(0, 8)}</TableCell>
                   <TableCell>{p.payment_type}</TableCell>
                   <TableCell className="font-medium">৳{p.amount?.toLocaleString()}</TableCell>
+                  <TableCell className="text-xs text-muted-foreground">{(p as any).sender_number || '-'}</TableCell>
+                  <TableCell className="font-mono text-xs text-muted-foreground">{(p as any).sender_transaction_id || '-'}</TableCell>
                   <TableCell>
                     <span className={`inline-flex rounded-full px-2 py-0.5 text-xs font-medium ${
                       p.status === 'completed' ? 'bg-primary/10 text-primary' :
@@ -534,7 +547,7 @@ const PaymentsSection = () => {
                   </TableCell>
                 </TableRow>
               )) : (
-                <TableRow><TableCell colSpan={6} className="py-8 text-center text-muted-foreground">{lang === 'bn' ? 'কোনো পেমেন্ট পাওয়া যায়নি' : 'No payments found'}</TableCell></TableRow>
+                <TableRow><TableCell colSpan={8} className="py-8 text-center text-muted-foreground">{lang === 'bn' ? 'কোনো পেমেন্ট পাওয়া যায়নি' : 'No payments found'}</TableCell></TableRow>
               )}
             </TableBody>
           </Table>
@@ -863,6 +876,149 @@ const ReviewsSection = () => {
           </div>
         </DialogContent>
       </Dialog>
+    </div>
+  );
+};
+
+/* ─── Payment Methods ─── */
+const PaymentMethodsSection = () => {
+  const { lang } = useI18n();
+  const { user, isAdmin } = useAuth();
+  const queryClient = useQueryClient();
+  const [form, setForm] = useState({ method_name: '', account_number: '', payment_type: 'send_money', is_active: true });
+  const [editingId, setEditingId] = useState<string | null>(null);
+  const [dialogOpen, setDialogOpen] = useState(false);
+
+  const { data: methods } = useQuery({
+    queryKey: ['admin-payment-methods'],
+    enabled: !!user && isAdmin,
+    queryFn: async () => {
+      const { data, error } = await supabase.from('payment_methods' as any).select('*').order('created_at', { ascending: false });
+      if (error) throw error;
+      return data as any[];
+    },
+  });
+
+  const saveMethod = useMutation({
+    mutationFn: async () => {
+      if (!form.method_name.trim() || !form.account_number.trim()) {
+        throw new Error(lang === 'bn' ? 'নাম ও নাম্বার দিন' : 'Name and number required');
+      }
+      if (editingId) {
+        const { error } = await supabase.from('payment_methods' as any).update(form as any).eq('id', editingId);
+        if (error) throw error;
+      } else {
+        const { error } = await supabase.from('payment_methods' as any).insert(form as any);
+        if (error) throw error;
+      }
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['admin-payment-methods'] });
+      setDialogOpen(false);
+      setForm({ method_name: '', account_number: '', payment_type: 'send_money', is_active: true });
+      setEditingId(null);
+      toast.success(lang === 'bn' ? 'সেভ হয়েছে' : 'Saved');
+    },
+    onError: (err: any) => toast.error(err.message),
+  });
+
+  const deleteMethod = useMutation({
+    mutationFn: async (id: string) => {
+      const { error } = await supabase.from('payment_methods' as any).delete().eq('id', id);
+      if (error) throw error;
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['admin-payment-methods'] });
+      toast.success(lang === 'bn' ? 'মুছে ফেলা হয়েছে' : 'Deleted');
+    },
+  });
+
+  const toggleActive = useMutation({
+    mutationFn: async ({ id, active }: { id: string; active: boolean }) => {
+      const { error } = await supabase.from('payment_methods' as any).update({ is_active: active } as any).eq('id', id);
+      if (error) throw error;
+    },
+    onSuccess: () => queryClient.invalidateQueries({ queryKey: ['admin-payment-methods'] }),
+  });
+
+  return (
+    <div className="space-y-4">
+      <div className="flex justify-end">
+        <Dialog open={dialogOpen} onOpenChange={setDialogOpen}>
+          <DialogTrigger asChild>
+            <Button onClick={() => { setForm({ method_name: '', account_number: '', payment_type: 'send_money', is_active: true }); setEditingId(null); }}>
+              <Plus className="mr-1 h-4 w-4" /> {lang === 'bn' ? 'মেথড যোগ করুন' : 'Add Method'}
+            </Button>
+          </DialogTrigger>
+          <DialogContent>
+            <DialogHeader>
+              <DialogTitle>{editingId ? (lang === 'bn' ? 'মেথড এডিট' : 'Edit Method') : (lang === 'bn' ? 'নতুন পেমেন্ট মেথড' : 'New Payment Method')}</DialogTitle>
+            </DialogHeader>
+            <div className="grid gap-4">
+              <div>
+                <Label>{lang === 'bn' ? 'মেথডের নাম' : 'Method Name'}</Label>
+                <Input value={form.method_name} onChange={(e) => setForm({ ...form, method_name: e.target.value })} placeholder="বিকাশ, নগদ, রকেট..." />
+              </div>
+              <div>
+                <Label>{lang === 'bn' ? 'একাউন্ট নাম্বার' : 'Account Number'}</Label>
+                <Input value={form.account_number} onChange={(e) => setForm({ ...form, account_number: e.target.value })} placeholder="01XXXXXXXXX" />
+              </div>
+              <div>
+                <Label>{lang === 'bn' ? 'পেমেন্ট টাইপ' : 'Payment Type'}</Label>
+                <select
+                  value={form.payment_type}
+                  onChange={(e) => setForm({ ...form, payment_type: e.target.value })}
+                  className="mt-1 w-full rounded border border-border bg-background px-3 py-2 text-sm text-foreground"
+                >
+                  <option value="send_money">{lang === 'bn' ? 'সেন্ড মানি' : 'Send Money'}</option>
+                  <option value="cash_out">{lang === 'bn' ? 'ক্যাশ আউট' : 'Cash Out'}</option>
+                </select>
+              </div>
+              <div className="flex items-center gap-2">
+                <Switch checked={form.is_active} onCheckedChange={(c) => setForm({ ...form, is_active: c })} />
+                <Label>{lang === 'bn' ? 'সক্রিয়' : 'Active'}</Label>
+              </div>
+              <Button onClick={() => saveMethod.mutate()} disabled={saveMethod.isPending}>
+                {saveMethod.isPending ? '...' : (lang === 'bn' ? 'সেভ করুন' : 'Save')}
+              </Button>
+            </div>
+          </DialogContent>
+        </Dialog>
+      </div>
+
+      <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
+        {methods?.map((m: any) => (
+          <Card key={m.id} className={`border-none shadow-sm ${!m.is_active ? 'opacity-50' : ''}`}>
+            <CardContent className="p-5 space-y-3">
+              <div className="flex items-center justify-between">
+                <h3 className="text-lg font-bold text-foreground">{m.method_name}</h3>
+                <Switch checked={m.is_active} onCheckedChange={(c) => toggleActive.mutate({ id: m.id, active: c })} />
+              </div>
+              <p className="text-2xl font-mono font-bold text-primary">{m.account_number}</p>
+              <p className="text-sm text-muted-foreground">
+                {m.payment_type === 'send_money' ? (lang === 'bn' ? 'সেন্ড মানি' : 'Send Money') : (lang === 'bn' ? 'ক্যাশ আউট' : 'Cash Out')}
+              </p>
+              <div className="flex gap-2 pt-2">
+                <Button variant="outline" size="sm" onClick={() => {
+                  setForm({ method_name: m.method_name, account_number: m.account_number, payment_type: m.payment_type, is_active: m.is_active });
+                  setEditingId(m.id);
+                  setDialogOpen(true);
+                }}>
+                  <Pencil className="mr-1 h-3 w-3" /> {lang === 'bn' ? 'এডিট' : 'Edit'}
+                </Button>
+                <Button variant="outline" size="sm" onClick={() => deleteMethod.mutate(m.id)} className="text-destructive hover:text-destructive">
+                  <Trash2 className="mr-1 h-3 w-3" /> {lang === 'bn' ? 'মুছুন' : 'Delete'}
+                </Button>
+              </div>
+            </CardContent>
+          </Card>
+        ))}
+        {(!methods || methods.length === 0) && (
+          <p className="col-span-full text-center py-8 text-muted-foreground">
+            {lang === 'bn' ? 'কোনো পেমেন্ট মেথড নেই' : 'No payment methods yet'}
+          </p>
+        )}
+      </div>
     </div>
   );
 };

@@ -18,6 +18,7 @@ import AddListing from "./pages/AddListing";
 import About from "./pages/About";
 import Contact from "./pages/Contact";
 import NotFound from "./pages/NotFound";
+import UserDashboard from "./pages/UserDashboard";
 
 const queryClient = new QueryClient();
 
@@ -37,6 +38,7 @@ const AppLayout = () => {
         <Route path="/land/:id" element={<LandDetail />} />
         <Route path="/auth" element={<Auth />} />
         <Route path="/favorites" element={<Favorites />} />
+        <Route path="/dashboard" element={<UserDashboard />} />
         <Route path="/packages" element={<Packages />} />
         <Route path="/admin" element={<Admin />} />
         <Route path="/add-listing" element={<AddListing />} />

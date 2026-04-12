@@ -493,7 +493,7 @@ const PaymentsSection = () => {
               </TableRow>
             </TableHeader>
             <TableBody>
-              {filtered?.map((p: any) => (
+              {filtered && filtered.length > 0 ? filtered.map((p: any) => (
                 <TableRow key={p.id}>
                   <TableCell className="font-mono text-xs text-muted-foreground">{p.id.slice(0, 8)}</TableCell>
                   <TableCell>{p.payment_type}</TableCell>
@@ -509,7 +509,13 @@ const PaymentsSection = () => {
                   </TableCell>
                   <TableCell className="text-muted-foreground">{new Date(p.created_at).toLocaleDateString()}</TableCell>
                 </TableRow>
-              ))}
+              )) : (
+                <TableRow>
+                  <TableCell colSpan={5} className="py-8 text-center text-muted-foreground">
+                    {lang === 'bn' ? 'কোনো পেমেন্ট পাওয়া যায়নি' : 'No payments found'}
+                  </TableCell>
+                </TableRow>
+              )}
             </TableBody>
           </Table>
         </CardContent>

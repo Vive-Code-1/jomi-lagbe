@@ -42,11 +42,11 @@ const Admin = () => {
   if (!authLoading && (!user || !isAdmin)) return <Navigate to="/" />;
 
   const menuItems = [
-    { id: 'dashboard' as Section, icon: LayoutDashboard, label: lang === 'bn' ? 'ড্যাশবোর্ড' : 'Dashboard' },
-    { id: 'listings' as Section, icon: MapPin, label: lang === 'bn' ? 'লিস্টিং' : 'My Listings' },
-    { id: 'payments' as Section, icon: CreditCard, label: lang === 'bn' ? 'পেমেন্ট' : 'Payments' },
-    { id: 'packages' as Section, icon: Package, label: lang === 'bn' ? 'এড প্যাকেজ' : 'Ad Packages' },
-    { id: 'users' as Section, icon: Users, label: lang === 'bn' ? 'ইউজার' : 'Users' },
+    { id: 'dashboard' as Section, icon: LayoutDashboard, label: lang === 'bn' ? 'ড্যাশবোর্ড' : 'Dashboard', desc: lang === 'bn' ? 'সামগ্রিক পরিসংখ্যান' : 'Overview & stats' },
+    { id: 'listings' as Section, icon: MapPin, label: lang === 'bn' ? 'লিস্টিং' : 'My Listings', desc: lang === 'bn' ? 'জমি ম্যানেজ করুন' : 'Manage properties' },
+    { id: 'payments' as Section, icon: CreditCard, label: lang === 'bn' ? 'পেমেন্ট' : 'Payments', desc: lang === 'bn' ? 'লেনদেনের ইতিহাস' : 'Transaction history' },
+    { id: 'packages' as Section, icon: Package, label: lang === 'bn' ? 'এড প্যাকেজ' : 'Ad Packages', desc: lang === 'bn' ? 'প্যাকেজ ম্যানেজ করুন' : 'Manage packages' },
+    { id: 'users' as Section, icon: Users, label: lang === 'bn' ? 'ইউজার' : 'Users', desc: lang === 'bn' ? 'ইউজার ম্যানেজমেন্ট' : 'User management' },
   ];
 
   return (
@@ -57,13 +57,13 @@ const Admin = () => {
       )}
 
       {/* Sidebar */}
-      <aside className={`fixed inset-y-0 left-0 z-50 flex w-64 flex-col bg-sidebar-background text-sidebar-foreground transition-transform lg:static lg:translate-x-0 ${sidebarOpen ? 'translate-x-0' : '-translate-x-full'}`}>
-        <div className="flex items-center justify-between px-6 py-6">
+      <aside className={`fixed inset-y-0 left-0 z-50 flex w-64 flex-col bg-sidebar text-white transition-transform lg:static lg:translate-x-0 ${sidebarOpen ? 'translate-x-0' : '-translate-x-full'}`}>
+        <div className="flex items-center justify-between px-6 py-6 border-b border-white/10">
           <div>
-            <h1 className="font-serif text-lg font-bold text-sidebar-accent">জমি লাগবে</h1>
-            <p className="text-[11px] uppercase tracking-[0.2em] text-sidebar-foreground/50">Admin Portal</p>
+            <h1 className="font-serif text-xl font-bold text-white">জমি লাগবে</h1>
+            <p className="text-[11px] uppercase tracking-[0.2em] text-white/40">Admin Portal</p>
           </div>
-          <button className="lg:hidden text-sidebar-foreground/60" onClick={() => setSidebarOpen(false)}>
+          <button className="lg:hidden text-white/60 hover:text-white" onClick={() => setSidebarOpen(false)}>
             <X className="h-5 w-5" />
           </button>
         </div>
@@ -75,8 +75,8 @@ const Admin = () => {
               onClick={() => { setSection(item.id); setSidebarOpen(false); }}
               className={`flex w-full items-center gap-3 rounded-lg px-4 py-3 text-sm font-medium transition-all ${
                 section === item.id
-                  ? 'bg-sidebar-accent/20 text-sidebar-accent'
-                  : 'text-sidebar-foreground/70 hover:bg-sidebar-foreground/10 hover:text-sidebar-foreground'
+                  ? 'bg-white/15 text-white'
+                  : 'text-white/60 hover:bg-white/10 hover:text-white'
               }`}
             >
               <item.icon className="h-[18px] w-[18px]" />
@@ -86,17 +86,17 @@ const Admin = () => {
           ))}
         </nav>
 
-        <div className="border-t border-sidebar-border px-3 py-4 space-y-1">
+        <div className="border-t border-white/10 px-3 py-4 space-y-1">
           <button
             onClick={() => navigate('/')}
-            className="flex w-full items-center gap-3 rounded-lg px-4 py-3 text-sm text-sidebar-foreground/60 hover:bg-sidebar-foreground/10 hover:text-sidebar-foreground transition-all"
+            className="flex w-full items-center gap-3 rounded-lg px-4 py-3 text-sm text-white/50 hover:bg-white/10 hover:text-white transition-all"
           >
             <Eye className="h-[18px] w-[18px]" />
             {lang === 'bn' ? 'সাইট দেখুন' : 'View Site'}
           </button>
           <button
             onClick={() => signOut()}
-            className="flex w-full items-center gap-3 rounded-lg px-4 py-3 text-sm text-destructive/80 hover:bg-destructive/10 transition-all"
+            className="flex w-full items-center gap-3 rounded-lg px-4 py-3 text-sm text-red-300/80 hover:bg-red-500/10 hover:text-red-300 transition-all"
           >
             <LogOut className="h-[18px] w-[18px]" />
             {t('logout')}
@@ -111,9 +111,12 @@ const Admin = () => {
           <button className="lg:hidden text-foreground" onClick={() => setSidebarOpen(true)}>
             <Menu className="h-5 w-5" />
           </button>
-          <h2 className="text-lg font-semibold text-foreground">
-            {menuItems.find(m => m.id === section)?.label}
-          </h2>
+          <div>
+            <h2 className="text-lg font-semibold text-foreground">
+              {menuItems.find(m => m.id === section)?.label}
+            </h2>
+            <p className="text-xs text-muted-foreground">{menuItems.find(m => m.id === section)?.desc}</p>
+          </div>
         </header>
 
         <main className="flex-1 overflow-y-auto p-6">
@@ -199,7 +202,7 @@ const DashboardSection = () => {
               </TableRow>
             </TableHeader>
             <TableBody>
-              {recentLands?.map((land: any) => (
+              {recentLands && recentLands.length > 0 ? recentLands.map((land: any) => (
                 <TableRow key={land.id}>
                   <TableCell className="font-medium">{lang === 'bn' ? land.title_bn : land.title_en}</TableCell>
                   <TableCell className="text-muted-foreground">{lang === 'bn' ? land.location_bn : land.location_en}</TableCell>
@@ -210,7 +213,13 @@ const DashboardSection = () => {
                     </span>
                   </TableCell>
                 </TableRow>
-              ))}
+              )) : (
+                <TableRow>
+                  <TableCell colSpan={4} className="py-8 text-center text-muted-foreground">
+                    {lang === 'bn' ? 'কোনো লিস্টিং পাওয়া যায়নি' : 'No listings found'}
+                  </TableCell>
+                </TableRow>
+              )}
             </TableBody>
           </Table>
         </CardContent>
@@ -348,7 +357,7 @@ const ListingsSection = () => {
               </TableRow>
             </TableHeader>
             <TableBody>
-              {filtered?.map((land: any) => (
+              {filtered && filtered.length > 0 ? filtered.map((land: any) => (
                 <TableRow key={land.id}>
                   <TableCell className="font-medium">{lang === 'bn' ? land.title_bn : land.title_en}</TableCell>
                   <TableCell className="text-muted-foreground">{lang === 'bn' ? land.location_bn : land.location_en}</TableCell>
@@ -378,7 +387,13 @@ const ListingsSection = () => {
                     </div>
                   </TableCell>
                 </TableRow>
-              ))}
+              )) : (
+                <TableRow>
+                  <TableCell colSpan={6} className="py-8 text-center text-muted-foreground">
+                    {lang === 'bn' ? 'কোনো লিস্টিং পাওয়া যায়নি' : 'No listings found'}
+                  </TableCell>
+                </TableRow>
+              )}
             </TableBody>
           </Table>
         </CardContent>
@@ -478,7 +493,7 @@ const PaymentsSection = () => {
               </TableRow>
             </TableHeader>
             <TableBody>
-              {filtered?.map((p: any) => (
+              {filtered && filtered.length > 0 ? filtered.map((p: any) => (
                 <TableRow key={p.id}>
                   <TableCell className="font-mono text-xs text-muted-foreground">{p.id.slice(0, 8)}</TableCell>
                   <TableCell>{p.payment_type}</TableCell>
@@ -494,7 +509,13 @@ const PaymentsSection = () => {
                   </TableCell>
                   <TableCell className="text-muted-foreground">{new Date(p.created_at).toLocaleDateString()}</TableCell>
                 </TableRow>
-              ))}
+              )) : (
+                <TableRow>
+                  <TableCell colSpan={5} className="py-8 text-center text-muted-foreground">
+                    {lang === 'bn' ? 'কোনো পেমেন্ট পাওয়া যায়নি' : 'No payments found'}
+                  </TableCell>
+                </TableRow>
+              )}
             </TableBody>
           </Table>
         </CardContent>
@@ -668,7 +689,7 @@ const UsersSection = () => {
             </TableRow>
           </TableHeader>
           <TableBody>
-            {profiles?.map((p: any) => (
+            {profiles && profiles.length > 0 ? profiles.map((p: any) => (
               <TableRow key={p.id}>
                 <TableCell className="font-medium">{p.full_name || '-'}</TableCell>
                 <TableCell className="font-mono text-xs text-muted-foreground">{p.user_id.slice(0, 8)}...</TableCell>
@@ -680,7 +701,13 @@ const UsersSection = () => {
                   />
                 </TableCell>
               </TableRow>
-            ))}
+            )) : (
+              <TableRow>
+                <TableCell colSpan={4} className="py-8 text-center text-muted-foreground">
+                  {lang === 'bn' ? 'কোনো ইউজার পাওয়া যায়নি' : 'No users found'}
+                </TableCell>
+              </TableRow>
+            )}
           </TableBody>
         </Table>
       </CardContent>

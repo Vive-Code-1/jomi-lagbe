@@ -102,6 +102,13 @@ const translations = {
     confirm: 'নিশ্চিত করুন',
     back: 'পিছনে',
     contactUnlockFee: 'মালিকের তথ্য আনলক ফি',
+    pricePerDecimal: 'প্রতি শতক দাম',
+    unlockOwnerNumber: 'মালিকের নম্বর আনলক করুন',
+    mapLocation: 'মানচিত্র অবস্থান',
+    safetyTips: 'নিরাপত্তা টিপস',
+    tip1: 'জমি কেনার আগে সরাসরি পরিদর্শন করুন।',
+    tip2: 'দলিল ও রেকর্ড যাচাই করুন।',
+    tip3: 'বিশ্বস্ত আইনজীবীর পরামর্শ নিন।',
   },
   en: {
     home: 'Home',
@@ -193,6 +200,13 @@ const translations = {
     confirm: 'Confirm',
     back: 'Back',
     contactUnlockFee: 'Owner Info Unlock Fee',
+    pricePerDecimal: 'Price per Decimal',
+    unlockOwnerNumber: 'Unlock Owner Number',
+    mapLocation: 'Map Location',
+    safetyTips: 'Safety Tips',
+    tip1: 'Visit the land in person before buying.',
+    tip2: 'Verify all documents and records.',
+    tip3: 'Consult a trusted lawyer.',
   },
 } as const;
 

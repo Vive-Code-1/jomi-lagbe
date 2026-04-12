@@ -1,28 +1,37 @@
 
 
-## হোমপেজে ক্লায়েন্ট রিভিউ ক্যারোসেল ও FAQ সেকশন যোগ
+## ৪টি সমস্যা সমাধান
 
-### যা করা হবে
+### সমস্যা বিশ্লেষণ
 
-1. **ক্লায়েন্ট রিভিউ ক্যারোসেল** — বর্তমান Trust সেকশনের টেস্টিমোনিয়ালগুলো একটি ইনফিনিটি অটো-স্ক্রল ক্যারোসেলে রূপান্তর করা হবে। আরও ৪-৫টি ডেমো রিভিউ যোগ হবে। `embla-carousel` (যা ইতোমধ্যে ইনস্টল আছে) + `autoplay` plugin ব্যবহার করে ইনফিনিট লুপ স্ক্রল করবে।
+1. **ক্যারোসেল** — বর্তমানে Embla `Autoplay` delay-ভিত্তিক (থেমে থেমে যাচ্ছে)। CSS marquee-style continuous scroll দরকার। বাম/ডান নেভ আইকন রিমুভ করতে হবে।
+2. **"সব ক্যাটেগরি"** — ড্রপডাউনের placeholder টেক্সট পরিবর্তন করে "জমির ধরন নির্বাচন করুন" / "Select Land Type" করতে হবে।
+3. **ইমেজ শো হচ্ছে না** — ডেটাবেসে images কলামে `/demo/land1.jpg` এসব fake path আছে। এগুলো বাস্তব URL দিয়ে আপডেট করতে হবে (Unsplash/পাবলিক ইমেজ)।
+4. **বগুড়ায় জমি নেই** — বগুড়া লোকেশনে কিছু ডেমো জমি ইনসার্ট করতে হবে।
 
-2. **FAQ সেকশন** — CTA সেকশনের আগে একটি FAQ সেকশন যোগ হবে। ৬টি প্রশ্ন-উত্তর — বামে ৩টি, ডানে ৩টি (2-column grid)। Accordion স্টাইলে প্রতিটি প্রশ্নে ক্লিক করলে উত্তর দেখাবে।
+### ধাপসমূহ
+
+1. **ক্যারোসেল → CSS Infinite Scroll**
+   - Embla Carousel + Autoplay রিমুভ করে CSS `@keyframes` marquee animation ব্যবহার করা হবে
+   - রিভিউ কার্ডগুলো দুইবার duplicate করে seamless infinite loop তৈরি হবে
+   - `CarouselPrevious` ও `CarouselNext` সম্পূর্ণ রিমুভ
+   - একটি নির্দিষ্ট স্পিডে (30-40s duration) বাম থেকে ডানে ক্রমাগত মুভ করবে
+
+2. **ক্যাটেগরি placeholder ফিক্স**
+   - `<option value="">` এর টেক্সট পরিবর্তন: "জমির ধরন নির্বাচন করুন" / "Select Land Type"
+
+3. **ইমেজ ফিক্স (DB Migration)**
+   - বিদ্যমান ৬টি জমির images কলাম আপডেট করে real Unsplash/পাবলিক ইমেজ URL দেওয়া হবে
+   - বাংলাদেশের জমি/প্লট সম্পর্কিত ইমেজ
+
+4. **বগুড়ায় ডেমো জমি (DB Migration)**
+   - ৩-৪টি নতুন জমি ইনসার্ট: location_bn "বগুড়া", location_en "Bogura"
+   - বিভিন্ন land_type (residential, agriculture, commercial)
+   - real ইমেজ URL সহ
 
 ### ফাইল পরিবর্তন
 
-**`src/pages/Index.tsx`:**
-- Trust সেকশনে রিভিউ কার্ডগুলো `Carousel` + `CarouselContent` + `CarouselItem` এ wrap করা
-- `embla-carousel-autoplay` plugin যোগ করে infinite loop + auto-scroll
-- ৬-৮টি ডেমো রিভিউ ডেটা array তৈরি (বাংলা ও ইংরেজি)
-- CTA এর আগে নতুন FAQ সেকশন — `Accordion` কম্পোনেন্ট ব্যবহার করে 2-column grid এ ৬টি FAQ
-- বাংলা/ইংরেজি দুই ভাষায় FAQ কনটেন্ট
-
-**`package.json`:**
-- `embla-carousel-autoplay` ডিপেন্ডেন্সি ইনস্টল
-
-### টেকনিক্যাল ডিটেইলস
-
-- ক্যারোসেল: `Autoplay({ delay: 4000, stopOnInteraction: false })` + `loop: true`
-- FAQ: shadcn `Accordion` কম্পোনেন্ট, `grid grid-cols-1 md:grid-cols-2 gap-6` লেআউট
-- রিভিউ কার্ড ডিজাইন: বর্তমান Heritage Modernist থিম অনুসরণ, ৫-স্টার রেটিং, নাম, উপাধি সহ
+- **`src/pages/Index.tsx`** — ক্যারোসেল সেকশন CSS marquee-তে রূপান্তর, ক্যাটেগরি placeholder পরিবর্তন
+- **`src/index.css`** — `@keyframes marquee` animation যোগ
+- **DB Migration** — বিদ্যমান জমির ইমেজ আপডেট + বগুড়ায় নতুন জমি ইনসার্ট
 

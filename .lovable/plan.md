@@ -1,37 +1,38 @@
 
 
-## ৪টি সমস্যা সমাধান
+## About Us ও Contact Us পেজ তৈরি
 
-### সমস্যা বিশ্লেষণ
+### যা করা হবে
 
-1. **ক্যারোসেল** — বর্তমানে Embla `Autoplay` delay-ভিত্তিক (থেমে থেমে যাচ্ছে)। CSS marquee-style continuous scroll দরকার। বাম/ডান নেভ আইকন রিমুভ করতে হবে।
-2. **"সব ক্যাটেগরি"** — ড্রপডাউনের placeholder টেক্সট পরিবর্তন করে "জমির ধরন নির্বাচন করুন" / "Select Land Type" করতে হবে।
-3. **ইমেজ শো হচ্ছে না** — ডেটাবেসে images কলামে `/demo/land1.jpg` এসব fake path আছে। এগুলো বাস্তব URL দিয়ে আপডেট করতে হবে (Unsplash/পাবলিক ইমেজ)।
-4. **বগুড়ায় জমি নেই** — বগুড়া লোকেশনে কিছু ডেমো জমি ইনসার্ট করতে হবে।
+রেফারেন্স HTML ফাইল থেকে ডিজাইন হুবহু কপি করে ২টি আলাদা পেজ তৈরি করা হবে:
 
-### ধাপসমূহ
-
-1. **ক্যারোসেল → CSS Infinite Scroll**
-   - Embla Carousel + Autoplay রিমুভ করে CSS `@keyframes` marquee animation ব্যবহার করা হবে
-   - রিভিউ কার্ডগুলো দুইবার duplicate করে seamless infinite loop তৈরি হবে
-   - `CarouselPrevious` ও `CarouselNext` সম্পূর্ণ রিমুভ
-   - একটি নির্দিষ্ট স্পিডে (30-40s duration) বাম থেকে ডানে ক্রমাগত মুভ করবে
-
-2. **ক্যাটেগরি placeholder ফিক্স**
-   - `<option value="">` এর টেক্সট পরিবর্তন: "জমির ধরন নির্বাচন করুন" / "Select Land Type"
-
-3. **ইমেজ ফিক্স (DB Migration)**
-   - বিদ্যমান ৬টি জমির images কলাম আপডেট করে real Unsplash/পাবলিক ইমেজ URL দেওয়া হবে
-   - বাংলাদেশের জমি/প্লট সম্পর্কিত ইমেজ
-
-4. **বগুড়ায় ডেমো জমি (DB Migration)**
-   - ৩-৪টি নতুন জমি ইনসার্ট: location_bn "বগুড়া", location_en "Bogura"
-   - বিভিন্ন land_type (residential, agriculture, commercial)
-   - real ইমেজ URL সহ
+1. **About Us পেজ** (`/about`) — Hero সেকশন (মিশন, স্ট্যাটস) + Bento Grid সেকশন ("কেন আমরা আলাদা?")
+2. **Contact Us পেজ** (`/contact`) — কন্টাক্ট ফর্ম + যোগাযোগ তথ্য (ফোন, ইমেইল, ঠিকানা, ম্যাপ) + FAQ সেকশন
 
 ### ফাইল পরিবর্তন
 
-- **`src/pages/Index.tsx`** — ক্যারোসেল সেকশন CSS marquee-তে রূপান্তর, ক্যাটেগরি placeholder পরিবর্তন
-- **`src/index.css`** — `@keyframes marquee` animation যোগ
-- **DB Migration** — বিদ্যমান জমির ইমেজ আপডেট + বগুড়ায় নতুন জমি ইনসার্ট
+1. **`src/pages/About.tsx`** (নতুন ফাইল)
+   - Hero: "OUR MISSION" ব্যাজ, "ভূমি মালিকানা হোক সহজ ও বিশ্বস্ত" হেডলাইন, বর্ণনা, ১০+ বছর ও ৫০০০+ ডিল স্ট্যাটস কার্ড, ডানে বড় ইমেজ
+   - Bento Grid: ৪টি কার্ড — যাচাইকৃত লিস্টিং (বড়, ইমেজসহ), আধুনিক ম্যাপ সুবিধা (সবুজ ব্যাকগ্রাউন্ড), নিরাপদ পেমেন্ট, ২৪/৭ সাপোর্ট (বড়, ইমেজসহ)
+   - Lucide আইকন ব্যবহার (ShieldCheck, Map, CreditCard, Headphones)
+   - Footer ইনক্লুড
+
+2. **`src/pages/Contact.tsx`** (নতুন ফাইল)
+   - বামে: "যোগাযোগ করুন" হেডিং, ফোন/ইমেইল/ঠিকানা তথ্য আইকনসহ, ম্যাপ ইমেজ
+   - ডানে: কন্টাক্ট ফর্ম (নাম, ইমেইল, বিষয় সিলেক্ট, বার্তা টেক্সটএরিয়া, সাবমিট বাটন)
+   - FAQ সেকশন: ৩টি প্রশ্ন-উত্তর Accordion স্টাইলে
+   - Footer ইনক্লুড
+
+3. **`src/App.tsx`**
+   - `/about` ও `/contact` রাউট যোগ
+
+4. **`src/components/Navbar.tsx`** ও **`src/components/Footer.tsx`**
+   - About Us ও Contact Us লিঙ্ক যোগ/আপডেট
+
+### টেকনিক্যাল ডিটেইলস
+
+- রেফারেন্স ইমেজের Google হোস্টেড ইমেজ URL সরাসরি ব্যবহার করা হবে
+- বাংলা/ইংরেজি দুই ভাষায় কনটেন্ট (`useI18n` হুক দিয়ে)
+- Heritage Modernist ডিজাইন সিস্টেম অনুসরণ: surface ব্যাকগ্রাউন্ড, primary/secondary কালার, bento-card hover effect
+- shadcn Accordion কম্পোনেন্ট FAQ-তে ব্যবহার
 

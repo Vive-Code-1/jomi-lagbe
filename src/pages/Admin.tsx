@@ -16,10 +16,10 @@ import { toast } from 'sonner';
 import {
   LayoutDashboard, MapPin, CreditCard, Package, Users, LogOut,
   Plus, Pencil, Trash2, DollarSign, TrendingUp, Eye, Search, Menu, X,
-  ChevronRight, Star, Globe, UserCircle, MessageSquare, Camera, Lock
+  ChevronRight, Star, Globe, UserCircle, MessageSquare, Camera, Lock, Wallet
 } from 'lucide-react';
 
-type Section = 'dashboard' | 'listings' | 'payments' | 'packages' | 'users' | 'reviews' | 'profile';
+type Section = 'dashboard' | 'listings' | 'payments' | 'packages' | 'users' | 'reviews' | 'profile' | 'payment-methods';
 
 const emptyLand = {
   title_bn: '', title_en: '', description_bn: '', description_en: '',

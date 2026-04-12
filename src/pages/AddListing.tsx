@@ -31,6 +31,9 @@ interface FormData {
   package_id: string;
   owner_name: string;
   owner_phone: string;
+  sender_number: string;
+  sender_transaction_id: string;
+  payment_method_id: string;
 }
 
 const initialFormData: FormData = {
@@ -51,6 +54,9 @@ const initialFormData: FormData = {
   package_id: '',
   owner_name: '',
   owner_phone: '',
+  sender_number: '',
+  sender_transaction_id: '',
+  payment_method_id: '',
 };
 
 const MAX_IMAGES = 5;

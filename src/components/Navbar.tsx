@@ -73,6 +73,7 @@ const Navbar = () => {
             <NavLink to="/listings" onClick={() => setMobileOpen(false)} className={mobileLinkClass}>{t('listings')}</NavLink>
             <NavLink to="/about" onClick={() => setMobileOpen(false)} className={mobileLinkClass}>{lang === 'bn' ? 'আমাদের সম্পর্কে' : 'About Us'}</NavLink>
             <NavLink to="/contact" onClick={() => setMobileOpen(false)} className={mobileLinkClass}>{lang === 'bn' ? 'যোগাযোগ' : 'Contact'}</NavLink>
+            {user && <NavLink to="/dashboard" onClick={() => setMobileOpen(false)} className={mobileLinkClass}>{lang === 'bn' ? 'ড্যাশবোর্ড' : 'Dashboard'}</NavLink>}
             {user && <NavLink to="/favorites" onClick={() => setMobileOpen(false)} className={mobileLinkClass}>{t('favorites')}</NavLink>}
             {isAdmin && <NavLink to="/admin" onClick={() => setMobileOpen(false)} className={mobileLinkClass}>{t('admin')}</NavLink>}
             <Button variant="ghost" size="sm" onClick={() => setLang(lang === 'bn' ? 'en' : 'bn')} className="justify-start text-primary">

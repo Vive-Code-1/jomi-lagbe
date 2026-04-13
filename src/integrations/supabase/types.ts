@@ -79,18 +79,21 @@ export type Database = {
           created_at: string
           id: string
           land_id: string
+          purchase_id: string | null
           user_id: string
         }
         Insert: {
           created_at?: string
           id?: string
           land_id: string
+          purchase_id?: string | null
           user_id: string
         }
         Update: {
           created_at?: string
           id?: string
           land_id?: string
+          purchase_id?: string | null
           user_id?: string
         }
         Relationships: [
@@ -99,6 +102,13 @@ export type Database = {
             columns: ["land_id"]
             isOneToOne: false
             referencedRelation: "lands"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "contact_unlocks_purchase_id_fkey"
+            columns: ["purchase_id"]
+            isOneToOne: false
+            referencedRelation: "unlock_purchases"
             referencedColumns: ["id"]
           },
         ]
@@ -359,6 +369,90 @@ export type Database = {
             columns: ["land_id"]
             isOneToOne: false
             referencedRelation: "lands"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      unlock_packages: {
+        Row: {
+          created_at: string
+          id: string
+          is_active: boolean
+          name_bn: string
+          name_en: string
+          price: number
+          unlock_count: number
+        }
+        Insert: {
+          created_at?: string
+          id?: string
+          is_active?: boolean
+          name_bn: string
+          name_en: string
+          price?: number
+          unlock_count?: number
+        }
+        Update: {
+          created_at?: string
+          id?: string
+          is_active?: boolean
+          name_bn?: string
+          name_en?: string
+          price?: number
+          unlock_count?: number
+        }
+        Relationships: []
+      }
+      unlock_purchases: {
+        Row: {
+          created_at: string
+          id: string
+          package_id: string | null
+          payment_method_id: string | null
+          sender_number: string | null
+          sender_transaction_id: string | null
+          status: string
+          total_unlocks: number
+          used_unlocks: number
+          user_id: string
+        }
+        Insert: {
+          created_at?: string
+          id?: string
+          package_id?: string | null
+          payment_method_id?: string | null
+          sender_number?: string | null
+          sender_transaction_id?: string | null
+          status?: string
+          total_unlocks?: number
+          used_unlocks?: number
+          user_id: string
+        }
+        Update: {
+          created_at?: string
+          id?: string
+          package_id?: string | null
+          payment_method_id?: string | null
+          sender_number?: string | null
+          sender_transaction_id?: string | null
+          status?: string
+          total_unlocks?: number
+          used_unlocks?: number
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "unlock_purchases_package_id_fkey"
+            columns: ["package_id"]
+            isOneToOne: false
+            referencedRelation: "unlock_packages"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "unlock_purchases_payment_method_id_fkey"
+            columns: ["payment_method_id"]
+            isOneToOne: false
+            referencedRelation: "payment_methods"
             referencedColumns: ["id"]
           },
         ]

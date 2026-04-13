@@ -158,7 +158,7 @@ const Contact = () => {
                 <Label className="text-foreground font-medium mb-2 block">
                   {lang === 'bn' ? 'বিষয়' : 'Subject'}
                 </Label>
-                <Select name="subject">
+                <Select name="subject" value={subject} onValueChange={setSubject}>
                   <SelectTrigger className="rounded-xl">
                     <SelectValue placeholder={lang === 'bn' ? 'বিষয় নির্বাচন করুন' : 'Select a subject'} />
                   </SelectTrigger>

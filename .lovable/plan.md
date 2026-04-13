@@ -1,39 +1,66 @@
 
 
-## Contact ফর্ম ডাটা সংগ্রহ + তথ্য আপডেট
+## মালিকের তথ্য আনলক পেমেন্ট সিস্টেম
 
-### পরিবর্তনসমূহ
+### সারসংক্ষেপ
+৪৯৯ টাকায় ১০টি জমির মালিকের তথ্য আনলক করার সম্পূর্ণ ফাংশনাল সিস্টেম তৈরি। ইউজার বিকাশ/নগদে পেমেন্ট করবে, অ্যাডমিন ভেরিফাই করবে, তারপর ইউজার তার ড্যাশবোর্ড থেকে মালিকের তথ্য দেখতে পাবে।
 
-**১. Database — `contact_messages` টেবিল তৈরি:**
-```sql
-CREATE TABLE contact_messages (
-  id uuid PRIMARY KEY DEFAULT gen_random_uuid(),
-  name text NOT NULL,
-  email text NOT NULL,
-  subject text,
-  message text NOT NULL,
-  is_read boolean DEFAULT false,
-  created_at timestamptz DEFAULT now()
-);
--- RLS: anyone can insert, admin can read
-```
+### ডাটাবেস পরিবর্তন
 
-**২. `src/pages/Contact.tsx` আপডেট:**
-- ফোন নাম্বার `01791208768` এ পরিবর্তন
-- ইমেইল `support@webogrowth.com` এ পরিবর্তন
-- `handleSubmit` এ Supabase `contact_messages` টেবিলে ডাটা ইনসার্ট করা (setTimeout সরিয়ে)
+**১. নতুন টেবিল: `unlock_packages`** — আনলক প্যাকেজ কনফিগারেশন
+- `id`, `name_bn`, `name_en`, `price` (499), `unlock_count` (10), `is_active`, `created_at`
 
-**৩. `src/components/Footer.tsx` আপডেট:**
-- কপিরাইট টেক্সট: `© 2024 জমি লাগবে। সর্বস্বত্ব সংরক্ষিত। Webogrowth` — "Webogrowth" এ `https://webogrowth.com/` লিংক যোগ
+**২. নতুন টেবিল: `unlock_purchases`** — ইউজারের কেনা প্যাকেজ ট্র্যাক
+- `id`, `user_id`, `package_id`, `total_unlocks` (10), `used_unlocks` (0), `status` (pending/active/expired), `payment_method_id`, `sender_number`, `sender_transaction_id`, `created_at`
 
-**৪. `src/pages/Admin.tsx` আপডেট:**
-- Section type এ `'contacts'` যোগ
-- সাইডবারে "যোগাযোগ বার্তা" মেনু আইটেম যোগ (MessageSquare আইকন ইতোমধ্যে import আছে)
-- নতুন সেকশনে `contact_messages` টেবিল থেকে ডাটা দেখানো — নাম, ইমেইল, বিষয়, বার্তা, তারিখ, read/unread টগল
+**৩. `contact_unlocks` টেবিল আপডেট** — `purchase_id` কলাম যোগ (কোন প্যাকেজ থেকে আনলক হয়েছে)
+
+**RLS পলিসি:**
+- `unlock_packages`: সবাই দেখতে পারবে, অ্যাডমিন ম্যানেজ করবে
+- `unlock_purchases`: ইউজার নিজের ডাটা দেখবে/ইনসার্ট করবে, অ্যাডমিন সব দেখবে/আপডেট করবে
+- `contact_unlocks`: বিদ্যমান পলিসি রাখা + purchase_id সাপোর্ট
 
 ### ফাইল পরিবর্তন
-1. **Database migration** — `contact_messages` টেবিল + RLS
-2. **`src/pages/Contact.tsx`** — নাম্বার/ইমেইল আপডেট + Supabase ইনসার্ট
-3. **`src/components/Footer.tsx`** — Webogrowth লিংক যোগ
-4. **`src/pages/Admin.tsx`** — contacts সেকশন যোগ
+
+**১. `src/pages/LandDetail.tsx`** — আনলক বাটন ক্লিক করলে:
+- লগইন না থাকলে → `/auth` এ রিডাইরেক্ট
+- ইউজারের active purchase আছে ও used < total → সরাসরি আনলক (contact_unlocks এ ইনসার্ট, used_unlocks +1)
+- Active purchase নেই → পেমেন্ট ডায়ালগ ওপেন:
+  - প্যাকেজ তথ্য দেখাবে: "৪৯৯ টাকায় ১০টি জমির মালিকের নম্বর পাবেন"
+  - বিকাশ/নগদ কার্ড (payment_methods থেকে)
+  - সেন্ডার নাম্বার ও ট্রানজেকশন আইডি ইনপুট
+  - সাবমিট করলে `unlock_purchases` এ ইনসার্ট (status: pending)
+  - টোস্ট: "পেমেন্ট ভেরিফিকেশন চলছে, অনুমোদন পেলে আনলক করতে পারবেন"
+
+**২. `src/pages/UserDashboard.tsx`** — নতুন ট্যাব "আনলক তথ্য":
+- ইউজারের unlock_purchases তালিকা (status সহ)
+- কতটি ব্যবহার হয়েছে / কতটি বাকি আছে progress bar
+- আনলক করা জমিগুলোর তালিকা (contact_unlocks + lands join) — মালিকের নাম, ফোন, ঠিকানা দেখাবে
+
+**৩. `src/pages/Admin.tsx`** — "আনলক পেমেন্ট" সেকশন যোগ:
+- pending unlock_purchases তালিকা
+- Approve বাটন → status = active করবে
+- Reject বাটন → status = rejected
+
+**৪. `src/lib/i18n.tsx`** — নতুন translation keys যোগ
+
+### ফ্লো
+```text
+ইউজার "মালিকের নম্বর আনলক করুন" ক্লিক
+  ├─ লগইন নেই → /auth
+  ├─ Active package আছে (used < total) → সরাসরি আনলক → তথ্য দেখায়
+  └─ Active package নেই → পেমেন্ট ডায়ালগ
+       ├─ বিকাশ/নগদ সিলেক্ট
+       ├─ সেন্ডার নম্বর + TxID দিয়ে সাবমিট
+       ├─ unlock_purchases এ pending ইনসার্ট
+       └─ অ্যাডমিন approve → status = active
+            └─ ইউজার আবার ক্লিক → আনলক হয়
+```
+
+### ফাইল তালিকা
+1. **Database migration** — `unlock_packages`, `unlock_purchases` টেবিল + `contact_unlocks` আপডেট + RLS
+2. **`src/pages/LandDetail.tsx`** — পেমেন্ট ডায়ালগ + আনলক লজিক
+3. **`src/pages/UserDashboard.tsx`** — "আনলক তথ্য" ট্যাব যোগ
+4. **`src/pages/Admin.tsx`** — আনলক পেমেন্ট approve/reject সেকশন
+5. **`src/lib/i18n.tsx`** — নতুন translations
 

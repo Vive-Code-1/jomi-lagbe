@@ -15,6 +15,7 @@ const Contact = () => {
   const { lang } = useI18n();
   const { toast } = useToast();
   const [loading, setLoading] = useState(false);
+  const [subject, setSubject] = useState('');
 
   const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
@@ -24,9 +25,9 @@ const Contact = () => {
     const { error } = await supabase.from('contact_messages' as any).insert({
       name: formData.get('name') as string,
       email: formData.get('email') as string,
-      subject: formData.get('subject') as string || null,
+      subject: subject || null,
       message: formData.get('message') as string,
-    });
+    } as any);
     setLoading(false);
     if (error) {
       toast({ title: lang === 'bn' ? 'ত্রুটি হয়েছে!' : 'Error!', description: error.message, variant: 'destructive' });
@@ -36,6 +37,7 @@ const Contact = () => {
         description: lang === 'bn' ? 'আমরা শীঘ্রই আপনার সাথে যোগাযোগ করব।' : 'We will contact you shortly.',
       });
       form.reset();
+      setSubject('');
     }
   };
 
@@ -156,7 +158,7 @@ const Contact = () => {
                 <Label className="text-foreground font-medium mb-2 block">
                   {lang === 'bn' ? 'বিষয়' : 'Subject'}
                 </Label>
-                <Select name="subject">
+                <Select name="subject" value={subject} onValueChange={setSubject}>
                   <SelectTrigger className="rounded-xl">
                     <SelectValue placeholder={lang === 'bn' ? 'বিষয় নির্বাচন করুন' : 'Select a subject'} />
                   </SelectTrigger>

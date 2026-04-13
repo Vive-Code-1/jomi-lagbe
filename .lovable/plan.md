@@ -1,66 +1,28 @@
 
 
-## মালিকের তথ্য আনলক পেমেন্ট সিস্টেম
+## আনলক কাউন্ট ফিক্স + প্যাকেজ শেষ হলে নোটিশ
 
-### সারসংক্ষেপ
-৪৯৯ টাকায় ১০টি জমির মালিকের তথ্য আনলক করার সম্পূর্ণ ফাংশনাল সিস্টেম তৈরি। ইউজার বিকাশ/নগদে পেমেন্ট করবে, অ্যাডমিন ভেরিফাই করবে, তারপর ইউজার তার ড্যাশবোর্ড থেকে মালিকের তথ্য দেখতে পাবে।
+### মূল সমস্যা
+`unlock_purchases` টেবিলে শুধু অ্যাডমিন UPDATE করতে পারে। তাই যখন ইউজার আনলক করে, `used_unlocks` increment হচ্ছে না (0 থেকে যাচ্ছে)।
 
-### ডাটাবেস পরিবর্তন
+### সমাধান
 
-**১. নতুন টেবিল: `unlock_packages`** — আনলক প্যাকেজ কনফিগারেশন
-- `id`, `name_bn`, `name_en`, `price` (499), `unlock_count` (10), `is_active`, `created_at`
+**১. Database Migration:**
+- ইউজার নিজের `unlock_purchases` এর `used_unlocks` আপডেট করতে পারবে এমন RLS policy যোগ
+- অথবা আরও নিরাপদভাবে: একটি `increment_used_unlocks(purchase_id uuid)` security definer function তৈরি করা যেটা চেক করবে purchase owner কিনা, তারপর increment করবে
 
-**২. নতুন টেবিল: `unlock_purchases`** — ইউজারের কেনা প্যাকেজ ট্র্যাক
-- `id`, `user_id`, `package_id`, `total_unlocks` (10), `used_unlocks` (0), `status` (pending/active/expired), `payment_method_id`, `sender_number`, `sender_transaction_id`, `created_at`
+**২. `src/pages/LandDetail.tsx` ফিক্স:**
+- `directUnlock` mutation এ raw update এর বদলে DB function কল করা
+- আনলকের পর সব সংশ্লিষ্ট query invalidate করা (dashboard ট্যাবও)
+- প্যাকেজের সব আনলক শেষ হলে (used >= total) payment dialog এ নোটিশ দেখানো: "আপনার ১০টি আনলক শেষ হয়েছে। আরো জমির মালিকের তথ্য দেখতে আবার প্যাকেজ ক্রয় করুন।"
 
-**৩. `contact_unlocks` টেবিল আপডেট** — `purchase_id` কলাম যোগ (কোন প্যাকেজ থেকে আনলক হয়েছে)
-
-**RLS পলিসি:**
-- `unlock_packages`: সবাই দেখতে পারবে, অ্যাডমিন ম্যানেজ করবে
-- `unlock_purchases`: ইউজার নিজের ডাটা দেখবে/ইনসার্ট করবে, অ্যাডমিন সব দেখবে/আপডেট করবে
-- `contact_unlocks`: বিদ্যমান পলিসি রাখা + purchase_id সাপোর্ট
-
-### ফাইল পরিবর্তন
-
-**১. `src/pages/LandDetail.tsx`** — আনলক বাটন ক্লিক করলে:
-- লগইন না থাকলে → `/auth` এ রিডাইরেক্ট
-- ইউজারের active purchase আছে ও used < total → সরাসরি আনলক (contact_unlocks এ ইনসার্ট, used_unlocks +1)
-- Active purchase নেই → পেমেন্ট ডায়ালগ ওপেন:
-  - প্যাকেজ তথ্য দেখাবে: "৪৯৯ টাকায় ১০টি জমির মালিকের নম্বর পাবেন"
-  - বিকাশ/নগদ কার্ড (payment_methods থেকে)
-  - সেন্ডার নাম্বার ও ট্রানজেকশন আইডি ইনপুট
-  - সাবমিট করলে `unlock_purchases` এ ইনসার্ট (status: pending)
-  - টোস্ট: "পেমেন্ট ভেরিফিকেশন চলছে, অনুমোদন পেলে আনলক করতে পারবেন"
-
-**২. `src/pages/UserDashboard.tsx`** — নতুন ট্যাব "আনলক তথ্য":
-- ইউজারের unlock_purchases তালিকা (status সহ)
-- কতটি ব্যবহার হয়েছে / কতটি বাকি আছে progress bar
-- আনলক করা জমিগুলোর তালিকা (contact_unlocks + lands join) — মালিকের নাম, ফোন, ঠিকানা দেখাবে
-
-**৩. `src/pages/Admin.tsx`** — "আনলক পেমেন্ট" সেকশন যোগ:
-- pending unlock_purchases তালিকা
-- Approve বাটন → status = active করবে
-- Reject বাটন → status = rejected
-
-**৪. `src/lib/i18n.tsx`** — নতুন translation keys যোগ
-
-### ফ্লো
-```text
-ইউজার "মালিকের নম্বর আনলক করুন" ক্লিক
-  ├─ লগইন নেই → /auth
-  ├─ Active package আছে (used < total) → সরাসরি আনলক → তথ্য দেখায়
-  └─ Active package নেই → পেমেন্ট ডায়ালগ
-       ├─ বিকাশ/নগদ সিলেক্ট
-       ├─ সেন্ডার নম্বর + TxID দিয়ে সাবমিট
-       ├─ unlock_purchases এ pending ইনসার্ট
-       └─ অ্যাডমিন approve → status = active
-            └─ ইউজার আবার ক্লিক → আনলক হয়
-```
+**৩. `src/pages/UserDashboard.tsx` ফিক্স:**
+- `used_unlocks` ছাড়াও `contact_unlocks` count থেকে সঠিক সংখ্যা দেখানো (backup)
+- প্যাকেজ শেষ হলে "আরো জমির মালিকের তথ্য দেখতে আবার ক্রয় করুন" নোটিশ দেখানো
+- `my-unlock-purchases` query থেকে `as any` সরানো
 
 ### ফাইল তালিকা
-1. **Database migration** — `unlock_packages`, `unlock_purchases` টেবিল + `contact_unlocks` আপডেট + RLS
-2. **`src/pages/LandDetail.tsx`** — পেমেন্ট ডায়ালগ + আনলক লজিক
-3. **`src/pages/UserDashboard.tsx`** — "আনলক তথ্য" ট্যাব যোগ
-4. **`src/pages/Admin.tsx`** — আনলক পেমেন্ট approve/reject সেকশন
-5. **`src/lib/i18n.tsx`** — নতুন translations
+1. **Database migration** — `increment_used_unlocks` function + user update policy
+2. **`src/pages/LandDetail.tsx`** — DB function কল, exhausted notice
+3. **`src/pages/UserDashboard.tsx`** — সঠিক কাউন্ট + exhausted notice
 

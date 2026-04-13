@@ -128,16 +128,17 @@ const LandDetail = () => {
         purchase_id: activePurchase.id,
       } as any);
       if (unlockError) throw unlockError;
-      // Increment used_unlocks
-      const { error: updateError } = await supabase
-        .from('unlock_purchases' as any)
-        .update({ used_unlocks: (activePurchase.used_unlocks || 0) + 1 } as any)
-        .eq('id', activePurchase.id);
+      // Increment used_unlocks via security definer function
+      const { error: updateError } = await supabase.rpc('increment_used_unlocks', {
+        p_purchase_id: activePurchase.id,
+      });
       if (updateError) throw updateError;
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['unlock', id, user?.id] });
       queryClient.invalidateQueries({ queryKey: ['active-purchase', user?.id] });
+      queryClient.invalidateQueries({ queryKey: ['my-unlock-purchases'] });
+      queryClient.invalidateQueries({ queryKey: ['my-unlocked-lands'] });
       toast.success(lang === 'bn' ? 'মালিকের তথ্য আনলক হয়েছে!' : 'Owner info unlocked!');
     },
     onError: (err: any) => toast.error(err.message),
@@ -187,7 +188,7 @@ const LandDetail = () => {
       return;
     }
     
-    // Open payment dialog
+    // Open payment dialog (show exhausted notice if applicable)
     setPaymentDialogOpen(true);
   };
 
@@ -433,6 +434,17 @@ const LandDetail = () => {
             </DialogTitle>
           </DialogHeader>
           <div className="space-y-5">
+            {/* Exhausted notice */}
+            {activePurchase && activePurchase.used_unlocks >= activePurchase.total_unlocks && (
+              <div className="rounded-xl bg-destructive/10 border border-destructive/20 p-4 text-center">
+                <p className="text-sm font-medium text-destructive">
+                  {lang === 'bn'
+                    ? `আপনার ${activePurchase.total_unlocks}টি আনলক শেষ হয়েছে। আরো জমির মালিকের তথ্য দেখতে আবার প্যাকেজ ক্রয় করুন।`
+                    : `Your ${activePurchase.total_unlocks} unlocks are used up. Purchase again to unlock more.`}
+                </p>
+              </div>
+            )}
+
             {/* Package info */}
             <div className="rounded-xl bg-primary/5 border border-primary/20 p-4 text-center">
               <p className="text-2xl font-bold text-primary">৳{unlockPackage?.price || 499}</p>

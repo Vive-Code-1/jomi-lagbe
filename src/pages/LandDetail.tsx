@@ -5,9 +5,13 @@ import { useI18n } from '@/lib/i18n';
 import { useAuth } from '@/lib/auth';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { supabase } from '@/integrations/supabase/client';
-import { Heart, MapPin, Ruler, Route, ArrowLeft, Lock, Unlock, Phone, User, Calendar, DollarSign, Info, Map, Star, ShieldCheck } from 'lucide-react';
+import { Heart, MapPin, Ruler, Route, ArrowLeft, Lock, Unlock, Phone, User, Calendar, DollarSign, Info, Map, Star, ShieldCheck, Loader2 } from 'lucide-react';
 import { toast } from 'sonner';
 import { useState } from 'react';
+import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog';
+import { Input } from '@/components/ui/input';
+import { Label } from '@/components/ui/label';
+import { Progress } from '@/components/ui/progress';
 import Footer from '@/components/Footer';
 
 const LandDetail = () => {
@@ -17,6 +21,10 @@ const LandDetail = () => {
   const navigate = useNavigate();
   const queryClient = useQueryClient();
   const [selectedImage, setSelectedImage] = useState(0);
+  const [paymentDialogOpen, setPaymentDialogOpen] = useState(false);
+  const [selectedMethod, setSelectedMethod] = useState<string | null>(null);
+  const [senderNumber, setSenderNumber] = useState('');
+  const [senderTxId, setSenderTxId] = useState('');
 
   const { data: land, isLoading } = useQuery({
     queryKey: ['land', id],
@@ -55,6 +63,46 @@ const LandDetail = () => {
     },
   });
 
+  // Get user's active unlock purchase
+  const { data: activePurchase } = useQuery({
+    queryKey: ['active-purchase', user?.id],
+    enabled: !!user,
+    queryFn: async () => {
+      const { data } = await supabase
+        .from('unlock_purchases' as any)
+        .select('*')
+        .eq('user_id', user!.id)
+        .eq('status', 'active')
+        .order('created_at', { ascending: false })
+        .limit(1)
+        .maybeSingle();
+      return data as any;
+    },
+  });
+
+  // Get payment methods
+  const { data: paymentMethods } = useQuery({
+    queryKey: ['payment-methods-active'],
+    queryFn: async () => {
+      const { data } = await supabase.from('payment_methods').select('*').eq('is_active', true);
+      return data || [];
+    },
+  });
+
+  // Get unlock package
+  const { data: unlockPackage } = useQuery({
+    queryKey: ['unlock-package'],
+    queryFn: async () => {
+      const { data } = await supabase
+        .from('unlock_packages' as any)
+        .select('*')
+        .eq('is_active', true)
+        .limit(1)
+        .maybeSingle();
+      return data as any;
+    },
+  });
+
   const toggleFavorite = useMutation({
     mutationFn: async () => {
       if (!user) { navigate('/auth'); return; }
@@ -69,9 +117,78 @@ const LandDetail = () => {
     },
   });
 
-  const handleUnlock = async () => {
-    if (!user) { navigate('/auth'); return; }
-    toast.info(lang === 'bn' ? 'পেমেন্ট সিস্টেম শীঘ্রই আসছে' : 'Payment system coming soon');
+  // Direct unlock when user has active purchase with remaining unlocks
+  const directUnlock = useMutation({
+    mutationFn: async () => {
+      if (!activePurchase || !user || !id) throw new Error('No active purchase');
+      // Insert contact_unlocks
+      const { error: unlockError } = await supabase.from('contact_unlocks').insert({
+        user_id: user.id,
+        land_id: id,
+        purchase_id: activePurchase.id,
+      } as any);
+      if (unlockError) throw unlockError;
+      // Increment used_unlocks
+      const { error: updateError } = await supabase
+        .from('unlock_purchases' as any)
+        .update({ used_unlocks: (activePurchase.used_unlocks || 0) + 1 } as any)
+        .eq('id', activePurchase.id);
+      if (updateError) throw updateError;
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['unlock', id, user?.id] });
+      queryClient.invalidateQueries({ queryKey: ['active-purchase', user?.id] });
+      toast.success(lang === 'bn' ? 'মালিকের তথ্য আনলক হয়েছে!' : 'Owner info unlocked!');
+    },
+    onError: (err: any) => toast.error(err.message),
+  });
+
+  // Submit payment for new purchase
+  const submitPayment = useMutation({
+    mutationFn: async () => {
+      if (!user || !unlockPackage || !selectedMethod) throw new Error('Missing data');
+      if (!senderNumber.trim() || !senderTxId.trim()) {
+        throw new Error(lang === 'bn' ? 'সেন্ডার নম্বর ও ট্রানজেকশন আইডি দিন' : 'Enter sender number and transaction ID');
+      }
+      const { error } = await supabase.from('unlock_purchases' as any).insert({
+        user_id: user.id,
+        package_id: unlockPackage.id,
+        total_unlocks: unlockPackage.unlock_count,
+        used_unlocks: 0,
+        status: 'pending',
+        payment_method_id: selectedMethod,
+        sender_number: senderNumber.trim(),
+        sender_transaction_id: senderTxId.trim(),
+      } as any);
+      if (error) throw error;
+    },
+    onSuccess: () => {
+      setPaymentDialogOpen(false);
+      setSenderNumber('');
+      setSenderTxId('');
+      setSelectedMethod(null);
+      queryClient.invalidateQueries({ queryKey: ['active-purchase', user?.id] });
+      toast.success(
+        lang === 'bn'
+          ? 'পেমেন্ট সাবমিট হয়েছে! ভেরিফিকেশনের পর আনলক করতে পারবেন।'
+          : 'Payment submitted! You can unlock after verification.'
+      );
+    },
+    onError: (err: any) => toast.error(err.message),
+  });
+
+  const handleUnlock = () => {
+    if (!user) { navigate('/auth?redirect=/land/' + id); return; }
+    
+    // Check if already has pending purchase
+    // Check if has active purchase with remaining unlocks
+    if (activePurchase && activePurchase.used_unlocks < activePurchase.total_unlocks) {
+      directUnlock.mutate();
+      return;
+    }
+    
+    // Open payment dialog
+    setPaymentDialogOpen(true);
   };
 
   if (isLoading) return <div className="flex min-h-[50vh] items-center justify-center text-muted-foreground font-body">{t('loading')}</div>;
@@ -82,6 +199,8 @@ const LandDetail = () => {
   const description = lang === 'bn' ? land.description_bn : land.description_en;
   const images = land.images || [];
   const pricePerDecimal = land.area_size > 0 ? Math.round(land.price / land.area_size) : 0;
+
+  const remainingUnlocks = activePurchase ? activePurchase.total_unlocks - activePurchase.used_unlocks : 0;
 
   return (
     <div className="min-h-screen bg-background font-body">
@@ -232,10 +351,38 @@ const LandDetail = () => {
                     <div className="h-16 w-16 rounded-full bg-primary/10 flex items-center justify-center mx-auto mb-4">
                       <Lock className="h-8 w-8 text-primary" />
                     </div>
-                    <p className="text-sm text-muted-foreground mb-1">{t('payToUnlock')}</p>
-                    <p className="text-xs text-muted-foreground mb-5">{t('contactUnlockFee')}</p>
-                    <Button onClick={handleUnlock} className="w-full rounded-xl h-12 text-base font-semibold">
-                      <Unlock className="mr-2 h-4 w-4" /> {t('unlockOwnerNumber')}
+                    <p className="text-sm font-medium text-foreground mb-1">{t('payToUnlock')}</p>
+                    <p className="text-xs text-muted-foreground mb-2">
+                      {lang === 'bn'
+                        ? `মালিকের তথ্য আনলক ফি ৳${unlockPackage?.price || 499} টাকায় ${unlockPackage?.unlock_count || 10}টি জমির মালিকের নম্বর পাবেন`
+                        : `Pay ৳${unlockPackage?.price || 499} to unlock ${unlockPackage?.unlock_count || 10} land owner contacts`}
+                    </p>
+                    {activePurchase && remainingUnlocks > 0 && (
+                      <div className="mb-4 p-3 rounded-xl bg-primary/5 border border-primary/20">
+                        <p className="text-xs text-primary font-medium mb-1">
+                          {lang === 'bn'
+                            ? `আপনার ${remainingUnlocks}টি আনলক বাকি আছে`
+                            : `You have ${remainingUnlocks} unlocks remaining`}
+                        </p>
+                        <Progress value={(activePurchase.used_unlocks / activePurchase.total_unlocks) * 100} className="h-2" />
+                        <p className="text-[10px] text-muted-foreground mt-1">
+                          {activePurchase.used_unlocks}/{activePurchase.total_unlocks} {lang === 'bn' ? 'ব্যবহৃত' : 'used'}
+                        </p>
+                      </div>
+                    )}
+                    <Button 
+                      onClick={handleUnlock} 
+                      className="w-full rounded-xl h-12 text-base font-semibold"
+                      disabled={directUnlock.isPending}
+                    >
+                      {directUnlock.isPending ? (
+                        <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                      ) : (
+                        <Unlock className="mr-2 h-4 w-4" />
+                      )}
+                      {activePurchase && remainingUnlocks > 0
+                        ? (lang === 'bn' ? 'আনলক করুন' : 'Unlock Now')
+                        : t('unlockOwnerNumber')}
                     </Button>
                   </div>
                 )}
@@ -276,6 +423,93 @@ const LandDetail = () => {
           </div>
         </div>
       </div>
+
+      {/* Payment Dialog */}
+      <Dialog open={paymentDialogOpen} onOpenChange={setPaymentDialogOpen}>
+        <DialogContent className="sm:max-w-md">
+          <DialogHeader>
+            <DialogTitle>
+              {lang === 'bn' ? 'মালিকের তথ্য আনলক প্যাকেজ' : 'Owner Info Unlock Package'}
+            </DialogTitle>
+          </DialogHeader>
+          <div className="space-y-5">
+            {/* Package info */}
+            <div className="rounded-xl bg-primary/5 border border-primary/20 p-4 text-center">
+              <p className="text-2xl font-bold text-primary">৳{unlockPackage?.price || 499}</p>
+              <p className="text-sm text-muted-foreground mt-1">
+                {lang === 'bn'
+                  ? `${unlockPackage?.unlock_count || 10}টি জমির মালিকের নম্বর পাবেন`
+                  : `Unlock ${unlockPackage?.unlock_count || 10} land owner contacts`}
+              </p>
+            </div>
+
+            {/* Payment methods */}
+            <div>
+              <Label className="mb-2 block">
+                {lang === 'bn' ? 'পেমেন্ট মেথড নির্বাচন করুন' : 'Select Payment Method'}
+              </Label>
+              <div className="grid gap-3">
+                {paymentMethods?.map((method: any) => (
+                  <button
+                    key={method.id}
+                    onClick={() => setSelectedMethod(method.id)}
+                    className={`flex items-center gap-4 p-4 rounded-xl border-2 transition-all text-left ${
+                      selectedMethod === method.id
+                        ? 'border-primary bg-primary/5'
+                        : 'border-border hover:border-primary/40'
+                    }`}
+                  >
+                    <div className="flex-1">
+                      <p className="font-semibold text-foreground">{method.method_name}</p>
+                      <p className="text-sm text-primary font-medium">{method.account_number}</p>
+                      <p className="text-xs text-muted-foreground capitalize">{method.payment_type}</p>
+                    </div>
+                    <div className={`h-5 w-5 rounded-full border-2 flex items-center justify-center ${
+                      selectedMethod === method.id ? 'border-primary' : 'border-muted-foreground/30'
+                    }`}>
+                      {selectedMethod === method.id && (
+                        <div className="h-2.5 w-2.5 rounded-full bg-primary" />
+                      )}
+                    </div>
+                  </button>
+                ))}
+              </div>
+            </div>
+
+            {selectedMethod && (
+              <div className="space-y-3">
+                <div>
+                  <Label>{lang === 'bn' ? 'সেন্ডার নম্বর' : 'Sender Number'}</Label>
+                  <Input
+                    placeholder={lang === 'bn' ? 'আপনার নম্বর লিখুন' : 'Enter your number'}
+                    value={senderNumber}
+                    onChange={(e) => setSenderNumber(e.target.value)}
+                  />
+                </div>
+                <div>
+                  <Label>{lang === 'bn' ? 'ট্রানজেকশন আইডি' : 'Transaction ID'}</Label>
+                  <Input
+                    placeholder={lang === 'bn' ? 'ট্রানজেকশন আইডি লিখুন' : 'Enter transaction ID'}
+                    value={senderTxId}
+                    onChange={(e) => setSenderTxId(e.target.value)}
+                  />
+                </div>
+              </div>
+            )}
+
+            <Button
+              onClick={() => submitPayment.mutate()}
+              disabled={!selectedMethod || !senderNumber.trim() || !senderTxId.trim() || submitPayment.isPending}
+              className="w-full h-12 rounded-xl text-base font-semibold"
+            >
+              {submitPayment.isPending ? (
+                <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+              ) : null}
+              {lang === 'bn' ? 'পেমেন্ট সাবমিট করুন' : 'Submit Payment'}
+            </Button>
+          </div>
+        </DialogContent>
+      </Dialog>
 
       <Footer />
     </div>

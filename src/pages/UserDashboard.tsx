@@ -102,10 +102,14 @@ const UserDashboard = () => {
 
   if (!user) return <Navigate to="/auth?redirect=/dashboard" />;
 
-  // Calculate totals
-  const activePurchase = myPurchases?.find((p: any) => p.status === 'active');
-  const totalUsed = myPurchases?.filter((p: any) => p.status === 'active').reduce((s: number, p: any) => s + (p.used_unlocks || 0), 0) || 0;
+  // Calculate totals — use contact_unlocks count as the real used count (more reliable)
+  const realUsedCount = unlockedLands?.length || 0;
   const totalAvailable = myPurchases?.filter((p: any) => p.status === 'active').reduce((s: number, p: any) => s + (p.total_unlocks || 0), 0) || 0;
+  const totalUsed = Math.max(
+    realUsedCount,
+    myPurchases?.filter((p: any) => p.status === 'active').reduce((s: number, p: any) => s + (p.used_unlocks || 0), 0) || 0
+  );
+  const isExhausted = totalAvailable > 0 && totalUsed >= totalAvailable;
 
   return (
     <div className="min-h-screen bg-muted/30 pt-24 pb-12">
@@ -242,14 +246,23 @@ const UserDashboard = () => {
                         <h3 className="font-semibold text-foreground">
                           {lang === 'bn' ? 'আনলক সারসংক্ষেপ' : 'Unlock Summary'}
                         </h3>
-                        <Badge className="bg-primary/10 text-primary border-0">
-                          {totalAvailable - totalUsed} {lang === 'bn' ? 'টি বাকি' : 'remaining'}
+                        <Badge className={`${isExhausted ? 'bg-destructive/10 text-destructive' : 'bg-primary/10 text-primary'} border-0`}>
+                          {Math.max(0, totalAvailable - totalUsed)} {lang === 'bn' ? 'টি বাকি' : 'remaining'}
                         </Badge>
                       </div>
-                      <Progress value={(totalUsed / totalAvailable) * 100} className="h-3 mb-2" />
+                      <Progress value={Math.min((totalUsed / totalAvailable) * 100, 100)} className="h-3 mb-2" />
                       <p className="text-xs text-muted-foreground">
                         {totalUsed}/{totalAvailable} {lang === 'bn' ? 'ব্যবহৃত' : 'used'}
                       </p>
+                      {isExhausted && (
+                        <div className="mt-3 p-3 rounded-lg bg-destructive/10 border border-destructive/20">
+                          <p className="text-sm text-destructive font-medium">
+                            {lang === 'bn'
+                              ? 'আপনার সব আনলক শেষ হয়েছে। আরো জমির মালিকের তথ্য দেখতে আবার প্যাকেজ ক্রয় করুন।'
+                              : 'All unlocks used. Purchase a new package to unlock more owner contacts.'}
+                          </p>
+                        </div>
+                      )}
                     </CardContent>
                   </Card>
                 )}

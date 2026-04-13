@@ -487,6 +487,10 @@ export type Database = {
         }
         Returns: boolean
       }
+      increment_used_unlocks: {
+        Args: { p_purchase_id: string }
+        Returns: undefined
+      }
     }
     Enums: {
       app_role: "admin" | "user"

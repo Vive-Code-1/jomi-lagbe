@@ -19,7 +19,7 @@ import {
   ChevronRight, Star, Globe, UserCircle, MessageSquare, Camera, Lock, Wallet
 } from 'lucide-react';
 
-type Section = 'dashboard' | 'listings' | 'payments' | 'packages' | 'users' | 'reviews' | 'profile' | 'payment-methods' | 'contacts';
+type Section = 'dashboard' | 'listings' | 'payments' | 'packages' | 'users' | 'reviews' | 'profile' | 'payment-methods' | 'contacts' | 'unlock-payments';
 
 const emptyLand = {
   title_bn: '', title_en: '', description_bn: '', description_en: '',
@@ -64,6 +64,7 @@ const Admin = () => {
     { id: 'reviews' as Section, icon: MessageSquare, label: lang === 'bn' ? 'রিভিউ' : 'Reviews', desc: lang === 'bn' ? 'রিভিউ ম্যানেজমেন্ট' : 'Manage reviews' },
     { id: 'payment-methods' as Section, icon: Wallet, label: lang === 'bn' ? 'পেমেন্ট মেথড' : 'Payment Methods', desc: lang === 'bn' ? 'বিকাশ/নগদ সেটিং' : 'bKash/Nagad settings' },
     { id: 'contacts' as Section, icon: MessageSquare, label: lang === 'bn' ? 'যোগাযোগ বার্তা' : 'Contact Messages', desc: lang === 'bn' ? 'ফর্ম থেকে প্রাপ্ত বার্তা' : 'Messages from contact form' },
+    { id: 'unlock-payments' as Section, icon: Lock, label: lang === 'bn' ? 'আনলক পেমেন্ট' : 'Unlock Payments', desc: lang === 'bn' ? 'মালিকের তথ্য আনলক অনুমোদন' : 'Approve owner info unlocks' },
     { id: 'profile' as Section, icon: UserCircle, label: lang === 'bn' ? 'প্রোফাইল' : 'Profile', desc: lang === 'bn' ? 'প্রোফাইল ও সিকিউরিটি' : 'Profile & security' },
   ];
 
@@ -158,6 +159,7 @@ const Admin = () => {
           {section === 'reviews' && <ReviewsSection />}
           {section === 'payment-methods' && <PaymentMethodsSection />}
           {section === 'contacts' && <ContactMessagesSection />}
+          {section === 'unlock-payments' && <UnlockPaymentsSection />}
           {section === 'profile' && <ProfileSection />}
         </main>
       </div>
@@ -1252,6 +1254,110 @@ const ContactMessagesSection = () => {
                 </TableRow>
               )) : (
                 <TableRow><TableCell colSpan={6} className="text-center py-8 text-muted-foreground">{lang === 'bn' ? 'কোনো বার্তা পাওয়া যায়নি' : 'No messages found'}</TableCell></TableRow>
+              )}
+            </TableBody>
+          </Table>
+        </CardContent>
+      </Card>
+    </div>
+  );
+};
+
+
+/* ─── Unlock Payments ─── */
+const UnlockPaymentsSection = () => {
+  const { lang } = useI18n();
+  const { user, isAdmin } = useAuth();
+  const queryClient = useQueryClient();
+
+  const { data: purchases, isLoading } = useQuery({
+    queryKey: ['admin-unlock-purchases'],
+    enabled: !!user && isAdmin,
+    queryFn: async () => {
+      const { data, error } = await supabase
+        .from('unlock_purchases' as any)
+        .select('*')
+        .order('created_at', { ascending: false });
+      if (error) throw error;
+      return data as any[];
+    },
+  });
+
+  const updateStatus = useMutation({
+    mutationFn: async ({ id, status }: { id: string; status: string }) => {
+      const { error } = await supabase
+        .from('unlock_purchases' as any)
+        .update({ status } as any)
+        .eq('id', id);
+      if (error) throw error;
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['admin-unlock-purchases'] });
+      toast.success(lang === 'bn' ? 'স্ট্যাটাস আপডেট হয়েছে' : 'Status updated');
+    },
+    onError: (err: any) => toast.error(err.message),
+  });
+
+  const pendingCount = purchases?.filter((p: any) => p.status === 'pending').length || 0;
+
+  return (
+    <div className="space-y-4">
+      <div className="flex items-center justify-between">
+        <p className="text-sm text-muted-foreground">
+          {lang === 'bn' ? `${pendingCount}টি পেন্ডিং অনুরোধ` : `${pendingCount} pending requests`}
+        </p>
+      </div>
+      <Card className="border-none bg-card shadow-sm">
+        <CardContent className="p-0">
+          <Table>
+            <TableHeader>
+              <TableRow>
+                <TableHead>{lang === 'bn' ? 'ইউজার আইডি' : 'User ID'}</TableHead>
+                <TableHead>{lang === 'bn' ? 'সেন্ডার নম্বর' : 'Sender Number'}</TableHead>
+                <TableHead>{lang === 'bn' ? 'ট্রানজেকশন আইডি' : 'Transaction ID'}</TableHead>
+                <TableHead>{lang === 'bn' ? 'আনলক' : 'Unlocks'}</TableHead>
+                <TableHead>{lang === 'bn' ? 'তারিখ' : 'Date'}</TableHead>
+                <TableHead>{lang === 'bn' ? 'স্ট্যাটাস' : 'Status'}</TableHead>
+                <TableHead>{lang === 'bn' ? 'অ্যাকশন' : 'Actions'}</TableHead>
+              </TableRow>
+            </TableHeader>
+            <TableBody>
+              {isLoading ? (
+                <TableRow><TableCell colSpan={7} className="text-center py-8 text-muted-foreground">{lang === 'bn' ? 'লোড হচ্ছে...' : 'Loading...'}</TableCell></TableRow>
+              ) : purchases && purchases.length > 0 ? purchases.map((p: any) => (
+                <TableRow key={p.id} className={p.status === 'pending' ? 'bg-yellow-50/50' : ''}>
+                  <TableCell className="text-xs text-muted-foreground font-mono">{p.user_id?.slice(0, 8)}...</TableCell>
+                  <TableCell className="font-medium">{p.sender_number || '-'}</TableCell>
+                  <TableCell className="text-muted-foreground">{p.sender_transaction_id || '-'}</TableCell>
+                  <TableCell className="text-muted-foreground">{p.used_unlocks}/{p.total_unlocks}</TableCell>
+                  <TableCell className="text-muted-foreground text-xs">{new Date(p.created_at).toLocaleDateString('bn-BD')}</TableCell>
+                  <TableCell>
+                    <span className={`inline-flex rounded-full px-2 py-0.5 text-xs font-medium ${
+                      p.status === 'active' ? 'bg-green-100 text-green-800' :
+                      p.status === 'pending' ? 'bg-yellow-100 text-yellow-800' :
+                      p.status === 'rejected' ? 'bg-red-100 text-red-800' :
+                      'bg-muted text-muted-foreground'
+                    }`}>
+                      {p.status === 'active' ? (lang === 'bn' ? 'অনুমোদিত' : 'Approved') :
+                       p.status === 'pending' ? (lang === 'bn' ? 'পেন্ডিং' : 'Pending') :
+                       p.status === 'rejected' ? (lang === 'bn' ? 'প্রত্যাখ্যাত' : 'Rejected') : p.status}
+                    </span>
+                  </TableCell>
+                  <TableCell>
+                    {p.status === 'pending' && (
+                      <div className="flex gap-1">
+                        <Button size="sm" variant="outline" className="text-green-600 border-green-200 hover:bg-green-50" onClick={() => updateStatus.mutate({ id: p.id, status: 'active' })}>
+                          {lang === 'bn' ? 'অনুমোদন' : 'Approve'}
+                        </Button>
+                        <Button size="sm" variant="outline" className="text-destructive border-destructive/20 hover:bg-destructive/5" onClick={() => updateStatus.mutate({ id: p.id, status: 'rejected' })}>
+                          {lang === 'bn' ? 'প্রত্যাখ্যান' : 'Reject'}
+                        </Button>
+                      </div>
+                    )}
+                  </TableCell>
+                </TableRow>
+              )) : (
+                <TableRow><TableCell colSpan={7} className="text-center py-8 text-muted-foreground">{lang === 'bn' ? 'কোনো অনুরোধ পাওয়া যায়নি' : 'No requests found'}</TableCell></TableRow>
               )}
             </TableBody>
           </Table>

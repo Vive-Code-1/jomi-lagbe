@@ -4,6 +4,7 @@ import AnimatedSection from '@/components/AnimatedSection';
 import LottieAnimation from '@/components/LottieAnimation';
 import { Button } from '@/components/ui/button';
 import { Link } from 'react-router-dom';
+import { ShieldCheck, Map, CreditCard, Headphones } from 'lucide-react';
 
 const About = () => {
   const { lang } = useI18n();
@@ -71,7 +72,7 @@ const About = () => {
           {/* Card 1 */}
           <div className="md:col-span-2 bg-card border border-border rounded-3xl p-8 flex flex-col md:flex-row gap-6 items-start hover-lift group">
             <div className="flex-1">
-              <LottieAnimation url="https://assets4.lottiefiles.com/packages/lf20_j3gumpgp.json" className="w-14 h-14 mb-4" />
+              <LottieAnimation url="https://assets4.lottiefiles.com/packages/lf20_j3gumpgp.json" className="w-14 h-14 mb-4" fallback={<ShieldCheck className="w-14 h-14 mb-4 text-primary" />} />
               <h3 className="text-xl font-bold text-foreground mb-3">
                 {lang === 'bn' ? 'যাচাইকৃত লিস্টিং' : 'Verified Listings'}
               </h3>
@@ -90,7 +91,7 @@ const About = () => {
 
           {/* Card 2 */}
           <div className="bg-primary rounded-3xl p-8 text-primary-foreground hover-lift">
-            <LottieAnimation url="https://assets3.lottiefiles.com/packages/lf20_svy4ivvy.json" className="w-14 h-14 mb-4" />
+            <LottieAnimation url="https://assets3.lottiefiles.com/packages/lf20_svy4ivvy.json" className="w-14 h-14 mb-4" fallback={<Map className="w-14 h-14 mb-4 text-primary-foreground" />} />
             <h3 className="text-xl font-bold mb-3">
               {lang === 'bn' ? 'আধুনিক ম্যাপ সুবিধা' : 'Modern Map Feature'}
             </h3>
@@ -103,7 +104,7 @@ const About = () => {
 
           {/* Card 3 */}
           <div className="bg-card border border-border rounded-3xl p-8 hover-lift">
-            <LottieAnimation url="https://assets10.lottiefiles.com/packages/lf20_uu0x8lqv.json" className="w-14 h-14 mb-4" />
+            <LottieAnimation url="https://assets10.lottiefiles.com/packages/lf20_uu0x8lqv.json" className="w-14 h-14 mb-4" fallback={<CreditCard className="w-14 h-14 mb-4 text-primary" />} />
             <h3 className="text-xl font-bold text-foreground mb-3">
               {lang === 'bn' ? 'নিরাপদ পেমেন্ট' : 'Secure Payment'}
             </h3>
@@ -117,7 +118,7 @@ const About = () => {
           {/* Card 4 */}
           <div className="md:col-span-2 bg-card border border-border rounded-3xl p-8 flex flex-col md:flex-row gap-6 items-start hover-lift group">
             <div className="flex-1">
-              <LottieAnimation url="https://assets1.lottiefiles.com/packages/lf20_u25cckyh.json" className="w-14 h-14 mb-4" />
+              <LottieAnimation url="https://assets1.lottiefiles.com/packages/lf20_u25cckyh.json" className="w-14 h-14 mb-4" fallback={<Headphones className="w-14 h-14 mb-4 text-primary" />} />
               <h3 className="text-xl font-bold text-foreground mb-3">
                 {lang === 'bn' ? '২৪/৭ সাপোর্ট' : '24/7 Support'}
               </h3>

@@ -1,4 +1,4 @@
-import { useEffect, useState, useRef } from 'react';
+import { useEffect, useState, useRef, ReactNode } from 'react';
 import Lottie from 'lottie-react';
 
 interface LottieAnimationProps {
@@ -7,9 +7,10 @@ interface LottieAnimationProps {
   loop?: boolean;
   autoplay?: boolean;
   style?: React.CSSProperties;
+  fallback?: ReactNode;
 }
 
-const LottieAnimation = ({ url, className = '', loop = true, autoplay = true, style }: LottieAnimationProps) => {
+const LottieAnimation = ({ url, className = '', loop = true, autoplay = true, style, fallback }: LottieAnimationProps) => {
   const [animationData, setAnimationData] = useState<any>(null);
   const [error, setError] = useState(false);
   const prefersReducedMotion = useRef(
@@ -19,7 +20,10 @@ const LottieAnimation = ({ url, className = '', loop = true, autoplay = true, st
   useEffect(() => {
     let cancelled = false;
     fetch(url)
-      .then(res => res.json())
+      .then(res => {
+        if (!res.ok) throw new Error('Failed');
+        return res.json();
+      })
       .then(data => {
         if (!cancelled) setAnimationData(data);
       })
@@ -29,7 +33,9 @@ const LottieAnimation = ({ url, className = '', loop = true, autoplay = true, st
     return () => { cancelled = true; };
   }, [url]);
 
-  if (error || !animationData) return null;
+  if (error || !animationData) {
+    return fallback ? <>{fallback}</> : null;
+  }
 
   return (
     <Lottie

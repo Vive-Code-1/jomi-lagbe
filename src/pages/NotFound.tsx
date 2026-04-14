@@ -3,6 +3,7 @@ import { useEffect } from "react";
 import LottieAnimation from "@/components/LottieAnimation";
 import { useI18n } from "@/lib/i18n";
 import { Button } from "@/components/ui/button";
+import { AlertTriangle } from "lucide-react";
 
 const NotFound = () => {
   const location = useLocation();
@@ -18,6 +19,7 @@ const NotFound = () => {
         <LottieAnimation
           url="https://assets2.lottiefiles.com/packages/lf20_kcsr6fcp.json"
           className="w-64 h-64 mx-auto mb-6"
+          fallback={<AlertTriangle className="w-24 h-24 mx-auto mb-6 text-primary" />}
         />
         <h1 className="mb-4 text-5xl font-bold text-primary">404</h1>
         <p className="mb-6 text-lg text-muted-foreground">

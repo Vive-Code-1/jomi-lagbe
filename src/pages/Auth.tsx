@@ -9,7 +9,7 @@ import { lovable } from '@/integrations/lovable/index';
 import LottieAnimation from '@/components/LottieAnimation';
 import { toast } from 'sonner';
 import { Separator } from '@/components/ui/separator';
-import { ArrowLeft } from 'lucide-react';
+import { ArrowLeft, Shield } from 'lucide-react';
 
 const Auth = () => {
   const { t, lang } = useI18n();
@@ -120,6 +120,7 @@ const Auth = () => {
           <LottieAnimation
             url="https://assets10.lottiefiles.com/packages/lf20_uu0x8lqv.json"
             className="w-48 h-48 mb-8"
+            fallback={<Shield className="w-32 h-32 mb-8 text-accent" />}
           />
           <h2 className="text-3xl lg:text-4xl font-bold text-white leading-tight mb-4" style={{ fontFamily: "'Hind Siliguri', sans-serif" }}>
             {lang === 'bn' ? 'আপনার ভবিষ্যতের' : 'Build the'}

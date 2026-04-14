@@ -7,6 +7,7 @@ import { I18nProvider } from "@/lib/i18n";
 import { AuthProvider } from "@/lib/auth";
 import Navbar from "@/components/Navbar";
 import ScrollToTop from "@/components/ScrollToTop";
+import PageTransition from "@/components/PageTransition";
 import Index from "./pages/Index";
 import Listings from "./pages/Listings";
 import LandDetail from "./pages/LandDetail";
@@ -32,20 +33,22 @@ const AppLayout = () => {
     <>
       <ScrollToTop />
       {!hideChrome && <Navbar />}
-      <Routes>
-        <Route path="/" element={<Index />} />
-        <Route path="/listings" element={<Listings />} />
-        <Route path="/land/:id" element={<LandDetail />} />
-        <Route path="/auth" element={<Auth />} />
-        <Route path="/favorites" element={<Favorites />} />
-        <Route path="/dashboard" element={<UserDashboard />} />
-        <Route path="/packages" element={<Packages />} />
-        <Route path="/admin" element={<Admin />} />
-        <Route path="/add-listing" element={<AddListing />} />
-        <Route path="/about" element={<About />} />
-        <Route path="/contact" element={<Contact />} />
-        <Route path="*" element={<NotFound />} />
-      </Routes>
+      <PageTransition>
+        <Routes>
+          <Route path="/" element={<Index />} />
+          <Route path="/listings" element={<Listings />} />
+          <Route path="/land/:id" element={<LandDetail />} />
+          <Route path="/auth" element={<Auth />} />
+          <Route path="/favorites" element={<Favorites />} />
+          <Route path="/dashboard" element={<UserDashboard />} />
+          <Route path="/packages" element={<Packages />} />
+          <Route path="/admin" element={<Admin />} />
+          <Route path="/add-listing" element={<AddListing />} />
+          <Route path="/about" element={<About />} />
+          <Route path="/contact" element={<Contact />} />
+          <Route path="*" element={<NotFound />} />
+        </Routes>
+      </PageTransition>
     </>
   );
 };

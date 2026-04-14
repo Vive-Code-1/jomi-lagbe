@@ -83,7 +83,7 @@ const Contact = () => {
             <div className="space-y-6 mb-10">
               <div className="flex items-start gap-4 group">
                 <div className="w-12 h-12 flex-shrink-0">
-                   <LottieAnimation url="https://assets2.lottiefiles.com/packages/lf20_u25cckyh.json" className="w-12 h-12" />
+                   <LottieAnimation url="https://assets2.lottiefiles.com/packages/lf20_u25cckyh.json" className="w-12 h-12" fallback={<Phone className="w-10 h-10 text-primary" />} />
                  </div>
                 <div>
                   <h3 className="font-bold text-foreground mb-1">
@@ -94,7 +94,7 @@ const Contact = () => {
               </div>
               <div className="flex items-start gap-4 group">
                 <div className="w-12 h-12 flex-shrink-0">
-                   <LottieAnimation url="https://assets6.lottiefiles.com/packages/lf20_ebqz3ltq.json" className="w-12 h-12" />
+                   <LottieAnimation url="https://assets6.lottiefiles.com/packages/lf20_ebqz3ltq.json" className="w-12 h-12" fallback={<Mail className="w-10 h-10 text-primary" />} />
                  </div>
                 <div>
                   <h3 className="font-bold text-foreground mb-1">
@@ -105,7 +105,7 @@ const Contact = () => {
               </div>
               <div className="flex items-start gap-4 group">
                 <div className="w-12 h-12 flex-shrink-0">
-                   <LottieAnimation url="https://assets3.lottiefiles.com/packages/lf20_svy4ivvy.json" className="w-12 h-12" />
+                   <LottieAnimation url="https://assets3.lottiefiles.com/packages/lf20_svy4ivvy.json" className="w-12 h-12" fallback={<MapPin className="w-10 h-10 text-primary" />} />
                  </div>
                 <div>
                   <h3 className="font-bold text-foreground mb-1">

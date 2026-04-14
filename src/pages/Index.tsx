@@ -8,7 +8,7 @@ import LandCard from '@/components/LandCard';
 import Footer from '@/components/Footer';
 import AnimatedSection from '@/components/AnimatedSection';
 import LottieAnimation from '@/components/LottieAnimation';
-import { Search, MapPin, Ruler, CheckCircle, Star, Quote } from 'lucide-react';
+import { Search, MapPin, Ruler, CheckCircle, Star, Quote, Upload, FileSearch, ShieldCheck, Users, Headphones, Loader2 } from 'lucide-react';
 import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from '@/components/ui/accordion';
 import { divisions } from '@/data/districts';
 
@@ -228,9 +228,10 @@ const Index = () => {
           </AnimatedSection>
           {isLoading ? (
             <div className="flex flex-col items-center justify-center py-16">
-              <LottieAnimation
+             <LottieAnimation
                 url="https://assets2.lottiefiles.com/packages/lf20_usmfx6bp.json"
                 className="w-32 h-32"
+                fallback={<Loader2 className="w-16 h-16 text-primary animate-spin" />}
               />
             </div>
           ) : featuredLands && featuredLands.length > 0 ? (
@@ -282,6 +283,7 @@ const Index = () => {
                 <LottieAnimation
                   url="https://assets5.lottiefiles.com/packages/lf20_vnikbbgo.json"
                   className="w-20 h-20 mb-6"
+                  fallback={<Upload className="w-16 h-16 mb-6 text-primary" />}
                 />
                 <h3 className="font-headline text-2xl font-bold text-primary mb-4">
                   {lang === 'bn' ? 'বিক্রেতাদের জন্য' : 'For Sellers'}
@@ -319,6 +321,7 @@ const Index = () => {
                 <LottieAnimation
                   url="https://assets3.lottiefiles.com/packages/lf20_rrqzmxuo.json"
                   className="w-20 h-20 mb-6"
+                  fallback={<FileSearch className="w-16 h-16 mb-6 text-secondary" />}
                 />
                 <h3 className="font-headline text-2xl font-bold text-secondary mb-4">
                   {lang === 'bn' ? 'ক্রেতাদের জন্য' : 'For Buyers'}
@@ -429,22 +432,22 @@ const Index = () => {
         <div className="max-w-4xl mx-auto">
           <AnimatedSection stagger={0.1} className="grid grid-cols-2 md:grid-cols-4 gap-6">
             <div className="flex flex-col items-center justify-center p-6 bg-card rounded-xl text-center border border-outline-variant/20 shadow-sm hover-lift">
-               <LottieAnimation url="https://assets4.lottiefiles.com/packages/lf20_j3gumpgp.json" className="w-12 h-12 mb-2" />
+               <LottieAnimation url="https://assets4.lottiefiles.com/packages/lf20_j3gumpgp.json" className="w-12 h-12 mb-2" fallback={<ShieldCheck className="w-10 h-10 mb-2 text-primary" />} />
                <span className="text-2xl font-bold text-primary">১০০%</span>
                <p className="text-xs text-outline font-bold uppercase mt-1">{lang === 'bn' ? 'যাচাইকৃত তথ্য' : 'Verified Docs'}</p>
              </div>
              <div className="flex flex-col items-center justify-center p-6 bg-card rounded-xl text-center border border-outline-variant/20 shadow-sm hover-lift">
-               <LottieAnimation url="https://assets9.lottiefiles.com/packages/lf20_v1yudlrx.json" className="w-12 h-12 mb-2" />
+               <LottieAnimation url="https://assets9.lottiefiles.com/packages/lf20_v1yudlrx.json" className="w-12 h-12 mb-2" fallback={<Users className="w-10 h-10 mb-2 text-primary" />} />
                <span className="text-2xl font-bold text-primary">৫০হাজার+</span>
                <p className="text-xs text-outline font-bold uppercase mt-1">{lang === 'bn' ? 'সক্রিয় ইউজার' : 'Active Users'}</p>
              </div>
              <div className="flex flex-col items-center justify-center p-6 bg-card rounded-xl text-center border border-outline-variant/20 shadow-sm hover-lift">
-               <LottieAnimation url="https://assets10.lottiefiles.com/packages/lf20_uu0x8lqv.json" className="w-12 h-12 mb-2" />
+               <LottieAnimation url="https://assets10.lottiefiles.com/packages/lf20_uu0x8lqv.json" className="w-12 h-12 mb-2" fallback={<ShieldCheck className="w-10 h-10 mb-2 text-primary" />} />
                <span className="text-2xl font-bold text-primary">{lang === 'bn' ? 'নিরাপদ' : 'Secure'}</span>
                <p className="text-xs text-outline font-bold uppercase mt-1">{lang === 'bn' ? 'নিরাপদ লেনদেন' : 'Secure Transactions'}</p>
              </div>
              <div className="flex flex-col items-center justify-center p-6 bg-card rounded-xl text-center border border-outline-variant/20 shadow-sm hover-lift">
-               <LottieAnimation url="https://assets1.lottiefiles.com/packages/lf20_u25cckyh.json" className="w-12 h-12 mb-2" />
+               <LottieAnimation url="https://assets1.lottiefiles.com/packages/lf20_u25cckyh.json" className="w-12 h-12 mb-2" fallback={<Headphones className="w-10 h-10 mb-2 text-primary" />} />
                <span className="text-2xl font-bold text-primary">২৪/৭</span>
                <p className="text-xs text-outline font-bold uppercase mt-1">{lang === 'bn' ? 'সাপোর্ট' : 'Expert Support'}</p>
              </div>

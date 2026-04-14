@@ -1,12 +1,13 @@
 import { Link } from 'react-router-dom';
 import { useI18n } from '@/lib/i18n';
+import AnimatedSection from '@/components/AnimatedSection';
 
 const Footer = () => {
   const { lang } = useI18n();
 
   return (
     <footer className="w-full bg-[#003215] rounded-t-3xl mt-12 text-white font-body text-sm leading-relaxed">
-      <div className="flex flex-col md:flex-row justify-between items-start px-8 md:px-12 py-16 gap-12 max-w-screen-2xl mx-auto">
+      <AnimatedSection stagger={0.12} className="flex flex-col md:flex-row justify-between items-start px-8 md:px-12 py-16 gap-12 max-w-screen-2xl mx-auto">
         <div className="md:w-1/3">
           <span className="text-xl font-bold text-secondary-container block mb-6">জমি লাগবে</span>
           <p className="text-[#aef2bb]/80 leading-relaxed mb-8">
@@ -53,7 +54,7 @@ const Footer = () => {
             </button>
           </div>
         </div>
-      </div>
+      </AnimatedSection>
       <div className="border-t border-white/10 px-12 py-8 text-center text-[#aef2bb]/60 text-xs">
         <p>© 2024 জমি লাগবে। সর্বস্বত্ব সংরক্ষিত। <a href="https://webogrowth.com/" target="_blank" rel="noopener noreferrer" className="text-secondary-container hover:text-white transition-all underline">Webogrowth</a></p>
       </div>

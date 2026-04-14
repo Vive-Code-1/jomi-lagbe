@@ -25,7 +25,7 @@ const LandCard = ({
 
   return (
     <Link to={`/land/${id}`}>
-      <div className="bg-surface-container-lowest rounded-xl overflow-hidden shadow-sm group border border-outline-variant/30">
+      <div className="bg-surface-container-lowest rounded-xl overflow-hidden shadow-sm group border border-outline-variant/30 hover-lift">
         <div className="relative h-64 overflow-hidden">
           <img
             src={images?.[0] || '/placeholder.svg'}

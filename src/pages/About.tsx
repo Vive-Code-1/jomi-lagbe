@@ -1,5 +1,6 @@
 import { useI18n } from '@/lib/i18n';
 import Footer from '@/components/Footer';
+import AnimatedSection from '@/components/AnimatedSection';
 import { ShieldCheck, Map, CreditCard, Headphones } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Link } from 'react-router-dom';
@@ -12,7 +13,7 @@ const About = () => {
       {/* Hero Section */}
       <section className="px-6 md:px-12 py-16 md:py-24 max-w-screen-2xl mx-auto">
         <div className="grid md:grid-cols-2 gap-12 items-center">
-          <div>
+          <AnimatedSection direction="left">
             <span className="inline-block bg-primary/10 text-primary text-xs font-bold uppercase tracking-widest px-4 py-2 rounded-full mb-6">
               {lang === 'bn' ? 'আমাদের মিশন' : 'OUR MISSION'}
             </span>
@@ -26,34 +27,36 @@ const About = () => {
                 ? 'জমি লাগবে প্ল্যাটফর্মের লক্ষ্য হলো বাংলাদেশের রিয়েল এস্টেট বাজারে স্বচ্ছতা এবং আধুনিক প্রযুক্তি ব্যবহারের মাধ্যমে জমি কেনা-বেচার প্রক্রিয়াকে সাধারণ মানুষের জন্য সহজতর করা। আমরা বিশ্বাস করি একটি টুকরো জমি কেবল সম্পত্তি নয়, এটি একটি পরিবারের ভবিষ্যৎ উত্তরাধিকার।'
                 : 'Jomi Lagbe aims to simplify the land buying and selling process for common people through transparency and modern technology in Bangladesh\'s real estate market. We believe a piece of land is not just property—it is a family\'s future legacy.'}
             </p>
-            <div className="flex gap-6">
-              <div className="bg-card border border-border rounded-2xl p-6 text-center min-w-[140px]">
+            <AnimatedSection stagger={0.15} delay={0.3} className="flex gap-6">
+              <div className="bg-card border border-border rounded-2xl p-6 text-center min-w-[140px] hover-lift">
                 <span className="text-3xl font-bold text-primary block">১০+</span>
                 <span className="text-muted-foreground text-sm">
                   {lang === 'bn' ? 'বছরের অভিজ্ঞতা' : 'Years Experience'}
                 </span>
               </div>
-              <div className="bg-card border border-border rounded-2xl p-6 text-center min-w-[140px]">
+              <div className="bg-card border border-border rounded-2xl p-6 text-center min-w-[140px] hover-lift">
                 <span className="text-3xl font-bold text-primary block">৫০০০+</span>
                 <span className="text-muted-foreground text-sm">
                   {lang === 'bn' ? 'সফল ডিল' : 'Successful Deals'}
                 </span>
               </div>
+            </AnimatedSection>
+          </AnimatedSection>
+          <AnimatedSection direction="right" delay={0.2}>
+            <div className="relative">
+              <img
+                src="https://images.unsplash.com/photo-1500382017468-9049fed747ef?w=800&q=80"
+                alt="Aerial view of green agricultural fields"
+                className="w-full h-[400px] md:h-[500px] object-cover rounded-3xl shadow-lg"
+              />
             </div>
-          </div>
-          <div className="relative">
-            <img
-              src="https://images.unsplash.com/photo-1500382017468-9049fed747ef?w=800&q=80"
-              alt="Aerial view of green agricultural fields"
-              className="w-full h-[400px] md:h-[500px] object-cover rounded-3xl shadow-lg"
-            />
-          </div>
+          </AnimatedSection>
         </div>
       </section>
 
       {/* Bento Grid - Why We're Different */}
       <section className="px-6 md:px-12 py-16 md:py-24 max-w-screen-2xl mx-auto">
-        <div className="text-center mb-14">
+        <AnimatedSection direction="up" className="text-center mb-14">
           <h2 className="text-2xl md:text-4xl font-heading font-bold text-foreground mb-4">
             {lang === 'bn' ? 'কেন আমরা আলাদা?' : 'Why We\'re Different?'}
           </h2>
@@ -62,11 +65,11 @@ const About = () => {
               ? 'আমাদের সেবার মূল ভিত্তি হলো সততা এবং আধুনিক প্রযুক্তি'
               : 'Our service is built on honesty and modern technology'}
           </p>
-        </div>
+        </AnimatedSection>
 
-        <div className="grid md:grid-cols-3 gap-6">
-          {/* Card 1 - Verified Listings (Large) */}
-          <div className="md:col-span-2 bg-card border border-border rounded-3xl p-8 flex flex-col md:flex-row gap-6 items-start hover:shadow-lg transition-shadow duration-300 group">
+        <AnimatedSection stagger={0.12} className="grid md:grid-cols-3 gap-6">
+          {/* Card 1 */}
+          <div className="md:col-span-2 bg-card border border-border rounded-3xl p-8 flex flex-col md:flex-row gap-6 items-start hover-lift group">
             <div className="flex-1">
               <div className="w-12 h-12 bg-primary/10 rounded-2xl flex items-center justify-center mb-4">
                 <ShieldCheck className="w-6 h-6 text-primary" />
@@ -87,8 +90,8 @@ const About = () => {
             />
           </div>
 
-          {/* Card 2 - Modern Map (Small, green bg) */}
-          <div className="bg-primary rounded-3xl p-8 text-primary-foreground hover:shadow-lg transition-shadow duration-300">
+          {/* Card 2 */}
+          <div className="bg-primary rounded-3xl p-8 text-primary-foreground hover-lift">
             <div className="w-12 h-12 bg-primary-foreground/20 rounded-2xl flex items-center justify-center mb-4">
               <Map className="w-6 h-6 text-primary-foreground" />
             </div>
@@ -102,8 +105,8 @@ const About = () => {
             </p>
           </div>
 
-          {/* Card 3 - Secure Payment (Small) */}
-          <div className="bg-card border border-border rounded-3xl p-8 hover:shadow-lg transition-shadow duration-300">
+          {/* Card 3 */}
+          <div className="bg-card border border-border rounded-3xl p-8 hover-lift">
             <div className="w-12 h-12 bg-accent/20 rounded-2xl flex items-center justify-center mb-4">
               <CreditCard className="w-6 h-6 text-accent-foreground" />
             </div>
@@ -117,8 +120,8 @@ const About = () => {
             </p>
           </div>
 
-          {/* Card 4 - 24/7 Support (Large) */}
-          <div className="md:col-span-2 bg-card border border-border rounded-3xl p-8 flex flex-col md:flex-row gap-6 items-start hover:shadow-lg transition-shadow duration-300 group">
+          {/* Card 4 */}
+          <div className="md:col-span-2 bg-card border border-border rounded-3xl p-8 flex flex-col md:flex-row gap-6 items-start hover-lift group">
             <div className="flex-1">
               <div className="w-12 h-12 bg-secondary/10 rounded-2xl flex items-center justify-center mb-4">
                 <Headphones className="w-6 h-6 text-secondary" />
@@ -143,7 +146,7 @@ const About = () => {
               className="w-full md:w-[200px] h-[160px] object-cover rounded-2xl"
             />
           </div>
-        </div>
+        </AnimatedSection>
       </section>
 
       <Footer />

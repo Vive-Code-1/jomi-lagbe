@@ -3,7 +3,8 @@ import { Button } from '@/components/ui/button';
 import { useI18n } from '@/lib/i18n';
 import { useAuth } from '@/lib/auth';
 import { Heart, Menu, X, Globe, Bell, User, Plus } from 'lucide-react';
-import { useState } from 'react';
+import { useState, useEffect, useRef } from 'react';
+import { gsap } from 'gsap';
 
 const activeClass = "text-primary font-bold border-b-2 border-secondary pb-1 text-sm tracking-tight whitespace-nowrap";
 const inactiveClass = "text-on-surface-variant font-medium text-sm tracking-tight hover:text-primary transition-colors duration-200 whitespace-nowrap";
@@ -15,12 +16,29 @@ const Navbar = () => {
   const { user, isAdmin, signOut } = useAuth();
   const navigate = useNavigate();
   const [mobileOpen, setMobileOpen] = useState(false);
+  const navRef = useRef<HTMLElement>(null);
+  const mobileMenuRef = useRef<HTMLDivElement>(null);
 
   const linkClass = ({ isActive }: { isActive: boolean }) => isActive ? activeClass : inactiveClass;
   const mobileLinkClass = ({ isActive }: { isActive: boolean }) => isActive ? mobileActiveClass : mobileInactiveClass;
 
+  // Navbar slide-down on mount
+  useEffect(() => {
+    if (navRef.current) {
+      gsap.fromTo(navRef.current, { y: -80, opacity: 0 }, { y: 0, opacity: 1, duration: 0.6, ease: 'power3.out' });
+    }
+  }, []);
+
+  // Mobile menu stagger animation
+  useEffect(() => {
+    if (mobileOpen && mobileMenuRef.current) {
+      const items = mobileMenuRef.current.children;
+      gsap.fromTo(items, { x: -30, opacity: 0 }, { x: 0, opacity: 1, duration: 0.3, stagger: 0.05, ease: 'power2.out' });
+    }
+  }, [mobileOpen]);
+
   return (
-    <nav className="fixed top-0 w-full z-50 bg-background/80 backdrop-blur-md">
+    <nav ref={navRef} className="fixed top-0 w-full z-50 bg-background/80 backdrop-blur-md">
       <div className="relative flex justify-between items-center px-8 h-20 max-w-screen-2xl mx-auto">
         <Link to="/" className="text-2xl font-bold text-primary shrink-0">
           জমি লাগবে
@@ -68,7 +86,7 @@ const Navbar = () => {
 
       {mobileOpen && (
         <div className="bg-background p-6 md:hidden">
-          <div className="flex flex-col gap-4">
+          <div ref={mobileMenuRef} className="flex flex-col gap-4">
             <NavLink to="/" end onClick={() => setMobileOpen(false)} className={mobileLinkClass}>{t('home')}</NavLink>
             <NavLink to="/listings" onClick={() => setMobileOpen(false)} className={mobileLinkClass}>{t('listings')}</NavLink>
             <NavLink to="/about" onClick={() => setMobileOpen(false)} className={mobileLinkClass}>{lang === 'bn' ? 'আমাদের সম্পর্কে' : 'About Us'}</NavLink>

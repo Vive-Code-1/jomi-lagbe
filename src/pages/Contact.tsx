@@ -1,6 +1,7 @@
 import { useI18n } from '@/lib/i18n';
 import Footer from '@/components/Footer';
 import AnimatedSection from '@/components/AnimatedSection';
+import LottieAnimation from '@/components/LottieAnimation';
 import { Phone, Mail, MapPin } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
@@ -81,9 +82,9 @@ const Contact = () => {
 
             <div className="space-y-6 mb-10">
               <div className="flex items-start gap-4 group">
-                <div className="w-10 h-10 bg-primary/10 rounded-xl flex items-center justify-center flex-shrink-0 group-hover:bg-primary group-hover:text-primary-foreground transition-colors duration-300">
-                  <Phone className="w-5 h-5 text-primary group-hover:text-primary-foreground transition-colors duration-300" />
-                </div>
+                <div className="w-12 h-12 flex-shrink-0">
+                   <LottieAnimation url="https://assets2.lottiefiles.com/packages/lf20_u25cckyh.json" className="w-12 h-12" />
+                 </div>
                 <div>
                   <h3 className="font-bold text-foreground mb-1">
                     {lang === 'bn' ? 'ফোন' : 'Phone'}
@@ -92,9 +93,9 @@ const Contact = () => {
                 </div>
               </div>
               <div className="flex items-start gap-4 group">
-                <div className="w-10 h-10 bg-primary/10 rounded-xl flex items-center justify-center flex-shrink-0 group-hover:bg-primary group-hover:text-primary-foreground transition-colors duration-300">
-                  <Mail className="w-5 h-5 text-primary group-hover:text-primary-foreground transition-colors duration-300" />
-                </div>
+                <div className="w-12 h-12 flex-shrink-0">
+                   <LottieAnimation url="https://assets6.lottiefiles.com/packages/lf20_ebqz3ltq.json" className="w-12 h-12" />
+                 </div>
                 <div>
                   <h3 className="font-bold text-foreground mb-1">
                     {lang === 'bn' ? 'ইমেইল' : 'Email'}
@@ -103,9 +104,9 @@ const Contact = () => {
                 </div>
               </div>
               <div className="flex items-start gap-4 group">
-                <div className="w-10 h-10 bg-primary/10 rounded-xl flex items-center justify-center flex-shrink-0 group-hover:bg-primary group-hover:text-primary-foreground transition-colors duration-300">
-                  <MapPin className="w-5 h-5 text-primary group-hover:text-primary-foreground transition-colors duration-300" />
-                </div>
+                <div className="w-12 h-12 flex-shrink-0">
+                   <LottieAnimation url="https://assets3.lottiefiles.com/packages/lf20_svy4ivvy.json" className="w-12 h-12" />
+                 </div>
                 <div>
                   <h3 className="font-bold text-foreground mb-1">
                     {lang === 'bn' ? 'ঠিকানা' : 'Address'}

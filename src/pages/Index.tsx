@@ -7,7 +7,8 @@ import { supabase } from '@/integrations/supabase/client';
 import LandCard from '@/components/LandCard';
 import Footer from '@/components/Footer';
 import AnimatedSection from '@/components/AnimatedSection';
-import { Search, MapPin, Ruler, Upload, SearchCheck, CheckCircle, Shield, Users, Headphones, Star, Quote } from 'lucide-react';
+import LottieAnimation from '@/components/LottieAnimation';
+import { Search, MapPin, Ruler, CheckCircle, Star, Quote } from 'lucide-react';
 import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from '@/components/ui/accordion';
 import { divisions } from '@/data/districts';
 
@@ -226,10 +227,11 @@ const Index = () => {
             </h2>
           </AnimatedSection>
           {isLoading ? (
-            <div className="grid gap-8 sm:grid-cols-2 lg:grid-cols-3">
-              {[1, 2, 3].map((i) => (
-                <div key={i} className="h-96 animate-pulse rounded-xl bg-surface-container" />
-              ))}
+            <div className="flex flex-col items-center justify-center py-16">
+              <LottieAnimation
+                url="https://assets2.lottiefiles.com/packages/lf20_usmfx6bp.json"
+                className="w-32 h-32"
+              />
             </div>
           ) : featuredLands && featuredLands.length > 0 ? (
             <AnimatedSection stagger={0.12} className="grid gap-8 sm:grid-cols-2 lg:grid-cols-3">
@@ -277,9 +279,10 @@ const Index = () => {
             {/* Sellers */}
             <AnimatedSection direction="left">
               <div className="bg-surface-container-low p-10 md:p-12 rounded-xl">
-                <div className="w-16 h-16 bg-primary text-white rounded-lg flex items-center justify-center mb-8 shadow-md">
-                  <Upload className="h-8 w-8" />
-                </div>
+                <LottieAnimation
+                  url="https://assets5.lottiefiles.com/packages/lf20_vnikbbgo.json"
+                  className="w-20 h-20 mb-6"
+                />
                 <h3 className="font-headline text-2xl font-bold text-primary mb-4">
                   {lang === 'bn' ? 'বিক্রেতাদের জন্য' : 'For Sellers'}
                 </h3>
@@ -313,9 +316,10 @@ const Index = () => {
             {/* Buyers */}
             <AnimatedSection direction="right">
               <div className="bg-surface-container-low p-10 md:p-12 rounded-xl">
-                <div className="w-16 h-16 bg-secondary text-white rounded-lg flex items-center justify-center mb-8 shadow-md">
-                  <SearchCheck className="h-8 w-8" />
-                </div>
+                <LottieAnimation
+                  url="https://assets3.lottiefiles.com/packages/lf20_rrqzmxuo.json"
+                  className="w-20 h-20 mb-6"
+                />
                 <h3 className="font-headline text-2xl font-bold text-secondary mb-4">
                   {lang === 'bn' ? 'ক্রেতাদের জন্য' : 'For Buyers'}
                 </h3>
@@ -425,25 +429,25 @@ const Index = () => {
         <div className="max-w-4xl mx-auto">
           <AnimatedSection stagger={0.1} className="grid grid-cols-2 md:grid-cols-4 gap-6">
             <div className="flex flex-col items-center justify-center p-6 bg-card rounded-xl text-center border border-outline-variant/20 shadow-sm hover-lift">
-              <Shield className="h-8 w-8 text-primary mb-3" />
-              <span className="text-2xl font-bold text-primary">১০০%</span>
-              <p className="text-xs text-outline font-bold uppercase mt-1">{lang === 'bn' ? 'যাচাইকৃত তথ্য' : 'Verified Docs'}</p>
-            </div>
-            <div className="flex flex-col items-center justify-center p-6 bg-card rounded-xl text-center border border-outline-variant/20 shadow-sm hover-lift">
-              <Users className="h-8 w-8 text-secondary mb-3" />
-              <span className="text-2xl font-bold text-primary">৫০হাজার+</span>
-              <p className="text-xs text-outline font-bold uppercase mt-1">{lang === 'bn' ? 'সক্রিয় ইউজার' : 'Active Users'}</p>
-            </div>
-            <div className="flex flex-col items-center justify-center p-6 bg-card rounded-xl text-center border border-outline-variant/20 shadow-sm hover-lift">
-              <Shield className="h-8 w-8 text-primary mb-3" />
-              <span className="text-2xl font-bold text-primary">{lang === 'bn' ? 'নিরাপদ' : 'Secure'}</span>
-              <p className="text-xs text-outline font-bold uppercase mt-1">{lang === 'bn' ? 'নিরাপদ লেনদেন' : 'Secure Transactions'}</p>
-            </div>
-            <div className="flex flex-col items-center justify-center p-6 bg-card rounded-xl text-center border border-outline-variant/20 shadow-sm hover-lift">
-              <Headphones className="h-8 w-8 text-secondary mb-3" />
-              <span className="text-2xl font-bold text-primary">২৪/৭</span>
-              <p className="text-xs text-outline font-bold uppercase mt-1">{lang === 'bn' ? 'সাপোর্ট' : 'Expert Support'}</p>
-            </div>
+               <LottieAnimation url="https://assets4.lottiefiles.com/packages/lf20_j3gumpgp.json" className="w-12 h-12 mb-2" />
+               <span className="text-2xl font-bold text-primary">১০০%</span>
+               <p className="text-xs text-outline font-bold uppercase mt-1">{lang === 'bn' ? 'যাচাইকৃত তথ্য' : 'Verified Docs'}</p>
+             </div>
+             <div className="flex flex-col items-center justify-center p-6 bg-card rounded-xl text-center border border-outline-variant/20 shadow-sm hover-lift">
+               <LottieAnimation url="https://assets9.lottiefiles.com/packages/lf20_v1yudlrx.json" className="w-12 h-12 mb-2" />
+               <span className="text-2xl font-bold text-primary">৫০হাজার+</span>
+               <p className="text-xs text-outline font-bold uppercase mt-1">{lang === 'bn' ? 'সক্রিয় ইউজার' : 'Active Users'}</p>
+             </div>
+             <div className="flex flex-col items-center justify-center p-6 bg-card rounded-xl text-center border border-outline-variant/20 shadow-sm hover-lift">
+               <LottieAnimation url="https://assets10.lottiefiles.com/packages/lf20_uu0x8lqv.json" className="w-12 h-12 mb-2" />
+               <span className="text-2xl font-bold text-primary">{lang === 'bn' ? 'নিরাপদ' : 'Secure'}</span>
+               <p className="text-xs text-outline font-bold uppercase mt-1">{lang === 'bn' ? 'নিরাপদ লেনদেন' : 'Secure Transactions'}</p>
+             </div>
+             <div className="flex flex-col items-center justify-center p-6 bg-card rounded-xl text-center border border-outline-variant/20 shadow-sm hover-lift">
+               <LottieAnimation url="https://assets1.lottiefiles.com/packages/lf20_u25cckyh.json" className="w-12 h-12 mb-2" />
+               <span className="text-2xl font-bold text-primary">২৪/৭</span>
+               <p className="text-xs text-outline font-bold uppercase mt-1">{lang === 'bn' ? 'সাপোর্ট' : 'Expert Support'}</p>
+             </div>
           </AnimatedSection>
         </div>
       </section>

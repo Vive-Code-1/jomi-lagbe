@@ -1,5 +1,6 @@
 import { useI18n } from '@/lib/i18n';
 import Footer from '@/components/Footer';
+import AnimatedSection from '@/components/AnimatedSection';
 import { Phone, Mail, MapPin } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
@@ -68,7 +69,7 @@ const Contact = () => {
       <section className="px-6 md:px-12 py-16 md:py-24 max-w-screen-2xl mx-auto">
         <div className="grid md:grid-cols-2 gap-12">
           {/* Left - Contact Info */}
-          <div>
+          <AnimatedSection direction="left">
             <h1 className="text-3xl md:text-4xl font-heading font-bold text-foreground mb-4">
               {lang === 'bn' ? 'যোগাযোগ করুন' : 'Contact Us'}
             </h1>
@@ -79,9 +80,9 @@ const Contact = () => {
             </p>
 
             <div className="space-y-6 mb-10">
-              <div className="flex items-start gap-4">
-                <div className="w-10 h-10 bg-primary/10 rounded-xl flex items-center justify-center flex-shrink-0">
-                  <Phone className="w-5 h-5 text-primary" />
+              <div className="flex items-start gap-4 group">
+                <div className="w-10 h-10 bg-primary/10 rounded-xl flex items-center justify-center flex-shrink-0 group-hover:bg-primary group-hover:text-primary-foreground transition-colors duration-300">
+                  <Phone className="w-5 h-5 text-primary group-hover:text-primary-foreground transition-colors duration-300" />
                 </div>
                 <div>
                   <h3 className="font-bold text-foreground mb-1">
@@ -90,9 +91,9 @@ const Contact = () => {
                   <p className="text-muted-foreground">01791208768</p>
                 </div>
               </div>
-              <div className="flex items-start gap-4">
-                <div className="w-10 h-10 bg-primary/10 rounded-xl flex items-center justify-center flex-shrink-0">
-                  <Mail className="w-5 h-5 text-primary" />
+              <div className="flex items-start gap-4 group">
+                <div className="w-10 h-10 bg-primary/10 rounded-xl flex items-center justify-center flex-shrink-0 group-hover:bg-primary group-hover:text-primary-foreground transition-colors duration-300">
+                  <Mail className="w-5 h-5 text-primary group-hover:text-primary-foreground transition-colors duration-300" />
                 </div>
                 <div>
                   <h3 className="font-bold text-foreground mb-1">
@@ -101,9 +102,9 @@ const Contact = () => {
                   <p className="text-muted-foreground">support@webogrowth.com</p>
                 </div>
               </div>
-              <div className="flex items-start gap-4">
-                <div className="w-10 h-10 bg-primary/10 rounded-xl flex items-center justify-center flex-shrink-0">
-                  <MapPin className="w-5 h-5 text-primary" />
+              <div className="flex items-start gap-4 group">
+                <div className="w-10 h-10 bg-primary/10 rounded-xl flex items-center justify-center flex-shrink-0 group-hover:bg-primary group-hover:text-primary-foreground transition-colors duration-300">
+                  <MapPin className="w-5 h-5 text-primary group-hover:text-primary-foreground transition-colors duration-300" />
                 </div>
                 <div>
                   <h3 className="font-bold text-foreground mb-1">
@@ -126,79 +127,81 @@ const Contact = () => {
                 className="w-full h-[200px] object-cover"
               />
             </div>
-          </div>
+          </AnimatedSection>
 
           {/* Right - Contact Form */}
-          <div className="bg-card border border-border rounded-3xl p-8">
-            <form onSubmit={handleSubmit} className="space-y-6">
-              <div>
-                <Label className="text-foreground font-medium mb-2 block">
-                  {lang === 'bn' ? 'আপনার নাম' : 'Your Name'}
-                </Label>
-                <Input
-                  name="name"
-                  placeholder={lang === 'bn' ? 'উদা: আব্দুল করিম' : 'e.g. Abdul Karim'}
-                  required
-                  className="rounded-xl"
-                />
-              </div>
-              <div>
-                <Label className="text-foreground font-medium mb-2 block">
-                  {lang === 'bn' ? 'ইমেইল ঠিকানা' : 'Email Address'}
-                </Label>
-                <Input
-                  name="email"
-                  type="email"
-                  placeholder="karim@email.com"
-                  required
-                  className="rounded-xl"
-                />
-              </div>
-              <div>
-                <Label className="text-foreground font-medium mb-2 block">
-                  {lang === 'bn' ? 'বিষয়' : 'Subject'}
-                </Label>
-                <Select name="subject" value={subject} onValueChange={setSubject}>
-                  <SelectTrigger className="rounded-xl">
-                    <SelectValue placeholder={lang === 'bn' ? 'বিষয় নির্বাচন করুন' : 'Select a subject'} />
-                  </SelectTrigger>
-                  <SelectContent>
-                    <SelectItem value="buy">{lang === 'bn' ? 'জমি কেনার বিষয়ে তথ্য' : 'Land buying information'}</SelectItem>
-                    <SelectItem value="sell">{lang === 'bn' ? 'জমি বিক্রি করতে চাই' : 'Want to sell land'}</SelectItem>
-                    <SelectItem value="legal">{lang === 'bn' ? 'আইনি পরামর্শ' : 'Legal consultation'}</SelectItem>
-                    <SelectItem value="other">{lang === 'bn' ? 'অন্যান্য' : 'Other'}</SelectItem>
-                  </SelectContent>
-                </Select>
-              </div>
-              <div>
-                <Label className="text-foreground font-medium mb-2 block">
-                  {lang === 'bn' ? 'বার্তা' : 'Message'}
-                </Label>
-                <Textarea
-                  name="message"
-                  placeholder={lang === 'bn' ? 'আপনার প্রশ্নটি বিস্তারিত লিখুন...' : 'Write your question in detail...'}
-                  required
-                  rows={5}
-                  className="rounded-xl"
-                />
-              </div>
-              <Button
-                type="submit"
-                disabled={loading}
-                className="w-full bg-primary text-primary-foreground rounded-xl font-bold py-3 text-base"
-              >
-                {loading
-                  ? (lang === 'bn' ? 'পাঠানো হচ্ছে...' : 'Sending...')
-                  : (lang === 'bn' ? 'বার্তা পাঠান' : 'Send Message')}
-              </Button>
-            </form>
-          </div>
+          <AnimatedSection direction="right" delay={0.15}>
+            <div className="bg-card border border-border rounded-3xl p-8">
+              <form onSubmit={handleSubmit} className="space-y-6">
+                <div>
+                  <Label className="text-foreground font-medium mb-2 block">
+                    {lang === 'bn' ? 'আপনার নাম' : 'Your Name'}
+                  </Label>
+                  <Input
+                    name="name"
+                    placeholder={lang === 'bn' ? 'উদা: আব্দুল করিম' : 'e.g. Abdul Karim'}
+                    required
+                    className="rounded-xl"
+                  />
+                </div>
+                <div>
+                  <Label className="text-foreground font-medium mb-2 block">
+                    {lang === 'bn' ? 'ইমেইল ঠিকানা' : 'Email Address'}
+                  </Label>
+                  <Input
+                    name="email"
+                    type="email"
+                    placeholder="karim@email.com"
+                    required
+                    className="rounded-xl"
+                  />
+                </div>
+                <div>
+                  <Label className="text-foreground font-medium mb-2 block">
+                    {lang === 'bn' ? 'বিষয়' : 'Subject'}
+                  </Label>
+                  <Select name="subject" value={subject} onValueChange={setSubject}>
+                    <SelectTrigger className="rounded-xl">
+                      <SelectValue placeholder={lang === 'bn' ? 'বিষয় নির্বাচন করুন' : 'Select a subject'} />
+                    </SelectTrigger>
+                    <SelectContent>
+                      <SelectItem value="buy">{lang === 'bn' ? 'জমি কেনার বিষয়ে তথ্য' : 'Land buying information'}</SelectItem>
+                      <SelectItem value="sell">{lang === 'bn' ? 'জমি বিক্রি করতে চাই' : 'Want to sell land'}</SelectItem>
+                      <SelectItem value="legal">{lang === 'bn' ? 'আইনি পরামর্শ' : 'Legal consultation'}</SelectItem>
+                      <SelectItem value="other">{lang === 'bn' ? 'অন্যান্য' : 'Other'}</SelectItem>
+                    </SelectContent>
+                  </Select>
+                </div>
+                <div>
+                  <Label className="text-foreground font-medium mb-2 block">
+                    {lang === 'bn' ? 'বার্তা' : 'Message'}
+                  </Label>
+                  <Textarea
+                    name="message"
+                    placeholder={lang === 'bn' ? 'আপনার প্রশ্নটি বিস্তারিত লিখুন...' : 'Write your question in detail...'}
+                    required
+                    rows={5}
+                    className="rounded-xl"
+                  />
+                </div>
+                <Button
+                  type="submit"
+                  disabled={loading}
+                  className="w-full bg-primary text-primary-foreground rounded-xl font-bold py-3 text-base"
+                >
+                  {loading
+                    ? (lang === 'bn' ? 'পাঠানো হচ্ছে...' : 'Sending...')
+                    : (lang === 'bn' ? 'বার্তা পাঠান' : 'Send Message')}
+                </Button>
+              </form>
+            </div>
+          </AnimatedSection>
         </div>
       </section>
 
       {/* FAQ Section */}
       <section className="px-6 md:px-12 py-16 md:py-24 max-w-screen-2xl mx-auto">
-        <div className="text-center mb-12">
+        <AnimatedSection direction="up" className="text-center mb-12">
           <h2 className="text-2xl md:text-4xl font-heading font-bold text-foreground mb-4">
             {lang === 'bn' ? 'সাধারণ জিজ্ঞাসা (FAQ)' : 'Frequently Asked Questions'}
           </h2>
@@ -207,9 +210,9 @@ const Contact = () => {
               ? 'পেমেন্ট এবং লিস্টিং সংক্রান্ত কিছু উত্তর যা আপনার উপকারে আসতে পারে'
               : 'Some answers about payments and listings that may help you'}
           </p>
-        </div>
+        </AnimatedSection>
 
-        <div className="max-w-3xl mx-auto">
+        <AnimatedSection direction="up" delay={0.15} className="max-w-3xl mx-auto">
           <Accordion type="single" collapsible className="space-y-4">
             {faqs.map((faq, i) => (
               <AccordionItem key={i} value={`item-${i}`} className="bg-card border border-border rounded-2xl px-6">
@@ -222,7 +225,7 @@ const Contact = () => {
               </AccordionItem>
             ))}
           </Accordion>
-        </div>
+        </AnimatedSection>
       </section>
 
       <Footer />

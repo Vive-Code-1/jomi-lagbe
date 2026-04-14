@@ -6,6 +6,7 @@ import { useQuery } from '@tanstack/react-query';
 import { supabase } from '@/integrations/supabase/client';
 import LandCard from '@/components/LandCard';
 import Footer from '@/components/Footer';
+import AnimatedSection from '@/components/AnimatedSection';
 import { Search, MapPin, Ruler, Upload, SearchCheck, CheckCircle, Shield, Users, Headphones, Star, Quote } from 'lucide-react';
 import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from '@/components/ui/accordion';
 import { divisions } from '@/data/districts';
@@ -69,113 +70,119 @@ const Index = () => {
           <div className="absolute inset-0 bg-primary/30" />
         </div>
         <div className="relative z-10 max-w-5xl w-full text-center mt-[-4rem]">
-          <h1 className="font-headline text-4xl md:text-6xl lg:text-7xl font-bold text-white mb-6 tracking-tight leading-tight">
-            {lang === 'bn' ? 'আপনার স্বপ্নের জমি,' : 'Find Your Dream'}
-            <br />
-            <span className="text-secondary-container">
-              {lang === 'bn' ? 'এখন হাতের নাগালে।' : 'Land Today.'}
-            </span>
-          </h1>
-          <p className="font-body text-lg md:text-xl text-white/95 mb-12 max-w-2xl mx-auto leading-relaxed">
-            {lang === 'bn'
-              ? 'বাংলাদেশের সেরা আবাসিক, বাণিজ্যিক ও কৃষি জমি খুঁজুন। আপনার ভবিষ্যৎ সুরক্ষিত করুন আজই।'
-              : 'Explore premium residential, commercial, and agricultural plots across Bangladesh. Secure your future legacy today.'}
-          </p>
+          <AnimatedSection direction="fade" duration={1}>
+            <h1 className="font-headline text-4xl md:text-6xl lg:text-7xl font-bold text-white mb-6 tracking-tight leading-tight">
+              {lang === 'bn' ? 'আপনার স্বপ্নের জমি,' : 'Find Your Dream'}
+              <br />
+              <span className="text-secondary-container">
+                {lang === 'bn' ? 'এখন হাতের নাগালে।' : 'Land Today.'}
+              </span>
+            </h1>
+          </AnimatedSection>
+          <AnimatedSection direction="up" delay={0.3}>
+            <p className="font-body text-lg md:text-xl text-white/95 mb-12 max-w-2xl mx-auto leading-relaxed">
+              {lang === 'bn'
+                ? 'বাংলাদেশের সেরা আবাসিক, বাণিজ্যিক ও কৃষি জমি খুঁজুন। আপনার ভবিষ্যৎ সুরক্ষিত করুন আজই।'
+                : 'Explore premium residential, commercial, and agricultural plots across Bangladesh. Secure your future legacy today.'}
+            </p>
+          </AnimatedSection>
 
           {/* Search Bar */}
-          <div className="bg-surface-container-lowest/95 backdrop-blur-md p-3 md:p-4 rounded-2xl shadow-xl max-w-5xl mx-auto">
-            <div className="flex flex-col md:flex-row items-stretch">
-              {/* Location */}
-              <div className="flex-1 px-4 py-3 md:border-r border-outline-variant/30">
-                <label className="block text-[10px] uppercase tracking-[0.15em] font-bold text-outline mb-1.5 font-label">
-                  {lang === 'bn' ? 'লোকেশন' : 'LOCATION'}
-                </label>
-                <div className="flex items-center gap-2">
-                  <MapPin className="h-4 w-4 text-primary flex-shrink-0" />
-                  <select
-                    className="w-full bg-transparent border-none focus:ring-0 font-semibold text-sm text-on-surface outline-none cursor-pointer appearance-none pl-1"
-                    value={selectedDistrict}
-                    onChange={(e) => setSelectedDistrict(e.target.value)}
+          <AnimatedSection direction="up" delay={0.5} distance={40}>
+            <div className="bg-surface-container-lowest/95 backdrop-blur-md p-3 md:p-4 rounded-2xl shadow-xl max-w-5xl mx-auto">
+              <div className="flex flex-col md:flex-row items-stretch">
+                {/* Location */}
+                <div className="flex-1 px-4 py-3 md:border-r border-outline-variant/30">
+                  <label className="block text-[10px] uppercase tracking-[0.15em] font-bold text-outline mb-1.5 font-label">
+                    {lang === 'bn' ? 'লোকেশন' : 'LOCATION'}
+                  </label>
+                  <div className="flex items-center gap-2">
+                    <MapPin className="h-4 w-4 text-primary flex-shrink-0" />
+                    <select
+                      className="w-full bg-transparent border-none focus:ring-0 font-semibold text-sm text-on-surface outline-none cursor-pointer appearance-none pl-1"
+                      value={selectedDistrict}
+                      onChange={(e) => setSelectedDistrict(e.target.value)}
+                    >
+                      <option value="">{lang === 'bn' ? 'কোথায় খুঁজছেন?' : 'Where are you looking?'}</option>
+                      {divisions.map(div => (
+                        <optgroup key={div.name_en} label={lang === 'bn' ? div.name_bn : div.name_en}>
+                          {div.districts.map(d => (
+                            <option key={d.name_en} value={d.name_en}>
+                              {lang === 'bn' ? d.name_bn : d.name_en}
+                            </option>
+                          ))}
+                        </optgroup>
+                      ))}
+                    </select>
+                  </div>
+                </div>
+
+                {/* Land Type */}
+                <div className="flex-1 px-4 py-3 md:border-r border-outline-variant/30">
+                  <label className="block text-[10px] uppercase tracking-[0.15em] font-bold text-outline mb-1.5 font-label">
+                    {lang === 'bn' ? 'জমির ধরন' : 'LAND TYPE'}
+                  </label>
+                  <div className="flex items-center gap-2">
+                    <Ruler className="h-4 w-4 text-primary flex-shrink-0" />
+                    <select
+                      className="w-full bg-transparent border-none focus:ring-0 font-semibold text-sm text-on-surface outline-none cursor-pointer appearance-none pl-1"
+                      value={selectedLandType}
+                      onChange={(e) => setSelectedLandType(e.target.value)}
+                    >
+                      <option value="">{lang === 'bn' ? 'জমির ধরন নির্বাচন করুন' : 'Select Land Type'}</option>
+                      <option value="residential">{lang === 'bn' ? 'আবাসিক' : 'Residential'}</option>
+                      <option value="commercial">{lang === 'bn' ? 'বাণিজ্যিক' : 'Commercial'}</option>
+                      <option value="agriculture">{lang === 'bn' ? 'কৃষি' : 'Agriculture'}</option>
+                      <option value="industrial">{lang === 'bn' ? 'শিল্প' : 'Industrial'}</option>
+                    </select>
+                  </div>
+                </div>
+
+                {/* Budget Range */}
+                <div className="flex-1 px-4 py-3 md:border-r border-outline-variant/30">
+                  <label className="block text-[10px] uppercase tracking-[0.15em] font-bold text-outline mb-1.5 font-label">
+                    {lang === 'bn' ? 'বাজেট রেঞ্জ' : 'BUDGET RANGE'}
+                  </label>
+                  <div className="flex items-center gap-2">
+                    <span className="text-primary font-bold text-sm flex-shrink-0">৳</span>
+                    <input
+                      type="number"
+                      className="w-full bg-transparent border-none focus:ring-0 font-semibold text-sm text-on-surface placeholder:text-outline-variant outline-none"
+                      placeholder={lang === 'bn' ? 'সর্বনিম্ন' : 'Min'}
+                      value={budgetMin}
+                      onChange={(e) => setBudgetMin(e.target.value)}
+                    />
+                    <span className="text-outline-variant">—</span>
+                    <input
+                      type="number"
+                      className="w-full bg-transparent border-none focus:ring-0 font-semibold text-sm text-on-surface placeholder:text-outline-variant outline-none"
+                      placeholder={lang === 'bn' ? 'সর্বোচ্চ' : 'Max'}
+                      value={budgetMax}
+                      onChange={(e) => setBudgetMax(e.target.value)}
+                    />
+                  </div>
+                </div>
+
+                {/* Search Button */}
+                <div className="flex items-center px-2 py-3 md:py-0">
+                  <button
+                    onClick={handleSearch}
+                    className="w-full md:w-auto bg-primary hover:opacity-90 text-primary-foreground px-8 py-3.5 rounded-xl font-bold flex items-center justify-center gap-2 transition-all duration-200 active:scale-95 whitespace-nowrap shadow-lg shadow-primary/20"
                   >
-                    <option value="">{lang === 'bn' ? 'কোথায় খুঁজছেন?' : 'Where are you looking?'}</option>
-                    {divisions.map(div => (
-                      <optgroup key={div.name_en} label={lang === 'bn' ? div.name_bn : div.name_en}>
-                        {div.districts.map(d => (
-                          <option key={d.name_en} value={d.name_en}>
-                            {lang === 'bn' ? d.name_bn : d.name_en}
-                          </option>
-                        ))}
-                      </optgroup>
-                    ))}
-                  </select>
+                    <Search className="h-5 w-5" />
+                    {lang === 'bn' ? 'জমি খুঁজুন' : 'Search Land'}
+                  </button>
                 </div>
-              </div>
-
-              {/* Land Type */}
-              <div className="flex-1 px-4 py-3 md:border-r border-outline-variant/30">
-                <label className="block text-[10px] uppercase tracking-[0.15em] font-bold text-outline mb-1.5 font-label">
-                  {lang === 'bn' ? 'জমির ধরন' : 'LAND TYPE'}
-                </label>
-                <div className="flex items-center gap-2">
-                  <Ruler className="h-4 w-4 text-primary flex-shrink-0" />
-                  <select
-                    className="w-full bg-transparent border-none focus:ring-0 font-semibold text-sm text-on-surface outline-none cursor-pointer appearance-none pl-1"
-                    value={selectedLandType}
-                    onChange={(e) => setSelectedLandType(e.target.value)}
-                  >
-                    <option value="">{lang === 'bn' ? 'জমির ধরন নির্বাচন করুন' : 'Select Land Type'}</option>
-                    <option value="residential">{lang === 'bn' ? 'আবাসিক' : 'Residential'}</option>
-                    <option value="commercial">{lang === 'bn' ? 'বাণিজ্যিক' : 'Commercial'}</option>
-                    <option value="agriculture">{lang === 'bn' ? 'কৃষি' : 'Agriculture'}</option>
-                    <option value="industrial">{lang === 'bn' ? 'শিল্প' : 'Industrial'}</option>
-                  </select>
-                </div>
-              </div>
-
-              {/* Budget Range */}
-              <div className="flex-1 px-4 py-3 md:border-r border-outline-variant/30">
-                <label className="block text-[10px] uppercase tracking-[0.15em] font-bold text-outline mb-1.5 font-label">
-                  {lang === 'bn' ? 'বাজেট রেঞ্জ' : 'BUDGET RANGE'}
-                </label>
-                <div className="flex items-center gap-2">
-                  <span className="text-primary font-bold text-sm flex-shrink-0">৳</span>
-                  <input
-                    type="number"
-                    className="w-full bg-transparent border-none focus:ring-0 font-semibold text-sm text-on-surface placeholder:text-outline-variant outline-none"
-                    placeholder={lang === 'bn' ? 'সর্বনিম্ন' : 'Min'}
-                    value={budgetMin}
-                    onChange={(e) => setBudgetMin(e.target.value)}
-                  />
-                  <span className="text-outline-variant">—</span>
-                  <input
-                    type="number"
-                    className="w-full bg-transparent border-none focus:ring-0 font-semibold text-sm text-on-surface placeholder:text-outline-variant outline-none"
-                    placeholder={lang === 'bn' ? 'সর্বোচ্চ' : 'Max'}
-                    value={budgetMax}
-                    onChange={(e) => setBudgetMax(e.target.value)}
-                  />
-                </div>
-              </div>
-
-              {/* Search Button */}
-              <div className="flex items-center px-2 py-3 md:py-0">
-                <button
-                  onClick={handleSearch}
-                  className="w-full md:w-auto bg-primary hover:opacity-90 text-primary-foreground px-8 py-3.5 rounded-xl font-bold flex items-center justify-center gap-2 transition-all duration-200 active:scale-95 whitespace-nowrap shadow-lg shadow-primary/20"
-                >
-                  <Search className="h-5 w-5" />
-                  {lang === 'bn' ? 'জমি খুঁজুন' : 'Search Land'}
-                </button>
               </div>
             </div>
-          </div>
+          </AnimatedSection>
         </div>
       </section>
 
       {/* Featured Categories */}
       <section className="py-20 md:py-24 bg-surface px-6 md:px-8">
         <div className="max-w-7xl mx-auto">
-          <div className="flex justify-between items-end mb-12">
+          <AnimatedSection direction="up" className="flex justify-between items-end mb-12">
             <div>
               <h2 className="font-headline text-3xl font-bold text-primary mb-2">
                 {lang === 'bn' ? 'ফিচার্ড ক্যাটেগরি' : 'Featured Categories'}
@@ -186,8 +193,8 @@ const Index = () => {
               {lang === 'bn' ? 'সব দেখুন' : 'Browse All'}
               <span className="group-hover:translate-x-1 transition-transform">→</span>
             </Link>
-          </div>
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
+          </AnimatedSection>
+          <AnimatedSection stagger={0.15} className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
             {categories.map((cat, i) => (
               <Link to="/listings" key={i} className="group relative overflow-hidden rounded-xl h-72 md:h-80 bg-surface-container">
                 <img
@@ -203,21 +210,21 @@ const Index = () => {
                 </div>
               </Link>
             ))}
-          </div>
+          </AnimatedSection>
         </div>
       </section>
 
       {/* Latest Listings */}
       <section className="py-20 md:py-24 bg-surface-container-low px-6 md:px-8">
         <div className="max-w-7xl mx-auto">
-          <div className="text-center mb-16">
+          <AnimatedSection direction="up" className="text-center mb-16">
             <span className="font-bold text-sm text-secondary tracking-widest uppercase">
               {lang === 'bn' ? 'নতুন এসেছে' : 'New Arrivals'}
             </span>
             <h2 className="font-headline text-4xl md:text-5xl font-bold text-primary mt-4">
               {lang === 'bn' ? 'সাম্প্রতিক জমি' : 'Latest Listings'}
             </h2>
-          </div>
+          </AnimatedSection>
           {isLoading ? (
             <div className="grid gap-8 sm:grid-cols-2 lg:grid-cols-3">
               {[1, 2, 3].map((i) => (
@@ -225,7 +232,7 @@ const Index = () => {
               ))}
             </div>
           ) : featuredLands && featuredLands.length > 0 ? (
-            <div className="grid gap-8 sm:grid-cols-2 lg:grid-cols-3">
+            <AnimatedSection stagger={0.12} className="grid gap-8 sm:grid-cols-2 lg:grid-cols-3">
               {featuredLands.map((land: any) => (
                 <LandCard
                   key={land.id}
@@ -241,7 +248,7 @@ const Index = () => {
                   is_featured={land.is_featured}
                 />
               ))}
-            </div>
+            </AnimatedSection>
           ) : (
             <div className="text-center py-12">
               <p className="text-outline text-lg">{t('noResults')}</p>
@@ -256,7 +263,7 @@ const Index = () => {
       {/* How It Works */}
       <section className="py-20 md:py-24 bg-surface px-6 md:px-8">
         <div className="max-w-7xl mx-auto">
-          <div className="text-center mb-16">
+          <AnimatedSection direction="up" className="text-center mb-16">
             <h2 className="font-headline text-4xl font-bold text-primary">
               {lang === 'bn' ? 'জমি লাগবে কিভাবে কাজ করে' : 'How Jomi Lagbe Works'}
             </h2>
@@ -265,75 +272,79 @@ const Index = () => {
                 ? 'সহজ, স্বচ্ছ এবং নিরাপদ প্রক্রিয়া জমি মালিক ও ক্রেতা উভয়ের জন্য।'
                 : 'Simple, transparent, and secure process for both land owners and seekers.'}
             </p>
-          </div>
+          </AnimatedSection>
           <div className="grid grid-cols-1 lg:grid-cols-2 gap-12">
             {/* Sellers */}
-            <div className="bg-surface-container-low p-10 md:p-12 rounded-xl">
-              <div className="w-16 h-16 bg-primary text-white rounded-lg flex items-center justify-center mb-8 shadow-md">
-                <Upload className="h-8 w-8" />
+            <AnimatedSection direction="left">
+              <div className="bg-surface-container-low p-10 md:p-12 rounded-xl">
+                <div className="w-16 h-16 bg-primary text-white rounded-lg flex items-center justify-center mb-8 shadow-md">
+                  <Upload className="h-8 w-8" />
+                </div>
+                <h3 className="font-headline text-2xl font-bold text-primary mb-4">
+                  {lang === 'bn' ? 'বিক্রেতাদের জন্য' : 'For Sellers'}
+                </h3>
+                <p className="text-on-surface/80 mb-8 leading-relaxed">
+                  {lang === 'bn'
+                    ? 'হাজার হাজার প্রকৃত ক্রেতার কাছে আপনার জমির বিজ্ঞাপন দিন।'
+                    : 'Reach thousands of genuine buyers instantly.'}
+                </p>
+                <ul className="space-y-4 mb-10">
+                  <li className="flex items-center gap-3 font-semibold text-primary">
+                    <CheckCircle className="h-5 w-5" />
+                    {lang === 'bn' ? 'প্রিমিয়াম এড প্লেসমেন্ট' : 'Pay small fee for premium ad placement'}
+                  </li>
+                  <li className="flex items-center gap-3 font-semibold text-primary">
+                    <CheckCircle className="h-5 w-5" />
+                    {lang === 'bn' ? 'যাচাইকৃত জমির তথ্য' : 'Get your land verified by our field agents'}
+                  </li>
+                  <li className="flex items-center gap-3 font-semibold text-primary">
+                    <CheckCircle className="h-5 w-5" />
+                    {lang === 'bn' ? 'যাচাইকৃত ক্রেতাদের সাথে সরাসরি যোগাযোগ' : 'Direct communication with verified buyers'}
+                  </li>
+                </ul>
+                <Link to="/packages">
+                  <button className="w-full py-4 border-2 border-primary text-primary rounded-lg font-bold hover:bg-primary hover:text-primary-foreground transition-all duration-200">
+                    {lang === 'bn' ? 'বিক্রি শুরু করুন' : 'Start Selling Now'}
+                  </button>
+                </Link>
               </div>
-              <h3 className="font-headline text-2xl font-bold text-primary mb-4">
-                {lang === 'bn' ? 'বিক্রেতাদের জন্য' : 'For Sellers'}
-              </h3>
-              <p className="text-on-surface/80 mb-8 leading-relaxed">
-                {lang === 'bn'
-                  ? 'হাজার হাজার প্রকৃত ক্রেতার কাছে আপনার জমির বিজ্ঞাপন দিন।'
-                  : 'Reach thousands of genuine buyers instantly.'}
-              </p>
-              <ul className="space-y-4 mb-10">
-                <li className="flex items-center gap-3 font-semibold text-primary">
-                  <CheckCircle className="h-5 w-5" />
-                  {lang === 'bn' ? 'প্রিমিয়াম এড প্লেসমেন্ট' : 'Pay small fee for premium ad placement'}
-                </li>
-                <li className="flex items-center gap-3 font-semibold text-primary">
-                  <CheckCircle className="h-5 w-5" />
-                  {lang === 'bn' ? 'যাচাইকৃত জমির তথ্য' : 'Get your land verified by our field agents'}
-                </li>
-                <li className="flex items-center gap-3 font-semibold text-primary">
-                  <CheckCircle className="h-5 w-5" />
-                  {lang === 'bn' ? 'যাচাইকৃত ক্রেতাদের সাথে সরাসরি যোগাযোগ' : 'Direct communication with verified buyers'}
-                </li>
-              </ul>
-              <Link to="/packages">
-                <button className="w-full py-4 border-2 border-primary text-primary rounded-lg font-bold hover:bg-primary hover:text-primary-foreground transition-all duration-200">
-                  {lang === 'bn' ? 'বিক্রি শুরু করুন' : 'Start Selling Now'}
-                </button>
-              </Link>
-            </div>
+            </AnimatedSection>
 
             {/* Buyers */}
-            <div className="bg-surface-container-low p-10 md:p-12 rounded-xl">
-              <div className="w-16 h-16 bg-secondary text-white rounded-lg flex items-center justify-center mb-8 shadow-md">
-                <SearchCheck className="h-8 w-8" />
+            <AnimatedSection direction="right">
+              <div className="bg-surface-container-low p-10 md:p-12 rounded-xl">
+                <div className="w-16 h-16 bg-secondary text-white rounded-lg flex items-center justify-center mb-8 shadow-md">
+                  <SearchCheck className="h-8 w-8" />
+                </div>
+                <h3 className="font-headline text-2xl font-bold text-secondary mb-4">
+                  {lang === 'bn' ? 'ক্রেতাদের জন্য' : 'For Buyers'}
+                </h3>
+                <p className="text-on-surface/80 mb-8 leading-relaxed">
+                  {lang === 'bn'
+                    ? 'হাজার হাজার জমির লিস্টিং ব্রাউজ করুন আত্মবিশ্বাসের সাথে।'
+                    : 'Browse thousands of land listings with confidence.'}
+                </p>
+                <ul className="space-y-4 mb-10">
+                  <li className="flex items-center gap-3 font-semibold text-secondary">
+                    <CheckCircle className="h-5 w-5" />
+                    {lang === 'bn' ? 'সব লিস্টিং ফ্রিতে দেখুন' : 'Free browsing of all listings'}
+                  </li>
+                  <li className="flex items-center gap-3 font-semibold text-secondary">
+                    <CheckCircle className="h-5 w-5" />
+                    {lang === 'bn' ? 'মালিকের তথ্য আনলক করতে পেমেন্ট করুন' : 'Pay only to unlock owner contact details'}
+                  </li>
+                  <li className="flex items-center gap-3 font-semibold text-secondary">
+                    <CheckCircle className="h-5 w-5" />
+                    {lang === 'bn' ? 'জমি রেজিস্ট্রেশনে আইনি সহায়তা' : 'Get legal assistance for land registration'}
+                  </li>
+                </ul>
+                <Link to="/listings">
+                  <button className="w-full py-4 border-2 border-secondary text-secondary rounded-lg font-bold hover:bg-secondary hover:text-secondary-foreground transition-all duration-200">
+                    {lang === 'bn' ? 'জমি খুঁজুন' : 'Find Land Now'}
+                  </button>
+                </Link>
               </div>
-              <h3 className="font-headline text-2xl font-bold text-secondary mb-4">
-                {lang === 'bn' ? 'ক্রেতাদের জন্য' : 'For Buyers'}
-              </h3>
-              <p className="text-on-surface/80 mb-8 leading-relaxed">
-                {lang === 'bn'
-                  ? 'হাজার হাজার জমির লিস্টিং ব্রাউজ করুন আত্মবিশ্বাসের সাথে।'
-                  : 'Browse thousands of land listings with confidence.'}
-              </p>
-              <ul className="space-y-4 mb-10">
-                <li className="flex items-center gap-3 font-semibold text-secondary">
-                  <CheckCircle className="h-5 w-5" />
-                  {lang === 'bn' ? 'সব লিস্টিং ফ্রিতে দেখুন' : 'Free browsing of all listings'}
-                </li>
-                <li className="flex items-center gap-3 font-semibold text-secondary">
-                  <CheckCircle className="h-5 w-5" />
-                  {lang === 'bn' ? 'মালিকের তথ্য আনলক করতে পেমেন্ট করুন' : 'Pay only to unlock owner contact details'}
-                </li>
-                <li className="flex items-center gap-3 font-semibold text-secondary">
-                  <CheckCircle className="h-5 w-5" />
-                  {lang === 'bn' ? 'জমি রেজিস্ট্রেশনে আইনি সহায়তা' : 'Get legal assistance for land registration'}
-                </li>
-              </ul>
-              <Link to="/listings">
-                <button className="w-full py-4 border-2 border-secondary text-secondary rounded-lg font-bold hover:bg-secondary hover:text-secondary-foreground transition-all duration-200">
-                  {lang === 'bn' ? 'জমি খুঁজুন' : 'Find Land Now'}
-                </button>
-              </Link>
-            </div>
+            </AnimatedSection>
           </div>
         </div>
       </section>
@@ -341,14 +352,14 @@ const Index = () => {
       {/* Client Reviews Carousel - CSS Marquee Infinite Scroll */}
       <section className="py-20 md:py-24 bg-surface-container-low overflow-hidden">
         <div className="max-w-7xl mx-auto px-6 md:px-8">
-          <div className="text-center mb-16">
+          <AnimatedSection direction="up" className="text-center mb-16">
             <span className="font-bold text-sm text-secondary tracking-widest uppercase">
               {lang === 'bn' ? 'ক্লায়েন্ট রিভিউ' : 'Client Reviews'}
             </span>
             <h2 className="font-headline text-4xl md:text-5xl font-bold text-primary mt-4">
               {lang === 'bn' ? 'বিশ্বস্ত ১০,০০০+ গ্রাহক' : 'Trusted by 10,000+ Clients'}
             </h2>
-          </div>
+          </AnimatedSection>
         </div>
 
         {(() => {
@@ -412,43 +423,43 @@ const Index = () => {
       {/* Stats Section */}
       <section className="py-20 md:py-24 bg-surface px-6 md:px-8">
         <div className="max-w-4xl mx-auto">
-          <div className="grid grid-cols-2 md:grid-cols-4 gap-6">
-            <div className="flex flex-col items-center justify-center p-6 bg-card rounded-xl text-center border border-outline-variant/20 shadow-sm hover:shadow-lg hover:-translate-y-1 transition-all duration-300">
+          <AnimatedSection stagger={0.1} className="grid grid-cols-2 md:grid-cols-4 gap-6">
+            <div className="flex flex-col items-center justify-center p-6 bg-card rounded-xl text-center border border-outline-variant/20 shadow-sm hover-lift">
               <Shield className="h-8 w-8 text-primary mb-3" />
               <span className="text-2xl font-bold text-primary">১০০%</span>
               <p className="text-xs text-outline font-bold uppercase mt-1">{lang === 'bn' ? 'যাচাইকৃত তথ্য' : 'Verified Docs'}</p>
             </div>
-            <div className="flex flex-col items-center justify-center p-6 bg-card rounded-xl text-center border border-outline-variant/20 shadow-sm hover:shadow-lg hover:-translate-y-1 transition-all duration-300">
+            <div className="flex flex-col items-center justify-center p-6 bg-card rounded-xl text-center border border-outline-variant/20 shadow-sm hover-lift">
               <Users className="h-8 w-8 text-secondary mb-3" />
               <span className="text-2xl font-bold text-primary">৫০হাজার+</span>
               <p className="text-xs text-outline font-bold uppercase mt-1">{lang === 'bn' ? 'সক্রিয় ইউজার' : 'Active Users'}</p>
             </div>
-            <div className="flex flex-col items-center justify-center p-6 bg-card rounded-xl text-center border border-outline-variant/20 shadow-sm hover:shadow-lg hover:-translate-y-1 transition-all duration-300">
+            <div className="flex flex-col items-center justify-center p-6 bg-card rounded-xl text-center border border-outline-variant/20 shadow-sm hover-lift">
               <Shield className="h-8 w-8 text-primary mb-3" />
               <span className="text-2xl font-bold text-primary">{lang === 'bn' ? 'নিরাপদ' : 'Secure'}</span>
               <p className="text-xs text-outline font-bold uppercase mt-1">{lang === 'bn' ? 'নিরাপদ লেনদেন' : 'Secure Transactions'}</p>
             </div>
-            <div className="flex flex-col items-center justify-center p-6 bg-card rounded-xl text-center border border-outline-variant/20 shadow-sm hover:shadow-lg hover:-translate-y-1 transition-all duration-300">
+            <div className="flex flex-col items-center justify-center p-6 bg-card rounded-xl text-center border border-outline-variant/20 shadow-sm hover-lift">
               <Headphones className="h-8 w-8 text-secondary mb-3" />
               <span className="text-2xl font-bold text-primary">২৪/৭</span>
               <p className="text-xs text-outline font-bold uppercase mt-1">{lang === 'bn' ? 'সাপোর্ট' : 'Expert Support'}</p>
             </div>
-          </div>
+          </AnimatedSection>
         </div>
       </section>
 
       {/* FAQ Section */}
       <section className="py-20 md:py-24 bg-surface-container px-6 md:px-8">
         <div className="max-w-7xl mx-auto">
-          <div className="text-center mb-16">
+          <AnimatedSection direction="up" className="text-center mb-16">
             <span className="font-bold text-sm text-secondary tracking-widest uppercase">
               {lang === 'bn' ? 'সচরাচর জিজ্ঞাসা' : 'FAQ'}
             </span>
             <h2 className="font-headline text-4xl md:text-5xl font-bold text-primary mt-4">
               {lang === 'bn' ? 'আপনার প্রশ্নের উত্তর' : 'Frequently Asked Questions'}
             </h2>
-          </div>
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+          </AnimatedSection>
+          <AnimatedSection stagger={0.1} className="grid grid-cols-1 md:grid-cols-2 gap-6">
             {/* Left column */}
             <Accordion type="single" collapsible className="space-y-4">
               {[
@@ -495,33 +506,35 @@ const Index = () => {
                 </AccordionItem>
               ))}
             </Accordion>
-          </div>
+          </AnimatedSection>
         </div>
       </section>
 
       {/* CTA */}
       <section className="py-20 md:py-24 bg-primary px-6 md:px-8">
         <div className="max-w-4xl mx-auto text-center">
-          <h2 className="font-headline text-3xl md:text-4xl lg:text-5xl font-bold text-white mb-8">
-            {lang === 'bn' ? 'আপনার জমি খোঁজার সময় এসেছে!' : 'Ready to secure your piece of earth?'}
-          </h2>
-          <p className="text-white/80 text-lg mb-12 font-body">
-            {lang === 'bn'
-              ? 'হাজার হাজার মানুষ জমি লাগবেতে তাদের স্বপ্নের জমি পেয়েছেন। আজই ব্রাউজ করুন অথবা আপনার জমি লিস্ট করুন।'
-              : 'Join thousands of people who have found their perfect land on Jomi Lagbe. Start browsing or list your property today.'}
-          </p>
-          <div className="flex flex-col sm:flex-row gap-6 justify-center">
-            <Link to="/listings">
-              <button className="bg-secondary-container text-on-secondary-container px-12 py-5 rounded-lg font-bold text-lg transition-all hover:scale-105">
-                {lang === 'bn' ? 'জমি দেখুন' : 'Browse Listings'}
-              </button>
-            </Link>
-            <Link to="/packages">
-              <button className="bg-white/10 text-white border border-white/20 backdrop-blur px-12 py-5 rounded-lg font-bold text-lg transition-all hover:bg-white/20">
-                {lang === 'bn' ? 'এড দিন' : 'Contact Sales'}
-              </button>
-            </Link>
-          </div>
+          <AnimatedSection direction="up">
+            <h2 className="font-headline text-3xl md:text-4xl lg:text-5xl font-bold text-white mb-8">
+              {lang === 'bn' ? 'আপনার জমি খোঁজার সময় এসেছে!' : 'Ready to secure your piece of earth?'}
+            </h2>
+            <p className="text-white/80 text-lg mb-12 font-body">
+              {lang === 'bn'
+                ? 'হাজার হাজার মানুষ জমি লাগবেতে তাদের স্বপ্নের জমি পেয়েছেন। আজই ব্রাউজ করুন অথবা আপনার জমি লিস্ট করুন।'
+                : 'Join thousands of people who have found their perfect land on Jomi Lagbe. Start browsing or list your property today.'}
+            </p>
+            <div className="flex flex-col sm:flex-row gap-6 justify-center">
+              <Link to="/listings">
+                <button className="bg-secondary-container text-on-secondary-container px-12 py-5 rounded-lg font-bold text-lg transition-all hover:scale-105">
+                  {lang === 'bn' ? 'জমি দেখুন' : 'Browse Listings'}
+                </button>
+              </Link>
+              <Link to="/packages">
+                <button className="bg-white/10 text-white border border-white/20 backdrop-blur px-12 py-5 rounded-lg font-bold text-lg transition-all hover:bg-white/20">
+                  {lang === 'bn' ? 'এড দিন' : 'Contact Sales'}
+                </button>
+              </Link>
+            </div>
+          </AnimatedSection>
         </div>
       </section>
 

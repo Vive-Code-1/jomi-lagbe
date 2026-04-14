@@ -50,21 +50,34 @@ const Auth = () => {
   const handleGoogleLogin = async () => {
     setGoogleLoading(true);
     try {
-      const result = await lovable.auth.signInWithOAuth("google", {
-        redirect_uri: window.location.origin,
-      });
+      const isLovableHost = window.location.hostname.endsWith('.lovable.app');
 
-      if (result.error) {
-        toast.error(result.error.message || (lang === 'bn' ? 'Google লগইনে সমস্যা হয়েছে' : 'Google login failed'));
-        return;
+      if (isLovableHost) {
+        // Lovable managed OAuth
+        const result = await lovable.auth.signInWithOAuth("google", {
+          redirect_uri: window.location.origin,
+        });
+
+        if (result.error) {
+          toast.error(result.error.message || (lang === 'bn' ? 'Google লগইনে সমস্যা হয়েছে' : 'Google login failed'));
+          return;
+        }
+
+        if (result.redirected) {
+          return;
+        }
+
+        toast.success(t('success'));
+        navigate(redirectTo);
+      } else {
+        // Supabase native OAuth (Vercel / custom domain)
+        const { error } = await supabase.auth.signInWithOAuth({
+          provider: 'google',
+          options: { redirectTo: window.location.origin },
+        });
+        if (error) throw error;
+        return; // browser redirects to Google
       }
-
-      if (result.redirected) {
-        return;
-      }
-
-      toast.success(t('success'));
-      navigate(redirectTo);
     } catch (err: any) {
       toast.error(err.message);
     } finally {

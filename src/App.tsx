@@ -34,6 +34,7 @@ const AppLayout = () => {
     <>
       <ScrollToTop />
       {!hideChrome && <Navbar />}
+      {!hideChrome && <WhatsAppButton />}
       <PageTransition>
         <Routes>
           <Route path="/" element={<Index />} />

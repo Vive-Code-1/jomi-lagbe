@@ -6,6 +6,7 @@ import { Label } from '@/components/ui/label';
 import { useI18n } from '@/lib/i18n';
 import { supabase } from '@/integrations/supabase/client';
 import { lovable } from '@/integrations/lovable/index';
+import LottieAnimation from '@/components/LottieAnimation';
 import { toast } from 'sonner';
 import { Separator } from '@/components/ui/separator';
 import { ArrowLeft } from 'lucide-react';
@@ -115,7 +116,11 @@ const Auth = () => {
         </div>
 
         {/* Center - Headline */}
-        <div className="relative z-10 flex-1 flex flex-col justify-center">
+        <div className="relative z-10 flex-1 flex flex-col justify-center items-center">
+          <LottieAnimation
+            url="https://assets10.lottiefiles.com/packages/lf20_uu0x8lqv.json"
+            className="w-48 h-48 mb-8"
+          />
           <h2 className="text-3xl lg:text-4xl font-bold text-white leading-tight mb-4" style={{ fontFamily: "'Hind Siliguri', sans-serif" }}>
             {lang === 'bn' ? 'আপনার ভবিষ্যতের' : 'Build the'}
             <br />

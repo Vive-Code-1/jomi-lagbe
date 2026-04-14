@@ -1,37 +1,36 @@
 
 
-## Vercel-এ Google Login 404 সমস্যা ফিক্স
+## Lottie Animation যোগ করার পরিকল্পনা
 
-### সমস্যা
-`lovable.auth.signInWithOAuth("google")` ফাংশনটি `/~oauth/initiate` পাথে রিডাইরেক্ট করে — এটি শুধুমাত্র Lovable হোস্টিং (`*.lovable.app`) এ কাজ করে। Vercel-এ এই পাথ নেই, তাই 404 আসছে।
+### পদ্ধতি
+`lottie-react` প্যাকেজ ইনস্টল করে LottieFiles থেকে ফ্রি JSON অ্যানিমেশন URL ব্যবহার করা হবে। যেখানে যেখানে স্ট্যাটিক আইকন আছে সেখানে Lottie অ্যানিমেশন দিয়ে replace করা হবে।
 
-### সমাধান
-`handleGoogleLogin` ফাংশনে হোস্টনেম চেক করা হবে। Lovable হোস্টিং-এ থাকলে `lovable.auth.signInWithOAuth` ব্যবহার হবে, অন্যথায় (Vercel বা অন্য কোনো হোস্টিং) Supabase-এর নেটিভ `supabase.auth.signInWithOAuth` ব্যবহার হবে।
+### কোথায় কোথায় Lottie যোগ হবে
 
-### ফাইল পরিবর্তন
+| জায়গা | বর্তমান | Lottie অ্যানিমেশন |
+|--------|---------|-------------------|
+| **404 NotFound পেজ** | শুধু টেক্সট | 404 ক্যারেক্টার অ্যানিমেশন |
+| **Index — How It Works** | স্ট্যাটিক Upload/SearchCheck আইকন | বিক্রেতা: ডকুমেন্ট আপলোড অ্যানিমেশন, ক্রেতা: সার্চ অ্যানিমেশন |
+| **Index — Stats সেকশন** | স্ট্যাটিক Shield/Users/Headphones আইকন | Security shield, community, support অ্যানিমেশন |
+| **Index — Loading state** | পালস div | সুন্দর লোডিং স্পিনার Lottie |
+| **About — Bento Grid আইকন** | স্ট্যাটিক ShieldCheck/Map/CreditCard/Headphones | ভেরিফাইড, ম্যাপ, পেমেন্ট, সাপোর্ট অ্যানিমেশন |
+| **Contact — তথ্য কার্ড আইকন** | Phone/Mail/MapPin আইকন | ফোন রিং, ইমেইল ফ্লাই, লোকেশন পিন অ্যানিমেশন |
+| **Auth পেজ** | কোনো ভিজ্যুয়াল নেই | লগইন/সিকিউরিটি অ্যানিমেশন |
+| **Empty states** | সব পেজে শুধু টেক্সট | "No data" / "Empty" অ্যানিমেশন |
 
-**`src/pages/Auth.tsx`** — `handleGoogleLogin` আপডেট:
-```typescript
-const isLovableHost = window.location.hostname.endsWith('.lovable.app');
-
-if (isLovableHost) {
-  // Lovable managed OAuth
-  const result = await lovable.auth.signInWithOAuth("google", { redirect_uri: window.location.origin });
-  // ... existing handling
-} else {
-  // Supabase native OAuth (Vercel / custom domain)
-  const { error } = await supabase.auth.signInWithOAuth({
-    provider: 'google',
-    options: { redirectTo: window.location.origin },
-  });
-  if (error) throw error;
-  return; // browser redirects
-}
-```
-
-### গুরুত্বপূর্ণ
-Vercel-এ Google OAuth কাজ করতে হলে Lovable Cloud-এর Authentication Settings-এ নিজের Google OAuth Client ID ও Secret সেট করতে হবে (অথবা managed credentials ব্যবহার করতে হবে)। এছাড়া Google Cloud Console-এ Vercel ডোমেইন (`jomi-lagbe.vercel.app`) কে authorized redirect URL-এ যোগ করতে হবে।
+### টেকনিক্যাল বিবরণ
+- `lottie-react` প্যাকেজ ইনস্টল
+- `src/components/LottieAnimation.tsx` — reusable wrapper (lazy load JSON via URL)
+- LottieFiles CDN থেকে ফ্রি অ্যানিমেশন JSON URL ব্যবহার (কোনো API key লাগবে না)
+- প্রতিটি অ্যানিমেশন `loop`, `autoplay`, সাইজ কন্ট্রোল prop সহ
+- `prefers-reduced-motion` রেসপেক্ট করবে
 
 ### ফাইল তালিকা
-1. **`src/pages/Auth.tsx`** — dual OAuth logic (Lovable vs Supabase native)
+1. **package.json** — `lottie-react` ইনস্টল
+2. **`src/components/LottieAnimation.tsx`** — Reusable Lottie wrapper
+3. **`src/pages/NotFound.tsx`** — 404 Lottie অ্যানিমেশন
+4. **`src/pages/Index.tsx`** — How It Works, Stats, Loading state-এ Lottie
+5. **`src/pages/About.tsx`** — Bento grid আইকনে Lottie
+6. **`src/pages/Contact.tsx`** — তথ্য কার্ডে Lottie
+7. **`src/pages/Auth.tsx`** — লগইন পেজে Lottie
 

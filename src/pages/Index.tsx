@@ -428,28 +428,28 @@ const Index = () => {
       </section>
 
       {/* Stats Section */}
-      <section className="py-20 md:py-24 bg-surface px-6 md:px-8">
-        <div className="max-w-4xl mx-auto">
-          <AnimatedSection stagger={0.1} className="grid grid-cols-2 md:grid-cols-4 gap-6">
-            <div className="flex flex-col items-center justify-center p-6 bg-card rounded-xl text-center border border-outline-variant/20 shadow-sm hover-lift">
-               <LottieAnimation url="https://assets4.lottiefiles.com/packages/lf20_j3gumpgp.json" className="w-12 h-12 mb-2" fallback={<ShieldCheck className="w-10 h-10 mb-2 text-primary" />} />
-               <span className="text-2xl font-bold text-primary">১০০%</span>
-               <p className="text-xs text-outline font-bold uppercase mt-1">{lang === 'bn' ? 'যাচাইকৃত তথ্য' : 'Verified Docs'}</p>
+      <section className="py-20 md:py-28 bg-surface px-6 md:px-8">
+        <div className="max-w-6xl mx-auto">
+          <AnimatedSection stagger={0.1} className="grid grid-cols-2 md:grid-cols-4 gap-6 md:gap-8">
+            <div className="flex flex-col items-center justify-center p-8 md:p-10 bg-card rounded-2xl text-center border border-outline-variant/20 shadow-md hover-lift">
+               <LottieAnimation url="https://assets4.lottiefiles.com/packages/lf20_j3gumpgp.json" className="w-16 h-16 md:w-20 md:h-20 mb-3" fallback={<ShieldCheck className="w-14 h-14 md:w-16 md:h-16 mb-3 text-primary" />} />
+               <span className="text-3xl md:text-4xl font-bold text-primary">১০০%</span>
+               <p className="text-sm md:text-base text-outline font-bold uppercase mt-2">{lang === 'bn' ? 'যাচাইকৃত তথ্য' : 'Verified Docs'}</p>
              </div>
-             <div className="flex flex-col items-center justify-center p-6 bg-card rounded-xl text-center border border-outline-variant/20 shadow-sm hover-lift">
-               <LottieAnimation url="https://assets9.lottiefiles.com/packages/lf20_v1yudlrx.json" className="w-12 h-12 mb-2" fallback={<Users className="w-10 h-10 mb-2 text-primary" />} />
-               <span className="text-2xl font-bold text-primary">৫০হাজার+</span>
-               <p className="text-xs text-outline font-bold uppercase mt-1">{lang === 'bn' ? 'সক্রিয় ইউজার' : 'Active Users'}</p>
+             <div className="flex flex-col items-center justify-center p-8 md:p-10 bg-card rounded-2xl text-center border border-outline-variant/20 shadow-md hover-lift">
+               <LottieAnimation url="https://assets9.lottiefiles.com/packages/lf20_v1yudlrx.json" className="w-16 h-16 md:w-20 md:h-20 mb-3" fallback={<Users className="w-14 h-14 md:w-16 md:h-16 mb-3 text-primary" />} />
+               <span className="text-3xl md:text-4xl font-bold text-primary">৫০হাজার+</span>
+               <p className="text-sm md:text-base text-outline font-bold uppercase mt-2">{lang === 'bn' ? 'সক্রিয় ইউজার' : 'Active Users'}</p>
              </div>
-             <div className="flex flex-col items-center justify-center p-6 bg-card rounded-xl text-center border border-outline-variant/20 shadow-sm hover-lift">
-               <LottieAnimation url="https://assets10.lottiefiles.com/packages/lf20_uu0x8lqv.json" className="w-12 h-12 mb-2" fallback={<ShieldCheck className="w-10 h-10 mb-2 text-primary" />} />
-               <span className="text-2xl font-bold text-primary">{lang === 'bn' ? 'নিরাপদ' : 'Secure'}</span>
-               <p className="text-xs text-outline font-bold uppercase mt-1">{lang === 'bn' ? 'নিরাপদ লেনদেন' : 'Secure Transactions'}</p>
+             <div className="flex flex-col items-center justify-center p-8 md:p-10 bg-card rounded-2xl text-center border border-outline-variant/20 shadow-md hover-lift">
+               <LottieAnimation url="https://assets10.lottiefiles.com/packages/lf20_uu0x8lqv.json" className="w-16 h-16 md:w-20 md:h-20 mb-3" fallback={<ShieldCheck className="w-14 h-14 md:w-16 md:h-16 mb-3 text-primary" />} />
+               <span className="text-3xl md:text-4xl font-bold text-primary">{lang === 'bn' ? 'নিরাপদ' : 'Secure'}</span>
+               <p className="text-sm md:text-base text-outline font-bold uppercase mt-2">{lang === 'bn' ? 'নিরাপদ লেনদেন' : 'Secure Transactions'}</p>
              </div>
-             <div className="flex flex-col items-center justify-center p-6 bg-card rounded-xl text-center border border-outline-variant/20 shadow-sm hover-lift">
-               <LottieAnimation url="https://assets1.lottiefiles.com/packages/lf20_u25cckyh.json" className="w-12 h-12 mb-2" fallback={<Headphones className="w-10 h-10 mb-2 text-primary" />} />
-               <span className="text-2xl font-bold text-primary">২৪/৭</span>
-               <p className="text-xs text-outline font-bold uppercase mt-1">{lang === 'bn' ? 'সাপোর্ট' : 'Expert Support'}</p>
+             <div className="flex flex-col items-center justify-center p-8 md:p-10 bg-card rounded-2xl text-center border border-outline-variant/20 shadow-md hover-lift">
+               <LottieAnimation url="https://assets1.lottiefiles.com/packages/lf20_u25cckyh.json" className="w-16 h-16 md:w-20 md:h-20 mb-3" fallback={<Headphones className="w-14 h-14 md:w-16 md:h-16 mb-3 text-primary" />} />
+               <span className="text-3xl md:text-4xl font-bold text-primary">২৪/৭</span>
+               <p className="text-sm md:text-base text-outline font-bold uppercase mt-2">{lang === 'bn' ? 'সাপোর্ট' : 'Expert Support'}</p>
              </div>
           </AnimatedSection>
         </div>

@@ -14,7 +14,7 @@ const WhatsAppButton = () => {
   return (
     <a
       ref={btnRef}
-      href="https://wa.me/8801791208768"
+      href="https://web.whatsapp.com/send?phone=8801791208768&text=Hello"
       target="_blank"
       rel="noopener noreferrer"
       title="Chat with us on WhatsApp"

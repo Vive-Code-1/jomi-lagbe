@@ -8,6 +8,7 @@ import { AuthProvider } from "@/lib/auth";
 import Navbar from "@/components/Navbar";
 import ScrollToTop from "@/components/ScrollToTop";
 import PageTransition from "@/components/PageTransition";
+import WhatsAppButton from "@/components/WhatsAppButton";
 import Index from "./pages/Index";
 import Listings from "./pages/Listings";
 import LandDetail from "./pages/LandDetail";
